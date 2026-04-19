@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>啓仲個的AI提示詞快速產生器</title>
+    <title>啓仲哥的AI提示詞快速產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -325,7 +325,11 @@
         const ANALYZE_DETAILED_ENABLED_CLASS = "flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
         const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
 
+        // ⚠️ 在目前的線上預覽環境中，API Key 必須保持為空字串 ("")，系統才會在底層自動注入金鑰並運作。
+        // 💡 如果您要將檔案「下載」到自己的電腦上獨立開啟，請將下方雙引號內填入您圖片上的金鑰：
+        // const apiKey = "AIzaSyCNHgPF0frIC-1Y0QyGVSBQ3LDMUANCqbk";
         const apiKey = "";
+        
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const app = Object.keys(firebaseConfig).length > 0 ? initializeApp(firebaseConfig) : null;
         const auth = app ? getAuth(app) : null;
@@ -597,11 +601,6 @@
             
             if (file.size > 4.5 * 1024 * 1024) {
                 showToast('檔案過大！請上傳小於 4.5MB 的檔案', 'error');
-                return;
-            }
-
-            if (!apiKey) {
-                showToast('系統未設定 Gemini API 金鑰', 'error');
                 return;
             }
             
