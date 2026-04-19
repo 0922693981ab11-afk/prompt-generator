@@ -74,14 +74,14 @@
                     <!-- AI Analysis Section -->
                     <div class="mb-5 p-4 bg-indigo-50 border border-indigo-100 rounded-lg shadow-inner">
                         <h3 class="text-sm font-bold text-indigo-900 uppercase tracking-tight mb-3 flex items-center gap-2">
-                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i> AI 投影片視覺分析
+                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i> AI 視覺分析 (上傳參考圖檔或文件)
                         </h3>
                         <div class="flex flex-col sm:flex-row items-center gap-3">
                             <label class="w-full sm:flex-1 cursor-pointer flex items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white rounded-md p-3 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
                                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
                                 <div id="file-display" class="flex flex-col items-center gap-1 text-indigo-400 text-center">
                                     <i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i>
-                                    <span class="text-sm font-bold text-indigo-600">點擊上傳 NotebookLM PDF 或截圖</span>
+                                    <span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span>
                                     <span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>
                                 </div>
                             </label>
@@ -188,7 +188,7 @@
             ],
             infographics: [
                 { id: 't1', label: '模板 1 (抽象幾何)', prompt: '生成一個高品質的抽象背景簡報，使用深藍色和金屬金色漸層作為主色調，融入微妙的幾何前景紋理來增加視覺深度，添加流暢線條覆蓋以營造半透明的現代感，在側設計深色空間來平衡布局，提供電影般的燈光效果，包括柔和的陰影和高光，讓整體呈現時尚企業美學，支持8K解析度，採用最小主義設計原則，避免過多元素，每張幻燈片保持乾淨簡潔，比例為16:9，適合橫向投影，並確保文字與圖形完美對齊。' },
-                { id: 't2', label: '模板 2 (黏土動畫)', prompt: '使用 NotebookLM 生成一個完整的黏土定格動畫風格簡報，讓每張幻燈片呈現活潑的黏土模型效果，包括色彩豐富的黏土材質（如紅、藍、綠等鮮豔顏色）、生動的角色或元素（如跳躍、旋轉的動態姿態），背景使用柔軟的黏土紋理，文字以手捏黏土字體呈現，每頁包含小標題序列來解釋內容，確保整體風格可愛且互動性強，支持高解析度輸出。' },
+                { id: 't2', label: '模板 2 (黏土動畫)', prompt: '生成一個完整的黏土定格動畫風格簡報，讓每張幻燈片呈現活潑的黏土模型效果，包括色彩豐富的黏土材質（如紅、藍、綠等鮮豔顏色）、生動的角色或元素（如跳躍、旋轉的動態姿態），背景使用柔軟的黏土紋理，文字以手捏黏土字體呈現，每頁包含小標題序列來解釋內容，確保整體風格可愛且互動性強，支持高解析度輸出。' },
                 { id: 't3', label: '模板 3 (漫畫風格)', prompt: '生成一個完整的漫畫風格簡報，使用白色背景、黑色文字作為基底，每頁以現代日本漫畫風格解釋內容，包括生動的漫畫面板布局（如多格漫畫格子）、角色對話泡泡（圓形或矩形泡泡）、動感線條（如速度線或爆發效果）和表情符號（如汗珠或星星），讓敘述更具故事性，顏色使用鮮豔的調色板（如紅藍黃為輔助色），每張幻燈片設計成連續故事流，支持高解析度，並確保圖文比例平衡以避免擁擠。' },
                 { id: 't4', label: '模板 4 (教室黑板)', prompt: '創建一個深綠色「黑板」設計的完整簡報，使用白色、黃色和粉紅色手寫粉筆文字，讓每張幻燈片模擬真實教室黑板效果，包括輕微的擦拭痕跡、隨意塗鴉元素（如箭頭或圓圈）、燈泡或小的手繪氛圍，背景紋理模仿粉筆灰塵，文字大小多樣化以強調重點，加入黑板邊框和橡皮擦效果，結構包括開場介紹、主要內容和總結，讓整體風格輕鬆教育化，支持高解析度輸出，並確保文字清晰不模糊。' },
                 { id: 't5', label: '模板 5 (復古像素)', prompt: '創建一個像素藝術復古遊戲風格的簡報，使用8位元色調如紅色、藍色和綠色方塊，每張幻燈片模擬老派電玩畫面，包括像素化角色、磚塊背景紋理、遊戲圖示如金幣或跳躍人物，讓內容以關卡面板布局呈現，文字使用像素字體，加入過框效果如遊戲邊界或分數欄，營造懷舊且趣味的氛圍，支持高解析度輸出，並確保文字清晰不模糊。' },
@@ -593,7 +593,7 @@
                 analyzeDetailedBtn.disabled = false;
                 analyzeConciseBtn.disabled = false;
             } else {
-                fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳 NotebookLM PDF 或截圖</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (最大 5MB)</span>`;
+                fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (最大 5MB)</span>`;
                 analyzeDetailedBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 analyzeConciseBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 analyzeDetailedBtn.disabled = true;
@@ -648,7 +648,7 @@
             titleInput.value = '';
             customNotesInput.value = '';
             fileInput.value = '';
-            fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳 NotebookLM PDF 或截圖</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>`;
+            fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>`;
             
             analyzeDetailedBtn.disabled = true;
             analyzeConciseBtn.disabled = true;
