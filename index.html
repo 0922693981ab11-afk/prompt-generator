@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>啓仲哥的AI提示詞快速產生器</title>
+    <title>啓仲個的AI提示詞快速產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -109,16 +109,16 @@
                     <!-- Clear Selections -->
                     <div class="mb-6 border-b border-slate-100 pb-5">
                         <button id="clear-selections-btn" class="w-full text-[15px] font-bold bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md tracking-widest">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新選擇所有按鈕
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新選擇所有選項與按鈕
                         </button>
                     </div>
 
                     <!-- Dynamic Selection Groups will be injected here -->
-                    <div id="selection-groups-container" class="space-y-6"></div>
+                    <div id="selection-groups-container" class="space-y-7"></div>
                     
                     <!-- Custom Notes -->
                     <div class="mt-8 pt-6 border-t-2 border-slate-100">
-                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-4 h-4 text-indigo-500"></i> 12. 自訂需求 (餵養原始資料區)</h3>
+                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-4 h-4 text-indigo-500"></i> 12. 原始資料區 (餵養文獻/自訂備註)</h3>
                         <p class="text-sm text-slate-400 mb-3">若有超大文字量的醫療專業文章、英文報告或專案概要，請直接貼在此處，AI 將根據上方選擇的「餵養型指令」進行處理。</p>
                         <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、範本內容，或任何需要 AI 參考的原始資料...】" class="w-full h-40 p-4 rounded-lg border-2 border-slate-200 bg-slate-50 text-[16px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
                     </div>
@@ -169,7 +169,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Config Data (Optimized with Advanced Formats & Demographics) ---
+        // --- Config Data ---
         const INITIAL_CONFIG = {
             data_types: [
                 { id: 'dt-ppt', label: '簡報結構規劃', prompt: '【輸出格式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
@@ -185,48 +185,22 @@
                 { id: 'act-feed-biz', label: '餵養型：文獻轉商業應用', prompt: '【進階任務-餵養型 (商業應用)】：請閱讀我提供的原始文獻資料，並執行以下步驟：\n1. 提供這篇文章的細節摘要與核心亮點。\n2. 將此文章的知識導入特定產業，提出如何應用新興商業模式的方針。\n3. 持續輸出執行面的細節思考與步驟，讓文章成為實用的產業整合方針。' },
                 { id: 'act-scenario', label: '場景型：嚴格角色扮演', prompt: '【進階任務-場景型】：請根據後續設定的「專屬角色」與「特定場景」，完全沉浸於該人設中。你的回答必須嚴格遵守該角色的語氣、限制條件與專業視角，不得跳脫人設框架。' }
             ],
-            roles: [
+            roles: [ // 擴充至 15 種
                 { id: 'expert-proc', label: '採購合約專家', prompt: '【專家角色】：你現在是一位擁有 20 年經驗的資深工程採購與合約管理專家，精通工程性質、規模評估與潛在風險預判。' },
-                { id: 'expert-red', label: '紅隊審核員', prompt: '【專家角色】：你現在是「紅隊審核員（風險評估專家）」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題，請忽略任何行銷包裝。' },
-                { id: 'expert-consultant', label: '策略顧問', prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢(ROI)與資源需求。' },
-                { id: 'expert-data', label: '資料分析師', prompt: '【專家角色】：你是一位嚴謹的資料分析師。任務是從混亂資料中，精煉出 5 個「只要回答就能完全掌握全局」的核心本質問題。' },
-                { id: 'expert-behavior', label: '行為科學家', prompt: '【專家角色】：你是一位行為科學家。請假設專案在兩年後「慘敗」，並運用「事前驗屍 (Pre-mortem)」法，分析潛在的人性與決策死角。' },
-                { id: 'expert-writer', label: '專題作家', prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並從中挖掘出令人驚訝的洞察。' },
+                { id: 'expert-red', label: '紅隊審核員', prompt: '【專家角色】：你現在是「紅隊審核員（風險評估專家）」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題，請忽略行銷包裝。' },
+                { id: 'expert-consultant', label: '策略顧問', prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢與資源需求。' },
+                { id: 'expert-data', label: '資料分析師', prompt: '【專家角色】：你是一位嚴謹的資料分析師。任務是從混亂資料中，精煉出「只要回答就能完全掌握全局」的核心本質問題。' },
+                { id: 'expert-behavior', label: '行為科學家', prompt: '【專家角色】：你是一位行為科學家。運用「事前驗屍 (Pre-mortem)」法，分析潛在的人性動機與決策死角。' },
+                { id: 'expert-writer', label: '專題作家', prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並挖掘出令人驚訝的洞察。' },
                 { id: 'expert-engineer', label: '資深工程師', prompt: '【專家角色】：你是一位具備扎實技術背景，擅長將複雜系統架構簡化說明、檢查漏洞與重構邏輯的資深工程師。' },
                 { id: 'expert-designer', label: '視覺設計大師', prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' },
-            ],
-            infographics: [
-                { id: 't1', label: '高階商務提案', prompt: '【版型與結構】：生成 10 頁商務提案簡報（現代扁平化設計，深藍主色調）。\n結構：一、首頁；二、目錄；三、核心問題與痛點；四、解決方案概述；五~八、詳細步驟；九、預期效益(KPI)；十、總結與行動(CTA)。' },
-                { id: 't2', label: '學術研究報告', prompt: '【版型與結構】：製作『資訊圖表風格』的報告簡報。\n結構：一、研究主題；二、背景與目的；三、文獻回顧；四、研究方法；五~七、結果與數據分析；八、討論；九、結論；十、參考文獻。' },
-                { id: 't3', label: '創意企劃海報', prompt: '【版型與結構】：製作『創意海報風格』的提案。色彩活潑，強調視覺吸引力。\n結構：一、概念故事(Hook)；二、行銷洞察；三、創意亮點；四~七、執行方案與模擬；八、預算與時程；九、結尾。' },
-                { id: 't4', label: '工程範本健檢', prompt: '【版型與結構】：進行工程發包規則健檢。\n1. 缺漏分析（技術規範/驗收標準）。\n2. 風險檢視（工期/預算/保固）。\n3. 在地適法性（勞安/環保）。\n4. 明確度優化與具體修正建議。' },
-                { id: 't5', label: '資金預測模型', prompt: '【版型與結構】：資金流量分析＋校正＋預測。\n1. 依進度判斷施工階段與資金分配邏輯。\n2. 資金流量校正：比對既有表單揪出落差。\n3. 重建月度資金需求表格。\n4. 描述資金 S-Curve 與調度風險。' },
-                { id: 't6', label: '動漫轉真人攝影', prompt: '【版型與結構】：動漫角色轉極度擬真真人。寫實攝影(Photorealistic)，保留原特徵，賦予真實皮膚紋理與眼神光。電影感光影(Cinematic lighting)、背景虛化。' },
-                { id: 't7', label: '抽象幾何企業', prompt: '【版型與結構】：高品質抽象背景，深藍與金漸層，幾何前景，流暢線條半透明感，深色負空間平衡。電影般柔和陰影，8K解析度。' },
-                { id: 't8', label: '黏土定格動畫', prompt: '【版型與結構】：黏土定格動畫風格，色彩鮮豔，生動動態，柔軟黏土紋理，手捏黏土字體，可愛且互動性強。' },
-                { id: 't9', label: '現代日本漫畫', prompt: '【版型與結構】：現代日本漫畫風格，多格面板佈局、對話泡泡、速度線與表情符號，鮮豔紅藍黃點綴。' },
-                { id: 't10', label: '歐美時尚雜誌', prompt: '【版型與結構】：歐美時尚雜誌排版，滿版大圖搭配極粗無襯線標題字，圖文交錯堆疊，捨棄傳統條列式。' },
-            ],
-            visual_styles: [
-                { id: 'vs-realistic', label: '寫實風格', prompt: '【視覺風格】：寫實風格 (Realistic)。呈現逼真細膩的肖像或風景。' },
-                { id: 'vs-abstract', label: '抽象藝術', prompt: '【視覺風格】：抽象藝術 (Abstract)。色彩鮮豔且形狀抽象。' },
-                { id: 'vs-comic', label: '漫畫書風', prompt: '【視覺風格】：漫畫書風格 (Comic Book)。動感場景與網點效果。' },
-                { id: 'vs-fantasy', label: '幻想藝術', prompt: '【視覺風格】：幻想藝術 (Fantasy)。夢幻、超現實與奇幻魔法元素。' },
-                { id: 'vs-retro', label: '復古風格', prompt: '【視覺風格】：復古風格 (Retro)。模仿底片圖像與懷舊色調。' },
-                { id: 'vs-cartoon', label: '卡通風格', prompt: '【視覺風格】：卡通風格 (Cartoon)。誇張比例和可愛特徵。' },
-                { id: 'vs-japan', label: '日系攝影', prompt: '【視覺風格】：日系攝影風格 (Japanese Photography)。柔和、低對比、具備空氣感。' },
-                { id: 'vs-pixar', label: '皮克斯風', prompt: '【視覺風格】：皮克斯風格 (Pixar Style)。3D 動畫細緻光影與圓潤圖像。' },
-                { id: 'vs-watercolor', label: '水彩畫風', prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩筆觸暈染效果。' },
-                { id: 'vs-future', label: '未來主義', prompt: '【視覺風格】：未來主義風格 (Futuristic)。強烈科幻、機甲和科技感。' },
-            ],
-            tones: [
-                { id: 't-passionate', label: '自信說服', prompt: '【語氣情境】：語氣高度自信且具備強大說服力，重點強調價值與成長。' },
-                { id: 't-objective', label: '客觀商務', prompt: '【語氣情境】：嚴謹的商務報告風格，刪除口語化或情緒化詞彙。' },
-                { id: 't-simple', label: '白話科普', prompt: '【語氣情境】：將所有專業術語換成生活化、極度容易理解的比喻。' },
-                { id: 't-critical', label: '嚴苛批判', prompt: '【語氣情境】：銳利且帶有批判性，一針見血指出問題核心。' },
-                { id: 't-urgent', label: '危機迫切', prompt: '【語氣情境】：強調時間緊迫性與潛在風險，促使受眾立即採取行動。' },
-                { id: 't-empathetic', label: '溫暖同理', prompt: '【語氣情境】：充滿同理心，語氣柔軟溫和，展現關懷。' },
-                { id: 't-humorous', label: '幽默詼諧', prompt: '【語氣情境】：輕鬆詼諧，適時加入趣味比喻打破沉悶。' },
+                { id: 'expert-psych', label: '心理諮商師', prompt: '【專家角色】：你是一位具備豐富臨床經驗的心理諮商師，擅長傾聽、分析人類行為與情緒，並給出專業且溫暖的建議。' },
+                { id: 'expert-fin', label: '財務規劃師', prompt: '【專家角色】：你是一位專業的財務規劃師 (CFP)。擅長資產配置、風險管理與稅務規劃，能提供穩健的投資理財建議。' },
+                { id: 'expert-law', label: '法律顧問', prompt: '【專家角色】：你是一位資深的企業法律顧問。具備嚴謹的法理邏輯，擅長合約審查、風險規避與法規遵循分析。' },
+                { id: 'expert-cmo', label: '品牌行銷總監', prompt: '【專家角色】：你是一位品牌行銷總監 (CMO)。精通品牌定位、公關危機處理與全通路整合行銷策略。' },
+                { id: 'expert-pm', label: '產品經理 (PM)', prompt: '【專家角色】：你是一位資深產品經理。擅長需求釐清、敏捷開發管理、使用者體驗 (UX) 優化與跨部門溝通。' },
+                { id: 'expert-edu', label: '教育培訓專家', prompt: '【專家角色】：你是一位教育培訓專家。擅長課程設計 (Instructional Design)、學習成效評估與引導式教學。' },
+                { id: 'expert-cs', label: '顧客服務專員', prompt: '【專家角色】：你是一位金牌顧客服務專員。擅長應對客訴、安撫情緒，並提供超乎預期的服務體驗。' }
             ],
             genders: [
                 { id: 'g-any', label: '不限性別', prompt: '【專屬性別設定】：性別不限，請使用通用、中性且包容的用語。' },
@@ -247,22 +221,91 @@
                 { id: 'age-55-64', label: '55-64歲', prompt: '【專屬年齡設定】：目標為 55-64 歲 (熟齡族)。重視養生、生活傳承與退休準備，用語溫和。' },
                 { id: 'age-65up', label: '65歲以上', prompt: '【專屬年齡設定】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
             ],
-            audiences: [
+            audiences: [ // 擴充至 15 種
                 { id: 'a-executives', label: '決策高層', prompt: '【目標對象】：公司決策高層。刪除廢話，直擊核心決策價值與 ROI。' },
                 { id: 'a-beginners', label: '初學新手', prompt: '【目標對象】：初學新手。不預設專業背景，使用最通俗語境。' },
                 { id: 'a-global', label: '國際商務', prompt: '【目標對象】：跨國商務人士。確保術語符合國際商務慣用表達。' },
                 { id: 'a-clients', label: '潛在客戶', prompt: '【目標對象】：潛在客戶。專注於痛點解決方案與產品優勢。' },
                 { id: 'a-devs', label: '技術人員', prompt: '【目標對象】：技術開發者。提供詳細架構、邏輯與技術實作細節。' },
                 { id: 'a-investors', label: '投資人', prompt: '【目標對象】：投資人/VC。側重市場規模、獲利能力與護城河。' },
+                { id: 'a-consumers', label: '一般消費者', prompt: '【目標對象】：一般終端消費者 (B2C)。強調產品能帶來的實際生活改變與高 CP 值，引發購買慾望。' },
+                { id: 'a-fans', label: '忠實鐵粉', prompt: '【目標對象】：品牌的忠實鐵粉或 VIP。用語請帶有專屬感、親切感與圈內人專用的默契。' },
+                { id: 'a-competitors', label: '競爭對手', prompt: '【目標對象】：市場競爭對手。展現出不容挑釁的實力、護城河與產業領導地位。' },
+                { id: 'a-employees', label: '內部員工', prompt: '【目標對象】：公司內部員工。溝通需具備透明度、凝聚向心力，並明確指示執行目標。' },
+                { id: 'a-media', label: '媒體記者', prompt: '【目標對象】：媒體記者或公關。請提供具備新聞價值 (Newsworthy) 的亮點、引號金句與易於報導的結構。' },
+                { id: 'a-students', label: '學生族群', prompt: '【目標對象】：學生或年輕世代。語境需輕鬆、有活力，結合流行時事，避免說教。' },
+                { id: 'a-seniors', label: '銀髮長輩', prompt: '【目標對象】：銀髮長輩。文字極度白話，強調健康、傳承與安心感。' },
+                { id: 'a-peers', label: '專業同行', prompt: '【目標對象】：同領域的專業人士。不必避諱艱澀術語，請直接切入深度技術與前沿探討。' },
+                { id: 'a-cross', label: '跨領域合作者', prompt: '【目標對象】：跨領域的合作夥伴。請將專業術語轉譯為對方能懂的語言，強調雙贏 (Win-Win) 綜效。' }
             ],
-            colors: [
-                { id: 'c-navy', label: '商務深藍', swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色彩搭配】：採用深藍色與金/灰色的商務配色，呈現穩健感。' },
-                { id: 'c-white', label: '極簡純白', swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色彩搭配】：極簡全白背景搭配深色內文，追求極致乾淨。' },
-                { id: 'c-gold', label: '奢華黑金', swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色彩搭配】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
-                { id: 'c-beige', label: '暖白米色', swatches: ['#FFFFFF', '#F5F5DC', '#D2B48C'], prompt: '【色彩搭配】：暖白、淺木色或米色主調，風格溫馨無壓力。' },
-                { id: 'c-cyber', label: '賽博霓虹', swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色彩搭配】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
+            tones: [ // 擴充至 12 種 (含喜怒哀樂祝福)
+                { id: 't-passionate', label: '自信說服', prompt: '【語氣情境】：語氣高度自信且具備強大說服力，重點強調價值與成長。' },
+                { id: 't-objective', label: '客觀商務', prompt: '【語氣情境】：嚴謹的商務報告風格，刪除口語化或情緒化詞彙。' },
+                { id: 't-simple', label: '白話科普', prompt: '【語氣情境】：將所有專業術語換成生活化、極度容易理解的比喻。' },
+                { id: 't-critical', label: '嚴苛批判', prompt: '【語氣情境】：銳利且帶有批判性，一針見血指出問題核心。' },
+                { id: 't-urgent', label: '危機迫切', prompt: '【語氣情境】：強調時間緊迫性與潛在風險，促使受眾立即採取行動。' },
+                { id: 't-empathetic', label: '溫暖同理', prompt: '【語氣情境】：充滿同理心，語氣柔軟溫和，展現關懷。' },
+                { id: 't-humorous', label: '幽默詼諧', prompt: '【語氣情境】：輕鬆詼諧，適時加入趣味比喻打破沉悶。' },
+                { id: 't-joy', label: '喜悅慶祝', prompt: '【語氣情境】：充滿喜悅與慶祝的氣氛，用詞歡快、高昂，適合節慶或里程碑發布。' },
+                { id: 't-anger', label: '憤怒譴責', prompt: '【語氣情境】：帶有強烈的憤怒與不滿，語氣嚴厲譴責，適合針對不公不義事件的聲明。' },
+                { id: 't-sorrow', label: '哀傷追憶', prompt: '【語氣情境】：充滿哀傷、追思與感懷的情緒。語調緩慢、沉重且深情。' },
+                { id: 't-happy', label: '歡樂輕鬆', prompt: '【語氣情境】：氛圍極度歡樂、輕鬆愉快，適合派對、休閒娛樂或生活分享的內容。' },
+                { id: 't-bless', label: '真摯祝福', prompt: '【語氣情境】：充滿誠摯的祝福與期許，用詞溫馨、感人，傳遞滿滿的正能量。' }
             ],
-            notes: [
+            infographics: [ // 擴充至 15 種
+                { id: 't1', label: '高階商務提案', prompt: '【版型與結構】：生成 10 頁商務提案簡報（現代扁平化設計，深藍主色調）。\n結構：一、首頁；二、目錄；三、核心問題與痛點；四、解決方案概述；五~八、詳細步驟；九、預期效益(KPI)；十、總結與行動(CTA)。' },
+                { id: 't2', label: '學術研究報告', prompt: '【版型與結構】：製作『資訊圖表風格』的報告簡報。\n結構：一、研究主題；二、背景與目的；三、文獻回顧；四、研究方法；五~七、結果與數據分析；八、討論；九、結論；十、參考文獻。' },
+                { id: 't3', label: '創意企劃海報', prompt: '【版型與結構】：製作『創意海報風格』的提案。色彩活潑，強調視覺吸引力。\n結構：一、概念故事(Hook)；二、行銷洞察；三、創意亮點；四~七、執行方案與模擬；八、預算與時程；九、結尾。' },
+                { id: 't4', label: '工程範本健檢', prompt: '【版型與結構】：進行工程發包規則健檢。\n1. 缺漏分析（技術規範/驗收標準）。\n2. 風險檢視（工期/預算/保固）。\n3. 在地適法性（勞安/環保）。\n4. 明確度優化與具體修正建議。' },
+                { id: 't5', label: '資金預測模型', prompt: '【版型與結構】：資金流量分析＋校正＋預測。\n1. 依進度判斷施工階段與資金分配邏輯。\n2. 資金流量校正：比對既有表單揪出落差。\n3. 重建月度資金需求表格。\n4. 描述資金 S-Curve 與調度風險。' },
+                { id: 't6', label: '動漫轉真人攝影', prompt: '【版型與結構】：動漫角色轉極度擬真真人。寫實攝影(Photorealistic)，保留原特徵，賦予真實皮膚紋理與眼神光。電影感光影(Cinematic lighting)、背景虛化。' },
+                { id: 't7', label: '抽象幾何企業', prompt: '【版型與結構】：高品質抽象背景，深藍與金漸層，幾何前景，流暢線條半透明感，深色負空間平衡。電影般柔和陰影，8K解析度。' },
+                { id: 't8', label: '黏土定格動畫', prompt: '【版型與結構】：黏土定格動畫風格，色彩鮮豔，生動動態，柔軟黏土紋理，手捏黏土字體，可愛且互動性強。' },
+                { id: 't9', label: '現代日本漫畫', prompt: '【版型與結構】：現代日本漫畫風格，多格面板佈局、對話泡泡、速度線與表情符號，鮮豔紅藍黃點綴。' },
+                { id: 't10', label: '歐美時尚雜誌', prompt: '【版型與結構】：歐美時尚雜誌排版，滿版大圖搭配極粗無襯線標題字，圖文交錯堆疊，捨棄傳統條列式。' },
+                { id: 't11', label: '產品發布會簡報', prompt: '【版型與結構】：製作『產品發布會 (Keynote)』簡報。極簡背景、滿版產品大圖，每頁不超過10個字，強調單一震撼亮點。' },
+                { id: 't12', label: '社群懶人包多圖', prompt: '【版型與結構】：製作 IG/FB 輪播式『社群懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導留言/分享頁。' },
+                { id: 't13', label: '募資計畫書', prompt: '【版型與結構】：製作『新創募資計畫書 (Pitch Deck)』。包含：電梯簡報、問題與痛點、解決方案、市場規模、競爭分析、團隊、財務預測與募資需求。' },
+                { id: 't14', label: '數據儀表板', prompt: '【版型與結構】：設計為『商業數據儀表板 (Dashboard)』介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖與趨勢線的視覺排版結構。' },
+                { id: 't15', label: '履歷與作品集', prompt: '【版型與結構】：製作『專業履歷與作品集』排版。包含：精煉個人自傳、核心技能標籤、量化工作經歷、代表性專案視覺呈現與聯絡資訊。' }
+            ],
+            visual_styles: [ // 擴充至 20 種
+                { id: 'vs-realistic', label: '寫實風格', prompt: '【視覺風格】：寫實風格 (Realistic)。呈現逼真細膩的肖像或風景。' },
+                { id: 'vs-abstract', label: '抽象藝術', prompt: '【視覺風格】：抽象藝術 (Abstract)。色彩鮮豔且形狀抽象。' },
+                { id: 'vs-comic', label: '漫畫書風', prompt: '【視覺風格】：漫畫書風格 (Comic Book)。動感場景與網點效果。' },
+                { id: 'vs-fantasy', label: '幻想藝術', prompt: '【視覺風格】：幻想藝術 (Fantasy)。夢幻、超現實與奇幻魔法元素。' },
+                { id: 'vs-retro', label: '復古風格', prompt: '【視覺風格】：復古風格 (Retro)。模仿底片圖像與懷舊色調。' },
+                { id: 'vs-cartoon', label: '卡通風格', prompt: '【視覺風格】：卡通風格 (Cartoon)。誇張比例和可愛特徵。' },
+                { id: 'vs-japan', label: '日系攝影', prompt: '【視覺風格】：日系攝影風格 (Japanese Photography)。柔和、低對比、具備空氣感。' },
+                { id: 'vs-pixar', label: '皮克斯風', prompt: '【視覺風格】：皮克斯風格 (Pixar Style)。3D 動畫細緻光影與圓潤圖像。' },
+                { id: 'vs-watercolor', label: '水彩畫風', prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩筆觸暈染效果。' },
+                { id: 'vs-future', label: '未來主義', prompt: '【視覺風格】：未來主義風格 (Futuristic)。強烈科幻、機甲和科技感。' },
+                { id: 'vs-oil', label: '油畫風格', prompt: '【視覺風格】：油畫風格 (Oil Painting)。模仿傳統油畫厚重筆觸與顏料堆疊的藝術感。' },
+                { id: 'vs-lowpoly', label: '低聚風格', prompt: '【視覺風格】：低聚風格 (Low Poly)。使用簡單多邊形幾何色塊創造的立體圖像。' },
+                { id: 'vs-bw', label: '黑白風格', prompt: '【視覺風格】：黑白風格 (Black & White)。僅使用黑白灰階色調，極致展現光影與紋理層次。' },
+                { id: 'vs-neon', label: '霓虹效果', prompt: '【視覺風格】：霓虹效果 (Neon)。暗黑背景搭配明亮、高飽和度的夜間霓虹發光色調。' },
+                { id: 'vs-lineart', label: '線條藝術', prompt: '【視覺風格】：線條藝術 (Line Art)。主要以乾淨俐落的線條與輪廓為主的簡約設計。' },
+                { id: 'vs-3d', label: '三維圖像', prompt: '【視覺風格】：三維圖像 (3D Render)。具有強烈深度、空間透視感和立體光影。' },
+                { id: 'vs-point', label: '點描風格', prompt: '【視覺風格】：點描風格 (Pointillism)。使用密集且多色彩的小點組成、充滿藝術感的圖像。' },
+                { id: 'vs-digital', label: '數碼藝術', prompt: '【視覺風格】：數碼藝術 (Digital Art)。以數位特效、炫光與高科技繪圖手法呈現的視覺。' },
+                { id: 'vs-cyberpunk', label: '賽博龐克', prompt: '【視覺風格】：賽博龐克 (Cyberpunk)。高反差的陰暗底色，搭配破敗科技與鮮豔螢光元素。' },
+                { id: 'vs-impressionism', label: '印象派風', prompt: '【視覺風格】：印象派風格 (Impressionism)。捕捉光影瞬間的變化，筆觸未經修飾，色彩豐富。' }
+            ],
+            colors: [ // 原色彩搭配，現為 色調風格，擴充至 12 種
+                { id: 'c-navy', label: '商務深藍', swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍色與金/灰色的商務配色，呈現穩健感。' },
+                { id: 'c-white', label: '極簡純白', swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色調風格】：極簡全白背景搭配深色內文，追求極致乾淨。' },
+                { id: 'c-gold', label: '奢華黑金', swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色調風格】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
+                { id: 'c-beige', label: '暖白米色', swatches: ['#FFFFFF', '#F5F5DC', '#D2B48C'], prompt: '【色調風格】：暖白、淺木色或米色主調，風格溫馨無壓力。' },
+                { id: 'c-cyber', label: '賽博霓虹', swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色調風格】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
+                { id: 'c-morandi', label: '莫蘭迪色', swatches: ['#9A8C98', '#C9ADA7', '#F2E9E4'], prompt: '【色調風格】：莫蘭迪色系。帶有灰調的低飽和度色彩，視覺柔和、沉穩且具備高級感。' },
+                { id: 'c-macaron', label: '粉彩馬卡龍', swatches: ['#FFB3BA', '#FFDFBA', '#FFFFBA'], prompt: '【色調風格】：粉彩馬卡龍色系。明亮、高明度但低飽和的可愛色彩，如同甜點般甜美。' },
+                { id: 'c-earth', label: '大地自然', swatches: ['#4A5D23', '#8B5A2B', '#E8E5D1'], prompt: '【色調風格】：大地自然色系。深綠、棕色、土色與卡其色交織，帶有環保、戶外與自然的氣息。' },
+                { id: 'c-pop', label: '鮮豔普普風', swatches: ['#FF0000', '#FFFF00', '#0000FF'], prompt: '【色調風格】：鮮豔普普風 (Pop Art)。高飽和、高對比的紅、黃、藍三原色碰撞，極具視覺張力。' },
+                { id: 'c-vintage', label: '復古刷舊色', swatches: ['#704214', '#A0522D', '#D2B48C'], prompt: '【色調風格】：復古刷舊色 (Vintage/Sepia)。帶有泛黃、褪色與底片漏光感的懷舊色調。' },
+                { id: 'c-ice', label: '冰川冷藍', swatches: ['#E0F7FA', '#B2EBF2', '#00BCD4'], prompt: '【色調風格】：冰川冷藍色系。以冰雪般的冷白色、淺藍與青色為主，呈現極度冷靜與科技感。' },
+                { id: 'c-bw', label: '經典黑白灰', swatches: ['#000000', '#7F7F7F', '#FFFFFF'], prompt: '【色調風格】：經典黑白灰色系。完全排除彩色，僅靠黑、白與不同階調的灰色構建純粹的視覺。' }
+            ],
+            notes: [ // 擴充至 12 種
                 { id: 'n-scene', label: '場景替換', prompt: '【細節微調】：將背景換成展現企業團隊合作與數位轉型、具備專業感的商務場景。' },
                 { id: 'n-data', label: '強化數據感', prompt: '【細節微調】：加入數據成長曲線與上升箭頭，強調市場潛力。' },
                 { id: 'n-crop', label: '精確裁切置中', prompt: '【細節微調】：圖片裁切為 16:9 比例，主體人物/物件完美置中。' },
@@ -273,6 +316,8 @@
                 { id: 'n-list', label: '極致清單化', prompt: '【細節微調】：長段落轉化為 3~5 個精簡列點(每行不過15字)，並加註數據佐證。' },
                 { id: 'n-logic', label: '邏輯對照表', prompt: '【細節微調】：內容設計為左右對照表（痛點 vs 方案），強化因果邏輯。' },
                 { id: 'n-cta', label: '行動呼籲(CTA)', prompt: '【細節微調】：在結尾增加『下一步行動』，明確列出後續執行的三個具體步驟。' },
+                { id: 'n-illus', label: '圖文並茂說明', prompt: '【細節微調】：內容需「圖文並茂」，在每個重要段落下方，明確標示並描述需要配上什麼樣的插圖。' },
+                { id: 'n-case', label: '加入真實案例', prompt: '【細節微調】：在抽象的概念或步驟說明後，務必補充一個「真實世界的具體案例」來幫助理解。' }
             ]
         };
 
@@ -303,6 +348,7 @@
             age_group: null,
             color: null,
             notes: [],
+            custom_inputs: {} // 記錄各分類的自訂輸入文字
         });
         
         let selections = getInitialSelections();
@@ -386,33 +432,43 @@
         };
 
         const buildPrompt = () => {
-            const buildSection = (categoryKey) => {
+            const buildSection = (categoryKey, customTitle) => {
                 const stateKey = categoryKey.replace(/s$/, '');
                 const selection = selections[stateKey];
-                if (!selection) return "";
-                return `${selection.prompt}\n\n`;
+                const customText = selections.custom_inputs[categoryKey];
+                
+                let content = "";
+                if (selection) content += `${selection.prompt}\n`;
+                if (customText && customText.trim() !== '') {
+                    content += `【自訂${customTitle}】：${customText.trim()}\n`;
+                }
+                return content ? content + "\n" : "";
             };
 
             const buildNoteSection = () => {
-                if (!selections.notes || selections.notes.length === 0) return "";
-                const list = selections.notes.map(n => `${n.prompt}`).join('\n');
-                return `${list}\n\n`;
+                let content = "";
+                if (selections.notes && selections.notes.length > 0) {
+                    content += selections.notes.map(n => `${n.prompt}`).join('\n') + '\n';
+                }
+                if (selections.custom_inputs['notes'] && selections.custom_inputs['notes'].trim() !== '') {
+                    content += `【自訂細節微調】：${selections.custom_inputs['notes'].trim()}\n`;
+                }
+                return content ? content + "\n" : "";
             };
 
             let prompt = "";
             
             // 1. 專家角色與指令框架
-            if (selections.role || selections.action_type) {
-                if (selections.role) prompt += buildSection("roles");
-                if (selections.action_type) prompt += buildSection("action_types");
-            }
+            let roleAndAction = buildSection("roles", "專家角色") + buildSection("action_types", "進階任務");
+            if (roleAndAction) prompt += roleAndAction;
             
             // 2. 任務目標與標題
-            if (title.trim() || selections.data_type) {
-                prompt += `【專案任務與主要格式】：\n`;
-                if (title.trim()) prompt += `本專案核心主題為：「${title.trim()}」。\n`;
-                if (selections.data_type) prompt += `${selections.data_type.prompt}\n`;
-                prompt += `\n`;
+            let targetAndFormat = "";
+            if (title.trim()) targetAndFormat += `本專案核心主題為：「${title.trim()}」。\n`;
+            targetAndFormat += buildSection("data_types", "輸出格式");
+            
+            if (targetAndFormat.trim()) {
+                prompt += `【專案任務與主要格式】：\n${targetAndFormat}\n`;
             }
 
             // 3. 原始資料餵養區
@@ -421,26 +477,20 @@
             }
             
             // 4. 對標受眾與情境 (性別/年齡/客群)
-            if (selections.audience || selections.gender || selections.age_group || selections.tone) {
-                if (selections.audience) prompt += selections.audience.prompt + "\n";
-                if (selections.gender) prompt += selections.gender.prompt + "\n";
-                if (selections.age_group) prompt += selections.age_group.prompt + "\n";
-                if (selections.tone) prompt += selections.tone.prompt + "\n";
-                prompt += `\n`;
-            }
+            let audienceSection = buildSection("audiences", "目標對象") + 
+                                  buildSection("genders", "性別設定") + 
+                                  buildSection("age_groups", "年齡設定") + 
+                                  buildSection("tones", "語氣情境");
+            if (audienceSection) prompt += audienceSection;
 
             // 5. 版型結構與視覺呈現
-            if (selections.infographic || selections.visual_style || selections.color) {
-                if (selections.infographic) prompt += buildSection("infographics");
-                if (selections.visual_style) prompt += selections.visual_style.prompt + "\n";
-                if (selections.color) prompt += selections.color.prompt + "\n";
-                prompt += `\n`;
-            }
+            let visualSection = buildSection("infographics", "版型結構") + 
+                                buildSection("visual_styles", "視覺風格") + 
+                                buildSection("colors", "色調風格");
+            if (visualSection) prompt += visualSection;
 
             // 6. 特定細節要求微調
-            if (selections.notes && selections.notes.length > 0) {
-                prompt += buildNoteSection();
-            }
+            prompt += buildNoteSection();
             
             // Wrap up perfectly
             if (prompt.trim()) {
@@ -454,17 +504,17 @@
             selectionGroupsContainer.innerHTML = '';
             
             const groups = [
-                { label: "1. 輸出格式", key: "data_types", icon: 'files' },
-                { label: "2. 進階任務框架", key: "action_types", icon: 'cpu' },
-                { label: "3. 專家角色", key: "roles", icon: 'user' },
-                { label: "4. 性別專屬", key: "genders", icon: 'user-check' },
-                { label: "5. 年齡層專屬", key: "age_groups", icon: 'calendar-days' },
-                { label: "6. 目標對象", key: "audiences", icon: 'users' },
-                { label: "7. 語氣情境", key: "tones", icon: 'mic' },
-                { label: "8. 內容版型與結構", key: "infographics", icon: 'layout-template' },
-                { label: "9. 視覺風格", key: "visual_styles", icon: 'palette' },
-                { label: "10. 色彩搭配", key: "colors", icon: 'pipette', isColor: true },
-                { label: "11. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true }
+                { label: "1. 輸出格式", key: "data_types", icon: 'files', customTitle: "輸出格式" },
+                { label: "2. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架" },
+                { label: "3. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色" },
+                { label: "4. 性別專屬", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
+                { label: "5. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡" },
+                { label: "6. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象" },
+                { label: "7. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境" },
+                { label: "8. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
+                { label: "9. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格" },
+                { label: "10. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
+                { label: "11. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
             ];
 
             groups.forEach(group => {
@@ -472,13 +522,14 @@
                 groupEl.className = 'mb-1 shrink-0';
                 
                 const titleEl = document.createElement('h3');
-                titleEl.className = 'text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5';
+                titleEl.className = 'text-[15px] font-bold text-slate-600 mb-3 flex items-center gap-1.5';
                 titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400 font-normal ml-1 text-[13px] tracking-wide">(此區塊可複選)</span>' : ''}`;
                 groupEl.appendChild(titleEl);
 
                 const grid = document.createElement('div');
                 grid.className = 'flex flex-wrap gap-2.5';
 
+                // 渲染預設按鈕
                 INITIAL_CONFIG[group.key].forEach(opt => {
                     const btn = document.createElement('button');
                     const stateKey = group.key.replace(/s$/, '');
@@ -516,7 +567,25 @@
                     };
                     grid.appendChild(btn);
                 });
+                
                 groupEl.appendChild(grid);
+
+                // 新增自訂義填寫框 (Custom Input Box)
+                const customInputWrapper = document.createElement('div');
+                customInputWrapper.className = 'w-full mt-3';
+                const customInput = document.createElement('input');
+                customInput.type = 'text';
+                customInput.placeholder = `✍️ 或在此輸入您的自訂${group.customTitle}...`;
+                customInput.className = 'w-full px-4 py-2.5 text-[15px] bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-inner text-slate-700 placeholder-slate-400';
+                customInput.value = selections.custom_inputs[group.key] || '';
+                customInput.oninput = (e) => {
+                    selections.custom_inputs[group.key] = e.target.value;
+                    buildPrompt(); // 即時預覽，但不重新渲染整個 grid 避免失去焦點
+                    saveState();
+                };
+                customInputWrapper.appendChild(customInput);
+                groupEl.appendChild(customInputWrapper);
+
                 selectionGroupsContainer.appendChild(groupEl);
             });
             lucide.createIcons({ root: selectionGroupsContainer });
@@ -684,7 +753,7 @@
         clearSelectionsBtn.onclick = () => {
             selections = getInitialSelections();
             updateStateAndRender();
-            showToast('已取消按鈕選取', 'info');
+            showToast('已取消按鈕選取與自訂文字', 'info');
         };
 
         // --- Resizer Logic ---
@@ -754,7 +823,11 @@
                     const snap = await getDoc(docRef);
                     if (snap.exists()) {
                         const data = snap.data();
-                        if (data.selections) selections = data.selections;
+                        if (data.selections) {
+                            selections = { ...getInitialSelections(), ...data.selections };
+                            // 確保舊資料升級不會覆蓋掉新的自訂屬性
+                            if(!selections.custom_inputs) selections.custom_inputs = {};
+                        }
                         if (data.title) { title = data.title; titleInput.value = title; }
                         if (data.customNotes) { customNotes = data.customNotes; customNotesInput.value = customNotes; }
                     }
