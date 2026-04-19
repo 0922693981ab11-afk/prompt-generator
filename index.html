@@ -9,16 +9,19 @@
     <style>
         .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .dark-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
         
-        #resizer:hover { background-color: #818cf8; }
+        #resizer:hover { background-color: #6366f1; }
+        
+        /* 按鈕選取後的強烈視覺狀態 */
         .selection-btn.active {
-            border-color: #4f46e5;
-            background-color: #4f46e5;
-            color: #ffffff;
+            border-color: #4338ca !important;
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
             font-weight: bold;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4), 0 2px 4px -1px rgba(79, 70, 229, 0.2) !important;
+            transform: translateY(-1px);
         }
 
         /* Toast Animation */
@@ -33,63 +36,64 @@
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
         .toast-leave { animation: fadeOut 0.3s ease-in forwards; }
         
-        /* 強制套用新細明體 */
+        /* 強制套用新細明體，並確保適當的行高與字距提升閱讀性 */
         body {
             font-family: "PMingLiU", "MingLiU", serif !important;
+            letter-spacing: 0.02em;
         }
     </style>
 </head>
-<body class="h-screen bg-slate-100 flex flex-col text-slate-900 overflow-hidden text-base">
+<body class="h-screen bg-slate-50 flex flex-col text-slate-900 overflow-hidden text-base">
 
     <!-- Header -->
-    <header class="shrink-0 p-3 border-b border-slate-200 bg-white z-10 shadow-sm flex items-center justify-between">
-        <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
-            <span class="bg-indigo-600 text-white px-2 py-0.5 rounded text-sm tracking-wider shadow-sm">ROLY</span>
+    <header class="shrink-0 px-4 py-3 border-b border-slate-200 bg-white z-10 shadow-sm flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
+            <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">ROLY</span>
             Roly的AI提示詞快速產生器
         </h1>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 md:gap-5">
             <!-- Visitor Counter -->
-            <div class="hidden sm:flex text-sm text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100 items-center gap-1.5 font-bold shadow-sm">
+            <div class="hidden sm:flex text-[15px] text-indigo-700 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100 items-center gap-1.5 font-bold shadow-sm">
                 <i data-lucide="users" class="w-4 h-4"></i> 總瀏覽人次：<span id="visitor-count">讀取中...</span>
             </div>
             <!-- Developer Info -->
-            <a href="mailto:0922693981ab11@gmail.com" class="hidden md:flex text-sm text-slate-500 hover:text-indigo-600 transition-colors items-center gap-1.5 font-medium bg-slate-50 px-2 py-1.5 rounded border border-slate-100">
+            <a href="mailto:0922693981ab11@gmail.com" class="hidden lg:flex text-[15px] text-slate-600 hover:text-indigo-600 transition-colors items-center gap-1.5 font-bold bg-slate-100 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200">
                 <i data-lucide="mail" class="w-4 h-4"></i> 程式開發者：吳啓仲
             </a>
             <!-- Reset Button -->
-            <button id="reset-all-btn" class="text-sm font-bold text-red-500 hover:text-red-700 border border-red-100 bg-red-50 px-3 py-1.5 rounded transition-all active:scale-95 uppercase tracking-tighter flex items-center gap-1">
+            <button id="reset-all-btn" class="text-[15px] font-bold text-red-600 hover:text-white border border-red-200 bg-red-50 hover:bg-red-500 px-4 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-1.5 shadow-sm">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> 全部清除
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow flex flex-col lg:flex-row flex-nowrap overflow-hidden lg:p-3 lg:gap-0" id="container">
+    <main class="flex-grow flex flex-col lg:flex-row flex-nowrap overflow-hidden lg:p-3 lg:gap-1" id="container">
         
         <!-- Left Panel: Configuration -->
-        <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-l-lg bg-white shadow-sm flex-1 lg:flex-none" style="flex-basis: 60%;">
-            <div class="flex-grow overflow-y-auto overflow-x-auto p-3 lg:p-4 scrollbar-thin">
-                <div class="min-w-[300px]" id="config-sections">
+        <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-xl bg-white shadow-sm flex-1 lg:flex-none" style="flex-basis: 58%;">
+            <div class="flex-grow overflow-y-auto overflow-x-hidden p-4 lg:p-6 scrollbar-thin">
+                <div class="min-w-[300px] max-w-4xl mx-auto" id="config-sections">
                     
                     <!-- AI Analysis Section -->
-                    <div class="mb-5 p-4 bg-indigo-50 border border-indigo-100 rounded-lg shadow-inner">
-                        <h3 class="text-sm font-bold text-indigo-900 uppercase tracking-tight mb-3 flex items-center gap-2">
-                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i> AI 視覺分析 (上傳參考圖檔或文件)
+                    <div class="mb-6 p-4 md:p-5 bg-indigo-50/70 border border-indigo-100 rounded-xl shadow-inner">
+                        <h3 class="text-base font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i> AI 視覺與文獻分析 (上傳參考圖檔或 PDF)
                         </h3>
                         <div class="flex flex-col sm:flex-row items-center gap-3">
-                            <label class="w-full sm:flex-1 cursor-pointer flex items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white rounded-md p-3 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
+                            <label class="w-full sm:flex-1 cursor-pointer flex items-center justify-center gap-3 border-2 border-dashed border-indigo-200 bg-white rounded-lg p-4 hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm">
                                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
-                                <div id="file-display" class="flex flex-col items-center gap-1 text-indigo-400 text-center">
-                                    <i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i>
-                                    <span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span>
-                                    <span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>
+                                <div id="file-display" class="flex flex-col items-center gap-1 text-indigo-500 text-center">
+                                    <i data-lucide="upload-cloud" class="w-7 h-7 mb-1"></i>
+                                    <span class="text-[15px] font-bold text-indigo-700">點擊上傳參考圖片、截圖或 PDF</span>
+                                    <span class="text-sm text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>
                                 </div>
                             </label>
-                            <div class="flex sm:flex-col flex-row gap-2 w-full sm:w-32 shrink-0">
-                                <button id="analyze-detailed" class="flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                            <div class="flex sm:flex-col flex-row gap-2 w-full sm:w-36 shrink-0">
+                                <button id="analyze-detailed" class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
                                     <i data-lucide="search" class="w-4 h-4"></i> 詳細分析
                                 </button>
-                                <button id="analyze-concise" class="flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                                <button id="analyze-concise" class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
                                     <i data-lucide="zap" class="w-4 h-4"></i> 精簡分析
                                 </button>
                             </div>
@@ -97,66 +101,67 @@
                     </div>
 
                     <!-- Title Input -->
-                    <div class="mb-4">
-                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-tight mb-1.5 flex items-center gap-1"><i data-lucide="heading-1" class="w-4 h-4"></i> 0. 封面標題</h3>
-                        <input type="text" id="title-input" placeholder="輸入要呈現的標題..." class="w-full px-3 py-2 rounded border border-slate-200 bg-slate-50 text-base outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-all">
+                    <div class="mb-6">
+                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="heading-1" class="w-4 h-4 text-indigo-500"></i> 0. 封面/主題標題</h3>
+                        <input type="text" id="title-input" placeholder="輸入要呈現的主題或標題..." class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-[17px] font-bold outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm">
                     </div>
 
                     <!-- Clear Selections -->
-                    <div class="mb-5 pt-1">
-                        <button id="clear-selections-btn" class="w-full text-sm font-bold bg-slate-800 hover:bg-slate-900 text-white py-2 rounded transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm uppercase tracking-wider">
+                    <div class="mb-6 border-b border-slate-100 pb-5">
+                        <button id="clear-selections-btn" class="w-full text-[15px] font-bold bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md tracking-widest">
                             <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新選擇所有按鈕
                         </button>
                     </div>
 
                     <!-- Dynamic Selection Groups will be injected here -->
-                    <div id="selection-groups-container" class="space-y-5"></div>
+                    <div id="selection-groups-container" class="space-y-6"></div>
                     
                     <!-- Custom Notes -->
-                    <div class="mt-6 pt-4 border-t border-slate-100">
-                        <h3 class="text-sm font-bold text-slate-500 uppercase mb-1.5 flex items-center gap-1"><i data-lucide="pen-line" class="w-4 h-4"></i> 9. 自訂需求 (AI 分析結果也會填入此處)</h3>
-                        <textarea id="custom-notes-input" placeholder="在此輸入自訂需求、額外細節備註，或由 AI 自動填入分析結果..." class="w-full h-32 p-3 rounded border border-slate-200 bg-slate-50 text-base outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
+                    <div class="mt-8 pt-6 border-t-2 border-slate-100">
+                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-4 h-4 text-indigo-500"></i> 12. 自訂需求 (餵養原始資料區)</h3>
+                        <p class="text-sm text-slate-400 mb-3">若有超大文字量的醫療專業文章、英文報告或專案概要，請直接貼在此處，AI 將根據上方選擇的「餵養型指令」進行處理。</p>
+                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、範本內容，或任何需要 AI 參考的原始資料...】" class="w-full h-40 p-4 rounded-lg border-2 border-slate-200 bg-slate-50 text-[16px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Resizer (Hidden on Mobile) -->
-        <div id="resizer" class="hidden lg:flex w-1.5 h-full cursor-col-resize transition-colors items-center justify-center shrink-0 bg-slate-200 group">
-            <div class="w-[1px] h-16 bg-slate-400 group-hover:bg-white rounded-full transition-colors"></div>
+        <div id="resizer" class="hidden lg:flex w-2 h-full cursor-col-resize transition-colors items-center justify-center shrink-0 bg-transparent hover:bg-indigo-400 group relative z-20">
+            <div class="w-1 h-20 bg-slate-300 group-hover:bg-white rounded-full transition-colors shadow-sm"></div>
         </div>
 
         <!-- Right Panel: Output -->
-        <div id="right-panel" class="h-[40vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-r-lg shadow-xl bg-slate-900 shrink-0 lg:shrink">
-            <div class="px-4 py-3 bg-slate-800 flex justify-between items-center border-b border-slate-700 shrink-0">
-                <span class="text-sm text-indigo-300 font-mono tracking-widest flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
-                <button id="copy-btn" class="text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded transition-all active:scale-95 shadow-md uppercase flex items-center gap-1.5">
+        <div id="right-panel" class="h-[45vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-xl shadow-2xl bg-[#1e293b] shrink-0 lg:shrink">
+            <div class="px-5 py-3 bg-[#0f172a] flex justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl">
+                <span class="text-[15px] text-indigo-300 font-sans font-bold tracking-widest flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
+                <button id="copy-btn" class="text-[15px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg transition-all active:scale-95 shadow-lg flex items-center gap-2">
                     <i data-lucide="copy" class="w-4 h-4"></i> 建立副本 (複製)
                 </button>
             </div>
-            <div class="p-4 lg:p-6 overflow-y-auto flex-grow font-mono text-base sm:text-lg text-indigo-100/90 leading-relaxed scrollbar-thin dark-scrollbar">
-                <pre id="prompt-output" class="whitespace-pre-wrap"></pre>
+            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[17px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar">
+                <pre id="prompt-output" class="whitespace-pre-wrap font-inherit"></pre>
             </div>
         </div>
     </main>
 
     <!-- Custom Modal for Reset Confirmation -->
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
-        <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm shadow-2xl border border-slate-200 transform scale-95 transition-transform duration-200" id="modal-content">
-            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
-                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white rounded-2xl p-8 w-11/12 max-w-sm shadow-2xl border border-slate-200 transform scale-95 transition-transform duration-200" id="modal-content">
+            <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mb-5 mx-auto">
+                <i data-lucide="alert-triangle" class="w-7 h-7 text-red-500"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-800 text-center mb-2">確定要全部清除嗎？</h3>
-            <p class="text-sm text-slate-500 text-center mb-6">將會清除您目前所有的選項與自訂備註，此動作無法復原。</p>
-            <div class="flex justify-center gap-3">
-                <button id="cancel-reset-btn" class="px-5 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">取消</button>
-                <button id="confirm-reset-btn" class="px-5 py-2 text-sm font-bold text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors shadow-sm shadow-red-200">確定清除</button>
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-3">確定要全部清除嗎？</h3>
+            <p class="text-base text-slate-500 text-center mb-8">將會清除您目前所有的選項與自訂備註，此動作無法復原。</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancel-reset-btn" class="px-6 py-2.5 text-[15px] font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">取消</button>
+                <button id="confirm-reset-btn" class="px-6 py-2.5 text-[15px] font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors shadow-md shadow-red-200">確定清除</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- Firebase Scripts -->
     <script type="module">
@@ -164,119 +169,116 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Config Data ---
+        // --- Config Data (Optimized with Advanced Formats & Demographics) ---
         const INITIAL_CONFIG = {
             data_types: [
-                { id: 'dt-ppt', label: '簡報 (PPT)', prompt: '輸出格式：完整的簡報大綱與各頁詳細內容規劃。' },
-                { id: 'dt-img', label: '圖片 (Image)', prompt: '輸出格式：詳細的 AI 繪圖提示詞 (Image Prompt)，精確描述畫面細節與視覺元素。' },
-                { id: 'dt-video', label: '影像 (Video)', prompt: '輸出格式：影片腳本 (Video Script)，包含分鏡描述、旁白與畫面動態指示。' },
-                { id: 'dt-report', label: '報告 (Report)', prompt: '輸出格式：結構化的專業文字報告，包含摘要、內文與結論。' },
-                { id: 'dt-table', label: '資料表 (Table)', prompt: '輸出格式：以 Markdown 表格 (Table) 呈現，清晰對齊各項數據與分類。' },
-                { id: 'dt-summary', label: '摘要重點 (Summary)', prompt: '輸出格式：極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' },
-                { id: 'dt-text', label: '文字 (Text)', prompt: '輸出格式：流暢的純文字敘述，適合文章、貼文或一般閱讀。' },
-                { id: 'dt-chart', label: '圖表結構 (Chart)', prompt: '輸出格式：適合轉換為心智圖、流程圖或階層結構圖的文字描述。' }
+                { id: 'dt-ppt', label: '簡報結構規劃', prompt: '【輸出格式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
+                { id: 'dt-report', label: '深度分析報告', prompt: '【輸出格式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
+                { id: 'dt-img', label: 'AI 繪圖指令', prompt: '【輸出格式】：請輸出詳細的 AI 繪圖提示詞 (Image Prompt)。務必精確描述主體、畫面細節、環境光影、攝影鏡頭與視覺元素。' },
+                { id: 'dt-table', label: '表格化資料', prompt: '【輸出格式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
+                { id: 'dt-summary', label: '精煉摘要', prompt: '【輸出格式】：請提供極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' }
+            ],
+            action_types: [
+                { id: 'act-format-modify', label: '格式型：文章優化與對照', prompt: '【進階任務-格式型】：我將給你一段文字，你的工作是提升文章的拼寫、語法、清晰度與流暢度，使其變得地道專業。\n請生成一個表格：第一欄為「原始句子」、第二欄為「修改後句子」、第三欄為「修改建議和理由」。' },
+                { id: 'act-format-intro', label: '格式型：分類與影響簡介', prompt: '【進階任務-格式型】：請用表格的形式提供一份簡介。表格必須包含：1. 類型或項目名稱、2. 主要的影響與特徵、3. 適合的目標人群與應用場景。' },
+                { id: 'act-feed-social', label: '餵養型：長文轉社群貼文', prompt: '【進階任務-餵養型 (社群轉化)】：請閱讀我提供的原始資料，並執行以下步驟：\n1. 整理成 800 字的重點文章，用 Markdown 格式輸出。\n2. 根據內容，整理出 10 條適合的 QA 內容。\n3. 撰寫三篇適合 FB/IG 的社群長文（含圖示與標籤），並為每篇文章設計「五字訣」或「七字訣」，讓讀者能快速記憶。' },
+                { id: 'act-feed-biz', label: '餵養型：文獻轉商業應用', prompt: '【進階任務-餵養型 (商業應用)】：請閱讀我提供的原始文獻資料，並執行以下步驟：\n1. 提供這篇文章的細節摘要與核心亮點。\n2. 將此文章的知識導入特定產業，提出如何應用新興商業模式的方針。\n3. 持續輸出執行面的細節思考與步驟，讓文章成為實用的產業整合方針。' },
+                { id: 'act-scenario', label: '場景型：嚴格角色扮演', prompt: '【進階任務-場景型】：請根據後續設定的「專屬角色」與「特定場景」，完全沉浸於該人設中。你的回答必須嚴格遵守該角色的語氣、限制條件與專業視角，不得跳脫人設框架。' }
             ],
             roles: [
-                { id: 'student', label: '大學學生', prompt: '你現在是一位充滿熱忱、樂於分享學習心得與校園生活的大學學生。' },
-                { id: 'grad-student', label: '研究生', prompt: '你現在是一位講究邏輯、實事求是、擅長文獻回顧與研究分析的研究所學生。' },
-                { id: 'engineer', label: '軟體工程師', prompt: '你現在是一位具備扎實技術背景，擅長將複雜系統架構簡化說明的資深軟體工程師。' },
-                { id: 'editor', label: '雜誌編輯', prompt: '你現在是一位對文字極度敏感、擅長抓眼球標題與優雅排版敘事的資深雜誌編輯。' },
-                { id: 'marketer', label: '行銷企劃', prompt: '你現在是一位敏銳的行銷企劃，擅長抓住受眾痛點、設計具備高轉化率的商業提案。' },
-                { id: 'pm', label: '專案經理', prompt: '你現在是一位擅長跨部門溝通、重視時程、風險管控與目標達成的專案經理(PM)。' },
-                { id: 'designer', label: '視覺設計師', prompt: '你現在是一位精通色彩心理學與排版美學，對視覺細節極度挑剔的設計大師。' },
-                { id: 'expert', label: '領域專家', prompt: '你現在是一位在此領域擁有超過 20 年經驗，見解獨到且具備高度權威的專家。' },
+                { id: 'expert-proc', label: '採購合約專家', prompt: '【專家角色】：你現在是一位擁有 20 年經驗的資深工程採購與合約管理專家，精通工程性質、規模評估與潛在風險預判。' },
+                { id: 'expert-red', label: '紅隊審核員', prompt: '【專家角色】：你現在是「紅隊審核員（風險評估專家）」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題，請忽略任何行銷包裝。' },
+                { id: 'expert-consultant', label: '策略顧問', prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢(ROI)與資源需求。' },
+                { id: 'expert-data', label: '資料分析師', prompt: '【專家角色】：你是一位嚴謹的資料分析師。任務是從混亂資料中，精煉出 5 個「只要回答就能完全掌握全局」的核心本質問題。' },
+                { id: 'expert-behavior', label: '行為科學家', prompt: '【專家角色】：你是一位行為科學家。請假設專案在兩年後「慘敗」，並運用「事前驗屍 (Pre-mortem)」法，分析潛在的人性與決策死角。' },
+                { id: 'expert-writer', label: '專題作家', prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並從中挖掘出令人驚訝的洞察。' },
+                { id: 'expert-engineer', label: '資深工程師', prompt: '【專家角色】：你是一位具備扎實技術背景，擅長將複雜系統架構簡化說明、檢查漏洞與重構邏輯的資深工程師。' },
+                { id: 'expert-designer', label: '視覺設計大師', prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' },
             ],
             infographics: [
-                { id: 't1', label: '模板 1 (抽象幾何)', prompt: '生成一個高品質的抽象背景簡報，使用深藍色和金屬金色漸層作為主色調，融入微妙的幾何前景紋理來增加視覺深度，添加流暢線條覆蓋以營造半透明的現代感，在側設計深色空間來平衡布局，提供電影般的燈光效果，包括柔和的陰影和高光，讓整體呈現時尚企業美學，支持8K解析度，採用最小主義設計原則，避免過多元素，每張幻燈片保持乾淨簡潔，比例為16:9，適合橫向投影，並確保文字與圖形完美對齊。' },
-                { id: 't2', label: '模板 2 (黏土動畫)', prompt: '生成一個完整的黏土定格動畫風格簡報，讓每張幻燈片呈現活潑的黏土模型效果，包括色彩豐富的黏土材質（如紅、藍、綠等鮮豔顏色）、生動的角色或元素（如跳躍、旋轉的動態姿態），背景使用柔軟的黏土紋理，文字以手捏黏土字體呈現，每頁包含小標題序列來解釋內容，確保整體風格可愛且互動性強，支持高解析度輸出。' },
-                { id: 't3', label: '模板 3 (漫畫風格)', prompt: '生成一個完整的漫畫風格簡報，使用白色背景、黑色文字作為基底，每頁以現代日本漫畫風格解釋內容，包括生動的漫畫面板布局（如多格漫畫格子）、角色對話泡泡（圓形或矩形泡泡）、動感線條（如速度線或爆發效果）和表情符號（如汗珠或星星），讓敘述更具故事性，顏色使用鮮豔的調色板（如紅藍黃為輔助色），每張幻燈片設計成連續故事流，支持高解析度，並確保圖文比例平衡以避免擁擠。' },
-                { id: 't4', label: '模板 4 (教室黑板)', prompt: '創建一個深綠色「黑板」設計的完整簡報，使用白色、黃色和粉紅色手寫粉筆文字，讓每張幻燈片模擬真實教室黑板效果，包括輕微的擦拭痕跡、隨意塗鴉元素（如箭頭或圓圈）、燈泡或小的手繪氛圍，背景紋理模仿粉筆灰塵，文字大小多樣化以強調重點，加入黑板邊框和橡皮擦效果，結構包括開場介紹、主要內容和總結，讓整體風格輕鬆教育化，支持高解析度輸出，並確保文字清晰不模糊。' },
-                { id: 't5', label: '模板 5 (復古像素)', prompt: '創建一個像素藝術復古遊戲風格的簡報，使用8位元色調如紅色、藍色和綠色方塊，每張幻燈片模擬老派電玩畫面，包括像素化角色、磚塊背景紋理、遊戲圖示如金幣或跳躍人物，讓內容以關卡面板布局呈現，文字使用像素字體，加入過框效果如遊戲邊界或分數欄，營造懷舊且趣味的氛圍，支持高解析度輸出，並確保文字清晰不模糊。' },
-                { id: 't6', label: '模板 6 (高階商務)', prompt: '生成一份商務提案簡報。風格為『現代扁平化設計』，背景白色，主色調為深藍色。結構要求：\n一、首頁：標題與副標題\n二、目錄\n三、核心問題與痛點（條列式）\n四、解決方案概述\n五、詳細步驟（每頁一個重點，配合關鍵字）\n六、預期效益與指標(KPI)\n七、總結與下一步行動(CTA)\n文字需精簡，以視覺化為主。' },
-                { id: 't7', label: '模板 7 (學術研究)', prompt: '製作一份『資訊圖表風格』的報告簡報。背景為淺灰色，使用粗體深色字體。結構要求：\n一、研究主題\n二、研究背景與目的\n三、文獻回顧\n四、研究方法\n五、研究結果與數據分析（請文字結構化，強調數據）\n六、討論\n七、結論與建議\n八、參考文獻\n務必將複雜資料轉化為清晰條列。' },
-                { id: 't8', label: '模板 8 (創意海報)', prompt: '製作成『創意海報風格』的提案簡報。色彩活潑、層次分明，重點強調視覺吸引力。結構要求：\n一、概念故事 (Hook)\n二、行銷洞察\n三、創意亮點\n四、執行方案與情境模擬\n五、預算與時程\n六、結尾畫面。' },
-                { id: 't9', label: '模板 9 (工程健檢)', prompt: '【專案文件分析與健檢範本】\n請根據專案特性進行評估：\n1.缺漏分析：工程(如水電/土建/裝修)範本中是否漏掉關鍵技術規範或驗收標準？\n2.風險檢視：合約條款關於『工期延宕』、『追加減預算』與『保固責任』規定是否嚴謹？\n3.在地適法性：是否有不符合目前工程實務或最新法規(如勞安/環保)？\n4.明確度優化：哪些條文易生歧義導致結算爭議？請提供具體修正建議。' },
-                { id: 't10', label: '模板 10 (玻璃擬物)', prompt: '採用 Glassmorphism (玻璃擬物化) 設計風格，帶有微立體感的半透明磨砂卡片設計，背景為柔和的流體漸層色，光影邊緣清晰，適合呈現科技與前衛主題，圖文資訊分離明確。' },
-                { id: 't11', label: '模板 11 (極簡日系)', prompt: '採用極簡的日系無印風格，使用大量的留白與低飽和度的木質色調或大地色，排版注重呼吸感與不對稱平衡，適合文青或生活風格的內容呈現。' },
-                { id: 't12', label: '模板 12 (暗黑科技)', prompt: '設計一個暗黑科技風格版型，以深邃的純黑色或暗夜藍為基底，搭配螢光藍、霓虹紫的發光線條與網格元素，營造出強烈的未來感與賽博龐克氛圍。' },
-                { id: 't13', label: '模板 13 (動態波浪)', prompt: '背景加入流暢的幾何波浪或液態形狀 (Liquid shapes)，使用鮮豔的漸層色彩組合，視覺帶有動態與活力感，能有效吸引年輕受眾目光，適合創意提案。' },
-                { id: 't14', label: '模板 14 (奢華黑金)', prompt: '打造高端奢華發表會版型，純黑背景搭配高質感磨砂金屬邊框，文字留白大氣，呈現頂級品牌質感與無可挑剔的工藝細節。' },
-                { id: 't15', label: '模板 15 (雜誌排版)', prompt: '歐美時尚雜誌排版風格，滿版高畫質大圖搭配極粗無襯線標題字，圖文交錯堆疊，捨棄傳統條列式，適合生活風格或品牌故事渲染。' },
+                { id: 't1', label: '高階商務提案', prompt: '【版型與結構】：生成 10 頁商務提案簡報（現代扁平化設計，深藍主色調）。\n結構：一、首頁；二、目錄；三、核心問題與痛點；四、解決方案概述；五~八、詳細步驟；九、預期效益(KPI)；十、總結與行動(CTA)。' },
+                { id: 't2', label: '學術研究報告', prompt: '【版型與結構】：製作『資訊圖表風格』的報告簡報。\n結構：一、研究主題；二、背景與目的；三、文獻回顧；四、研究方法；五~七、結果與數據分析；八、討論；九、結論；十、參考文獻。' },
+                { id: 't3', label: '創意企劃海報', prompt: '【版型與結構】：製作『創意海報風格』的提案。色彩活潑，強調視覺吸引力。\n結構：一、概念故事(Hook)；二、行銷洞察；三、創意亮點；四~七、執行方案與模擬；八、預算與時程；九、結尾。' },
+                { id: 't4', label: '工程範本健檢', prompt: '【版型與結構】：進行工程發包規則健檢。\n1. 缺漏分析（技術規範/驗收標準）。\n2. 風險檢視（工期/預算/保固）。\n3. 在地適法性（勞安/環保）。\n4. 明確度優化與具體修正建議。' },
+                { id: 't5', label: '資金預測模型', prompt: '【版型與結構】：資金流量分析＋校正＋預測。\n1. 依進度判斷施工階段與資金分配邏輯。\n2. 資金流量校正：比對既有表單揪出落差。\n3. 重建月度資金需求表格。\n4. 描述資金 S-Curve 與調度風險。' },
+                { id: 't6', label: '動漫轉真人攝影', prompt: '【版型與結構】：動漫角色轉極度擬真真人。寫實攝影(Photorealistic)，保留原特徵，賦予真實皮膚紋理與眼神光。電影感光影(Cinematic lighting)、背景虛化。' },
+                { id: 't7', label: '抽象幾何企業', prompt: '【版型與結構】：高品質抽象背景，深藍與金漸層，幾何前景，流暢線條半透明感，深色負空間平衡。電影般柔和陰影，8K解析度。' },
+                { id: 't8', label: '黏土定格動畫', prompt: '【版型與結構】：黏土定格動畫風格，色彩鮮豔，生動動態，柔軟黏土紋理，手捏黏土字體，可愛且互動性強。' },
+                { id: 't9', label: '現代日本漫畫', prompt: '【版型與結構】：現代日本漫畫風格，多格面板佈局、對話泡泡、速度線與表情符號，鮮豔紅藍黃點綴。' },
+                { id: 't10', label: '歐美時尚雜誌', prompt: '【版型與結構】：歐美時尚雜誌排版，滿版大圖搭配極粗無襯線標題字，圖文交錯堆疊，捨棄傳統條列式。' },
             ],
             visual_styles: [
-                { id: 'vs-realistic', label: '寫實風格', prompt: '視覺風格：寫實風格。呈現逼真細膩的肖像、物件或風景，如同真實攝影般精準。' },
-                { id: 'vs-abstract', label: '抽象藝術', prompt: '視覺風格：抽象藝術。色彩鮮豔且形狀抽象，打破常規框架的藝術作品。' },
-                { id: 'vs-comic', label: '漫畫風格', prompt: '視覺風格：漫畫書風格。動感十足的漫畫場景、角色與美漫網點效果。' },
-                { id: 'vs-fantasy', label: '幻想藝術', prompt: '視覺風格：幻想藝術。充滿夢幻、超現實與奇幻魔法元素的場景。' },
-                { id: 'vs-retro', label: '復古風格', prompt: '視覺風格：復古風格。模仿過去某一時期的底片圖像、懷舊色調與雜訊效果。' },
-                { id: 'vs-modern', label: '現代藝術', prompt: '視覺風格：現代藝術。簡約、俐落且具備前衛感的現代設計。' },
-                { id: 'vs-cartoon', label: '卡通風格', prompt: '視覺風格：卡通風格。具有卡通元素、誇張比例和可愛特徵的圖像。' },
-                { id: 'vs-digital', label: '數碼藝術', prompt: '視覺風格：數碼藝術。以 CG 數位效果創作的高科技繪圖風格。' },
-                { id: 'vs-hdr', label: 'HDR攝影', prompt: '視覺風格：高動態範圍 (HDR)。色彩鮮明、對比度極度增強的攝影圖像。' },
-                { id: 'vs-japan', label: '日系攝影', prompt: '視覺風格：日系攝影風格。柔和、低對比、具備空氣感且自然的攝影效果。' },
-                { id: 'vs-pixar', label: '皮克斯風', prompt: '視覺風格：皮克斯風格。類似於皮克斯 3D 動畫的細緻光影與圓潤圖像效果。' },
-                { id: 'vs-lowpoly', label: '低聚風格', prompt: '視覺風格：低聚風格 (Low Poly)。使用簡單多邊形幾何色塊創造的立體圖像。' },
-                { id: 'vs-watercolor', label: '水彩畫風', prompt: '視覺風格：水彩畫風格。模仿水彩筆觸、邊緣自然暈染的柔和效果。' },
-                { id: 'vs-oil', label: '油畫風格', prompt: '視覺風格：油畫風格。模仿傳統油畫厚重筆觸與顏料堆疊的藝術效果。' },
-                { id: 'vs-lineart', label: '線條藝術', prompt: '視覺風格：線條藝術。主要以乾淨線條輪廓為主的簡約幾何設計。' },
-                { id: 'vs-bw', label: '黑白風格', prompt: '視覺風格：黑白風格。僅使用黑白灰階色調，透過光影展現層次的圖像。' },
-                { id: 'vs-neon', label: '霓虹效果', prompt: '視覺風格：霓虹效果。暗背景搭配明亮且鮮豔的夜間霓虹發光色調。' },
-                { id: 'vs-future', label: '未來主義', prompt: '視覺風格：未來主義風格。具有強烈科幻、機甲和未來科技感的設計。' },
-                { id: 'vs-3d', label: '三維圖像', prompt: '視覺風格：三維圖像。具有強烈深度、空間透視感和立體光影的 3D 效果。' },
-                { id: 'vs-point', label: '點描風格', prompt: '視覺風格：點描風格。使用密集小點組成、充滿藝術感的圖像。' },
+                { id: 'vs-realistic', label: '寫實風格', prompt: '【視覺風格】：寫實風格 (Realistic)。呈現逼真細膩的肖像或風景。' },
+                { id: 'vs-abstract', label: '抽象藝術', prompt: '【視覺風格】：抽象藝術 (Abstract)。色彩鮮豔且形狀抽象。' },
+                { id: 'vs-comic', label: '漫畫書風', prompt: '【視覺風格】：漫畫書風格 (Comic Book)。動感場景與網點效果。' },
+                { id: 'vs-fantasy', label: '幻想藝術', prompt: '【視覺風格】：幻想藝術 (Fantasy)。夢幻、超現實與奇幻魔法元素。' },
+                { id: 'vs-retro', label: '復古風格', prompt: '【視覺風格】：復古風格 (Retro)。模仿底片圖像與懷舊色調。' },
+                { id: 'vs-cartoon', label: '卡通風格', prompt: '【視覺風格】：卡通風格 (Cartoon)。誇張比例和可愛特徵。' },
+                { id: 'vs-japan', label: '日系攝影', prompt: '【視覺風格】：日系攝影風格 (Japanese Photography)。柔和、低對比、具備空氣感。' },
+                { id: 'vs-pixar', label: '皮克斯風', prompt: '【視覺風格】：皮克斯風格 (Pixar Style)。3D 動畫細緻光影與圓潤圖像。' },
+                { id: 'vs-watercolor', label: '水彩畫風', prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩筆觸暈染效果。' },
+                { id: 'vs-future', label: '未來主義', prompt: '【視覺風格】：未來主義風格 (Futuristic)。強烈科幻、機甲和科技感。' },
             ],
             tones: [
-                { id: 't-passionate', label: '激昂振奮', prompt: '詮釋情境：充滿熱情與能量，具備強大號召力，能瞬間點燃讀者情緒。' },
-                { id: 't-humorous', label: '幽默風趣', prompt: '詮釋情境：輕鬆詼諧，適時加入幽默笑話或趣味比喻，讓氣氛不沉悶。' },
-                { id: 't-empathetic', label: '溫暖同理', prompt: '詮釋情境：充滿同理心，語氣柔軟溫和，貼近人心並展現關懷。' },
-                { id: 't-objective', label: '嚴謹客觀', prompt: '詮釋情境：不帶個人情緒，完全基於事實與數據說話，論述滴水不漏。' },
-                { id: 't-urgent', label: '焦慮急迫', prompt: '詮釋情境：強調時間緊迫性與潛在危機感，促使受眾必須立即採取行動。' },
-                { id: 't-casual', label: '輕鬆日常', prompt: '詮釋情境：像朋友聊天般的口吻，自然不造作，毫無距離感。' },
-                { id: 't-authoritative', label: '權威自信', prompt: '詮釋情境：展現強大的專業自信，以不容置疑的領導者語氣傳遞資訊。' },
-                { id: 't-nostalgic', label: '懷舊感傷', prompt: '詮釋情境：帶有歲月沉澱的回憶感，感性且容易觸動情感共鳴。' },
-                { id: 't-curious', label: '充滿好奇', prompt: '詮釋情境：以提問與探索的角度出發，引導讀者共同思考未知領域。' },
-                { id: 't-sarcastic', label: '諷刺批判', prompt: '詮釋情境：銳利且帶有批判性，一針見血指出問題核心，不留情面。' },
+                { id: 't-passionate', label: '自信說服', prompt: '【語氣情境】：語氣高度自信且具備強大說服力，重點強調價值與成長。' },
+                { id: 't-objective', label: '客觀商務', prompt: '【語氣情境】：嚴謹的商務報告風格，刪除口語化或情緒化詞彙。' },
+                { id: 't-simple', label: '白話科普', prompt: '【語氣情境】：將所有專業術語換成生活化、極度容易理解的比喻。' },
+                { id: 't-critical', label: '嚴苛批判', prompt: '【語氣情境】：銳利且帶有批判性，一針見血指出問題核心。' },
+                { id: 't-urgent', label: '危機迫切', prompt: '【語氣情境】：強調時間緊迫性與潛在風險，促使受眾立即採取行動。' },
+                { id: 't-empathetic', label: '溫暖同理', prompt: '【語氣情境】：充滿同理心，語氣柔軟溫和，展現關懷。' },
+                { id: 't-humorous', label: '幽默詼諧', prompt: '【語氣情境】：輕鬆詼諧，適時加入趣味比喻打破沉悶。' },
+            ],
+            genders: [
+                { id: 'g-any', label: '不限性別', prompt: '【專屬性別設定】：性別不限，請使用通用、中性且包容的用語。' },
+                { id: 'g-male', label: '男性', prompt: '【專屬性別設定】：針對「男性」視角與潛在心理需求進行溝通撰寫。' },
+                { id: 'g-female', label: '女性', prompt: '【專屬性別設定】：針對「女性」視角與潛在心理需求進行溝通撰寫。' },
+                { id: 'g-bmale', label: '生理男', prompt: '【專屬性別設定】：特別針對「生理男性」的特徵或特定需求進行撰寫。' },
+                { id: 'g-bfemale', label: '生理女', prompt: '【專屬性別設定】：特別針對「生理女性」的特徵或特定需求進行撰寫。' },
+                { id: 'g-other', label: '其他 (多元)', prompt: '【專屬性別設定】：採用包容多元性別族群 (LGBTQ+) 的友善敘事方式。' }
+            ],
+            age_groups: [
+                { id: 'age-any', label: '不限年齡', prompt: '【專屬年齡設定】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
+                { id: 'age-u12', label: '12歲以下', prompt: '【專屬年齡設定】：目標為 12 歲以下兒童。使用極度簡單、童趣且具教育意義的字彙。' },
+                { id: 'age-13-17', label: '13-17歲', prompt: '【專屬年齡設定】：目標為 13-17 歲青少年。結合時下校園流行語與青少年關注議題。' },
+                { id: 'age-18-24', label: '18-24歲', prompt: '【專屬年齡設定】：目標為 18-24 歲 (大學生/新鮮人)。重視自我實現、探索與網路原生代的共鳴。' },
+                { id: 'age-25-34', label: '25-34歲', prompt: '【專屬年齡設定】：目標為 25-34 歲 (職場輕熟齡)。切中工作效率、生活品質與職涯焦慮。' },
+                { id: 'age-35-44', label: '35-44歲', prompt: '【專屬年齡設定】：目標為 35-44 歲 (三明治族群)。重視務實、家庭照顧與投資報酬率。' },
+                { id: 'age-45-54', label: '45-54歲', prompt: '【專屬年齡設定】：目標為 45-54 歲。語氣穩重成熟，強調理財規劃、健康與尊榮感。' },
+                { id: 'age-55-64', label: '55-64歲', prompt: '【專屬年齡設定】：目標為 55-64 歲 (熟齡族)。重視養生、生活傳承與退休準備，用語溫和。' },
+                { id: 'age-65up', label: '65歲以上', prompt: '【專屬年齡設定】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
             ],
             audiences: [
-                { id: 'a-general', label: '一般大眾', prompt: '目標對象：一般大眾。不預設專業背景，請使用最通俗的語境。' },
-                { id: 'a-executives', label: '公司高層', prompt: '目標對象：公司高層。他們時間寶貴，請僅呈現核心決策價值與最終結論。' },
-                { id: 'a-clients', label: '潛在客戶', prompt: '目標對象：潛在客戶。請專注於痛點解決方案與產品的核心優勢。' },
-                { id: 'a-students', label: '大學學生', prompt: '目標對象：大學學生。請使用淺顯易懂的邏輯、時下流行語與教育引導。' },
-                { id: 'a-social', label: '社群粉絲', prompt: '目標對象：社群媒體粉絲。請強調視覺衝擊與短平快的爆點資訊。' },
-                { id: 'a-devs', label: '技術開發者', prompt: '目標對象：技術開發者。請提供詳細架構、代碼邏輯與底層實現細節。' },
-                { id: 'a-investors', label: '投資人', prompt: '目標對象：投資人。請側重市場潛力、商業模式獲利能力與風險分析。' },
-                { id: 'a-beginners', label: '初學新手', prompt: '目標對象：初學新手。請將所有專業術語替換為生活化的比喻。' },
+                { id: 'a-executives', label: '決策高層', prompt: '【目標對象】：公司決策高層。刪除廢話，直擊核心決策價值與 ROI。' },
+                { id: 'a-beginners', label: '初學新手', prompt: '【目標對象】：初學新手。不預設專業背景，使用最通俗語境。' },
+                { id: 'a-global', label: '國際商務', prompt: '【目標對象】：跨國商務人士。確保術語符合國際商務慣用表達。' },
+                { id: 'a-clients', label: '潛在客戶', prompt: '【目標對象】：潛在客戶。專注於痛點解決方案與產品優勢。' },
+                { id: 'a-devs', label: '技術人員', prompt: '【目標對象】：技術開發者。提供詳細架構、邏輯與技術實作細節。' },
+                { id: 'a-investors', label: '投資人', prompt: '【目標對象】：投資人/VC。側重市場規模、獲利能力與護城河。' },
             ],
             colors: [
-                { id: 'c-beige', label: '暖白米色', swatches: ['#FFFFFF', '#F5F5DC', '#D2B48C'], prompt: '色彩搭配：採用暖白、淺木色或米色作為主色調，風格溫馨優雅。' },
-                { id: 'c-navy', label: '專業深藍', swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '色彩搭配：深海軍藍搭配石板灰，呈現穩重專業感。' },
-                { id: 'c-white', label: '經典純白', swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '色彩搭配：大面積極簡純白背景，搭配深色內文，追求極致乾淨。' },
-                { id: 'c-blue', label: '微軟藍', swatches: ['#2B579A', '#FFFFFF', '#D9E1F2'], prompt: '色彩搭配：經典辦公室深藍與純白組合。' },
-                { id: 'c-orange', label: '簡報橘', swatches: ['#B7472A', '#FFFFFF', '#FFF2CC'], prompt: '色彩搭配：充滿活力的暖橘與深紅對比。' },
-                { id: 'c-gold', label: '奢華黑金', swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '色彩搭配：純黑背景搭配磨砂金或香檳金。' },
-                { id: 'c-morandi', label: '莫蘭迪色', swatches: ['#9A8C98', '#C9ADA7', '#F2E9E4'], prompt: '色彩搭配：低飽和度灰階色調，柔和不刺眼。' },
-                { id: 'c-cyber', label: '賽博龐克', swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '色彩搭配：純黑背景搭配螢光紫與青色。' },
-                { id: 'c-earth', label: '大地自然', swatches: ['#4A5D23', '#8B5A2B', '#E8E5D1'], prompt: '色彩搭配：深綠與棕色系，帶有環保與自然氣息。' },
-                { id: 'c-pastel', label: '粉彩馬卡龍', swatches: ['#FFB3BA', '#FFDFBA', '#FFFFBA'], prompt: '色彩搭配：明亮可愛的粉彩色系，如馬卡龍般甜美。' },
+                { id: 'c-navy', label: '商務深藍', swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色彩搭配】：採用深藍色與金/灰色的商務配色，呈現穩健感。' },
+                { id: 'c-white', label: '極簡純白', swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色彩搭配】：極簡全白背景搭配深色內文，追求極致乾淨。' },
+                { id: 'c-gold', label: '奢華黑金', swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色彩搭配】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
+                { id: 'c-beige', label: '暖白米色', swatches: ['#FFFFFF', '#F5F5DC', '#D2B48C'], prompt: '【色彩搭配】：暖白、淺木色或米色主調，風格溫馨無壓力。' },
+                { id: 'c-cyber', label: '賽博霓虹', swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色彩搭配】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
             ],
             notes: [
-                { id: 'n-scene', label: '場景轉換', prompt: '場景轉換：將圖像換成一張展現企業團隊合作與數位轉型、具備專業感的商務場景。' },
-                { id: 'n-data', label: '數據感強化', prompt: '加入數據感：在圖像中加入數據成長曲線與上升箭頭，強調市場成長潛力。' },
-                { id: 'n-crop', label: '精確裁切置中', prompt: '精確裁切：將圖片裁切為 16:9 比例，並將主體人物或核心物件置中顯示。' },
-                { id: 'n-brand', label: '風格色統一', prompt: '精準控制：請將所有裝飾元件、線條或箭頭改為與主色調一致的商務配色，呈現穩健感。' },
-                { id: 'n-draw', label: '手繪標註', prompt: '風格化標註：將關鍵字以「紅色手繪圈選效果」標示，呈現白板筆標註的風格。' },
-                { id: 'n-blank', label: '預留排版空間', prompt: '預留空間：刪除瑣碎背景內容，只留標題與重點，並保留單側大面積留白空間供後續手動排版。' },
-                { id: 'n-title', label: '標題張力優化', prompt: '標題優化：標題請改為置中對齊，並包含具體數字與成果導向的寫法，增加視覺張力。' },
-                { id: 'n-list', label: '內文清單化', prompt: '內文清單化：請將長段落或複雜結構轉化為 3 到 5 個精簡列點，每行不超過 15 個字。' },
-                { id: 'n-logic', label: '邏輯對照表', prompt: '邏輯重組：將內容設計為左右對照表（左側為痛點，右側為對應方案），或強烈的因果邏輯排版。' },
-                { id: 'n-cta', label: '行動呼籲(CTA)', prompt: '行動呼籲設計：在頁面下方或明顯處增加「下一步行動(CTA)」，明確列出後續執行的三個具體步驟。' },
+                { id: 'n-scene', label: '場景替換', prompt: '【細節微調】：將背景換成展現企業團隊合作與數位轉型、具備專業感的商務場景。' },
+                { id: 'n-data', label: '強化數據感', prompt: '【細節微調】：加入數據成長曲線與上升箭頭，強調市場潛力。' },
+                { id: 'n-crop', label: '精確裁切置中', prompt: '【細節微調】：圖片裁切為 16:9 比例，主體人物/物件完美置中。' },
+                { id: 'n-brand', label: '色調統一', prompt: '【細節微調】：所有裝飾元件、箭頭改為與主色調一致的配色。' },
+                { id: 'n-draw', label: '紅筆手繪標註', prompt: '【細節微調】：將畫面關鍵字以「紅色手繪圈選效果」標示，如白板筆。' },
+                { id: 'n-blank', label: '預留排版空間', prompt: '【細節微調】：刪除圖中瑣碎內容，保留單側大面積留白供後續排版。' },
+                { id: 'n-title', label: '標題張力升級', prompt: '【細節微調】：標題置中，包含具體數字與成果導向，或使用問題式句型。' },
+                { id: 'n-list', label: '極致清單化', prompt: '【細節微調】：長段落轉化為 3~5 個精簡列點(每行不過15字)，並加註數據佐證。' },
+                { id: 'n-logic', label: '邏輯對照表', prompt: '【細節微調】：內容設計為左右對照表（痛點 vs 方案），強化因果邏輯。' },
+                { id: 'n-cta', label: '行動呼籲(CTA)', prompt: '【細節微調】：在結尾增加『下一步行動』，明確列出後續執行的三個具體步驟。' },
             ]
         };
 
-        // --- Extracted CSS Constants for Clean Code ---
-        const ANALYZE_BTN_DISABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
-        const ANALYZE_DETAILED_ENABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
-        const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
+        const ANALYZE_BTN_DISABLED_CLASS = "flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
+        const ANALYZE_DETAILED_ENABLED_CLASS = "flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
+        const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
 
         const apiKey = "";
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
@@ -291,11 +293,14 @@
         // Centralized initial state function
         const getInitialSelections = () => ({
             data_type: null,
+            action_type: null,
             role: null,
             infographic: null,
             visual_style: null,
             tone: null,
             audience: null,
+            gender: null,
+            age_group: null,
             color: null,
             notes: [],
         });
@@ -320,25 +325,21 @@
         const clearSelectionsBtn = document.getElementById('clear-selections-btn');
         const toastContainer = document.getElementById('toast-container');
         
-        // Modal elements
         const confirmModal = document.getElementById('confirm-modal');
         const confirmModalContent = document.getElementById('modal-content');
         const cancelResetBtn = document.getElementById('cancel-reset-btn');
         const confirmResetBtn = document.getElementById('confirm-reset-btn');
 
-        // Initialize Icons
         lucide.createIcons();
 
         // --- Functions ---
-
-        // Toast Notification System
         const showToast = (message, type = 'success') => {
             const toast = document.createElement('div');
             const bgClass = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-slate-800');
             const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
             
-            toast.className = `toast-enter flex items-center gap-2 px-4 py-2.5 rounded-lg text-white font-bold text-xs shadow-lg pointer-events-auto ${bgClass}`;
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> <span>${message}</span>`;
+            toast.className = `toast-enter flex items-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-[15px] shadow-2xl pointer-events-auto ${bgClass}`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i> <span>${message}</span>`;
             
             toastContainer.appendChild(toast);
             lucide.createIcons({ root: toast });
@@ -349,7 +350,6 @@
             }, 3000);
         };
 
-        // Modal Logic
         const showModal = () => {
             confirmModal.classList.remove('hidden');
             setTimeout(() => {
@@ -366,7 +366,6 @@
             setTimeout(() => confirmModal.classList.add('hidden'), 200);
         };
 
-        // Auto Save to Firebase
         const saveState = () => {
             if (!user || !db) return;
             clearTimeout(autoSaveTimeout);
@@ -387,45 +386,65 @@
         };
 
         const buildPrompt = () => {
-            const buildSection = (titleLabel, categoryKey) => {
+            const buildSection = (categoryKey) => {
                 const stateKey = categoryKey.replace(/s$/, '');
                 const selection = selections[stateKey];
                 if (!selection) return "";
-                return `\n# ${titleLabel}\n${selection.prompt}\n`;
+                return `${selection.prompt}\n\n`;
             };
 
             const buildNoteSection = () => {
                 if (!selections.notes || selections.notes.length === 0) return "";
-                const list = selections.notes.map(n => `- ${n.prompt}`).join('\n');
-                return `\n# 視覺效果要求\n${list}\n`;
+                const list = selections.notes.map(n => `${n.prompt}`).join('\n');
+                return `${list}\n\n`;
             };
 
             let prompt = "";
-            if (title.trim()) prompt += `# 封面標題\n"${title.trim()}"\n`;
-            if (selections.data_type) prompt += buildSection("主要輸出格式", "data_types");
-            if (selections.role) prompt += buildSection("角色設定", "roles");
-            if (selections.infographic) prompt += buildSection("版型模板", "infographics");
-
-            if (selections.visual_style || selections.color) {
-                prompt += `\n# 視覺與風格\n`;
-                if (selections.visual_style) prompt += selections.visual_style.prompt + "\n";
-                if (selections.color) prompt += selections.color.prompt + "\n";
-            }
-
-            if (selections.tone || selections.audience) {
-                prompt += `\n# 策略設定\n`;
-                if (selections.tone) prompt += selections.tone.prompt + "\n";
-                if (selections.audience) prompt += selections.audience.prompt + "\n";
-            }
-
-            prompt += buildNoteSection();
-
-            if (customNotes && customNotes.trim()) {
-                prompt += `\n# 自訂需求與備註\n${customNotes.trim()}\n`;
+            
+            // 1. 專家角色與指令框架
+            if (selections.role || selections.action_type) {
+                if (selections.role) prompt += buildSection("roles");
+                if (selections.action_type) prompt += buildSection("action_types");
             }
             
+            // 2. 任務目標與標題
+            if (title.trim() || selections.data_type) {
+                prompt += `【專案任務與主要格式】：\n`;
+                if (title.trim()) prompt += `本專案核心主題為：「${title.trim()}」。\n`;
+                if (selections.data_type) prompt += `${selections.data_type.prompt}\n`;
+                prompt += `\n`;
+            }
+
+            // 3. 原始資料餵養區
+            if (customNotes && customNotes.trim()) {
+                prompt += `【請先詳細閱讀以下專案/原始文獻資料】：\n---\n${customNotes.trim()}\n---\n\n`;
+            }
+            
+            // 4. 對標受眾與情境 (性別/年齡/客群)
+            if (selections.audience || selections.gender || selections.age_group || selections.tone) {
+                if (selections.audience) prompt += selections.audience.prompt + "\n";
+                if (selections.gender) prompt += selections.gender.prompt + "\n";
+                if (selections.age_group) prompt += selections.age_group.prompt + "\n";
+                if (selections.tone) prompt += selections.tone.prompt + "\n";
+                prompt += `\n`;
+            }
+
+            // 5. 版型結構與視覺呈現
+            if (selections.infographic || selections.visual_style || selections.color) {
+                if (selections.infographic) prompt += buildSection("infographics");
+                if (selections.visual_style) prompt += selections.visual_style.prompt + "\n";
+                if (selections.color) prompt += selections.color.prompt + "\n";
+                prompt += `\n`;
+            }
+
+            // 6. 特定細節要求微調
+            if (selections.notes && selections.notes.length > 0) {
+                prompt += buildNoteSection();
+            }
+            
+            // Wrap up perfectly
             if (prompt.trim()) {
-                prompt = `請依照以下條件與設定，生成符合要求的高品質內容與描述：\n\n${prompt.trim()}`;
+                prompt = `請嚴格依照以下設定框架、專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}\n========================================\n\n確認以上所有條件與資料無誤後，請立即開始執行並給出最佳結果。`;
             }
 
             promptOutput.textContent = prompt;
@@ -436,26 +455,29 @@
             
             const groups = [
                 { label: "1. 輸出格式", key: "data_types", icon: 'files' },
-                { label: "2. 角色", key: "roles", icon: 'user' },
-                { label: "3. 版型模板", key: "infographics", icon: 'layout-template' },
-                { label: "4. 視覺風格", key: "visual_styles", icon: 'palette' },
-                { label: "5. 詮釋情境", key: "tones", icon: 'mic' },
+                { label: "2. 進階任務框架", key: "action_types", icon: 'cpu' },
+                { label: "3. 專家角色", key: "roles", icon: 'user' },
+                { label: "4. 性別專屬", key: "genders", icon: 'user-check' },
+                { label: "5. 年齡層專屬", key: "age_groups", icon: 'calendar-days' },
                 { label: "6. 目標對象", key: "audiences", icon: 'users' },
-                { label: "7. 色彩搭配", key: "colors", icon: 'pipette', isColor: true },
-                { label: "8. 視覺效果", key: "notes", icon: 'list-checks', isMulti: true }
+                { label: "7. 語氣情境", key: "tones", icon: 'mic' },
+                { label: "8. 內容版型與結構", key: "infographics", icon: 'layout-template' },
+                { label: "9. 視覺風格", key: "visual_styles", icon: 'palette' },
+                { label: "10. 色彩搭配", key: "colors", icon: 'pipette', isColor: true },
+                { label: "11. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true }
             ];
 
             groups.forEach(group => {
                 const groupEl = document.createElement('div');
-                groupEl.className = 'mb-2 shrink-0';
+                groupEl.className = 'mb-1 shrink-0';
                 
                 const titleEl = document.createElement('h3');
-                titleEl.className = 'text-sm font-bold text-slate-600 uppercase tracking-tight mb-2 flex items-center gap-1.5';
-                titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400 normal-case ml-1 font-normal opacity-80 text-xs">(可複選)</span>' : ''}`;
+                titleEl.className = 'text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5';
+                titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400 font-normal ml-1 text-[13px] tracking-wide">(此區塊可複選)</span>' : ''}`;
                 groupEl.appendChild(titleEl);
 
                 const grid = document.createElement('div');
-                grid.className = 'flex flex-wrap gap-2';
+                grid.className = 'flex flex-wrap gap-2.5';
 
                 INITIAL_CONFIG[group.key].forEach(opt => {
                     const btn = document.createElement('button');
@@ -464,15 +486,15 @@
                         ? selections.notes.some(n => n.id === opt.id)
                         : selections[stateKey]?.id === opt.id;
 
-                    btn.className = `selection-btn group relative flex flex-col items-center justify-center min-h-[36px] px-3 min-w-[80px] rounded-lg transition-all text-sm text-center border shrink-0 ${
-                        isActive ? 'active' : 'border-slate-300 bg-white text-slate-600 hover:border-indigo-400 hover:bg-slate-50'
+                    btn.className = `selection-btn group relative flex flex-col items-center justify-center min-h-[42px] px-3.5 min-w-[90px] rounded-xl transition-all text-[15px] text-center border-2 shrink-0 ${
+                        isActive ? 'active' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50/50'
                     }`;
                     
-                    btn.innerHTML = `<div class="truncate w-full leading-tight font-medium">${opt.label}</div>`;
+                    btn.innerHTML = `<div class="truncate w-full leading-tight font-medium tracking-wide">${opt.label}</div>`;
                     
                     if (group.isColor && opt.swatches) {
                         const swatchContainer = document.createElement('div');
-                        swatchContainer.className = 'flex gap-1 mt-1 opacity-90';
+                        swatchContainer.className = 'flex gap-1.5 mt-1.5 opacity-90';
                         opt.swatches.forEach(c => {
                             const swatch = document.createElement('div');
                             swatch.className = 'w-3 h-3 rounded-full border border-black/10 shadow-sm';
@@ -530,8 +552,8 @@
                 reader.onloadend = async () => {
                     const base64Data = reader.result.split(',')[1];
                     let promptStr = mode === 'detailed'
-                        ? "你是一位專業的視覺分析師。請詳細分析這份投影片（或圖片內容）的視覺設計元素，包括配色方案、排版邏輯、字體特點以及整體的視覺氛圍。請以「條列式」的方式呈現分析結果，並將最關鍵的核心重點放在最前面。分析結果應是一段可以用於 AI 內容生成的「提示詞描述」，且必須使用「繁體中文」撰寫。請直接回傳分析後的條列內容，不要有額外的開場白或結論。"
-                        : "你是一位專業的視覺分析師。請以「極其精煉」的條列式文字，快速分析這張投影片的風格與排版核心。排除贅字，總字數控制在 100 字以內，使用「繁體中文」。請直接回傳核心條列內容。";
+                        ? "你是一位專業的文獻與視覺分析師。請詳細分析這份文件（或圖片內容）的核心資訊、排版邏輯、文字特點以及視覺氛圍。請以「條列式」呈現分析結果，並將最關鍵的重點放在最前面。分析結果應是一段可以用於 AI 後續生成處理的「精華總結資料」，且必須使用「繁體中文」撰寫。請直接回傳分析後的條列內容，不要有額外的開場白。"
+                        : "你是一位專業的分析師。請以「極其精煉」的條列式文字，快速擷取這張圖/文件的最核心資訊。排除贅字，總字數控制在 150 字以內，使用「繁體中文」。請直接回傳核心條列內容。";
 
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                         method: 'POST',
@@ -552,11 +574,11 @@
                     const analysisText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                     
                     if (analysisText) {
-                        const header = mode === 'detailed' ? "【 AI 視覺深度分析結果 】" : "【 AI 風格速寫結果 】";
+                        const header = mode === 'detailed' ? "【 AI 深度分析與文獻萃取結果 】" : "【 AI 速寫重點擷取 】";
                         customNotes = (customNotes ? customNotes + "\n\n" : "") + header + "\n" + analysisText.trim();
                         customNotesInput.value = customNotes;
                         updateStateAndRender();
-                        showToast('AI 分析完成！已填入自訂需求區', 'success');
+                        showToast('AI 分析完成！已填入自訂需求區，請選擇「餵養型指令」接續處理。', 'success');
                     } else {
                         throw new Error('No text in response');
                     }
@@ -579,7 +601,6 @@
         };
 
         // --- Event Listeners ---
-
         titleInput.oninput = (e) => { title = e.target.value; buildPrompt(); saveState(); };
         customNotesInput.oninput = (e) => { customNotes = e.target.value; buildPrompt(); saveState(); };
 
@@ -587,13 +608,13 @@
             const file = e.target.files[0];
             if (file) {
                 const iconType = file.type.includes('pdf') ? 'file-text' : 'image';
-                fileDisplay.innerHTML = `<i data-lucide="${iconType}" class="w-6 h-6 text-indigo-500 mb-1"></i><span class="text-sm font-bold truncate max-w-[200px] text-indigo-700">${file.name}</span><span class="text-xs text-indigo-400">${(file.size / 1024 / 1024).toFixed(2)} MB</span>`;
+                fileDisplay.innerHTML = `<i data-lucide="${iconType}" class="w-7 h-7 text-indigo-500 mb-1"></i><span class="text-[15px] font-bold truncate max-w-[220px] text-indigo-700">${file.name}</span><span class="text-sm text-indigo-400">${(file.size / 1024 / 1024).toFixed(2)} MB</span>`;
                 analyzeDetailedBtn.className = ANALYZE_DETAILED_ENABLED_CLASS;
                 analyzeConciseBtn.className = ANALYZE_CONCISE_ENABLED_CLASS;
                 analyzeDetailedBtn.disabled = false;
                 analyzeConciseBtn.disabled = false;
             } else {
-                fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (最大 5MB)</span>`;
+                fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-7 h-7 mb-1"></i><span class="text-[15px] font-bold text-indigo-700">點擊上傳參考圖片、截圖或 PDF</span><span class="text-sm text-slate-400 font-normal">支援 PNG, JPG, PDF (最大 5MB)</span>`;
                 analyzeDetailedBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 analyzeConciseBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 analyzeDetailedBtn.disabled = true;
@@ -618,7 +639,7 @@
             
             try {
                 document.execCommand('copy');
-                showToast('提示詞已複製到剪貼簿！', 'success');
+                showToast('完美！提示詞已完整複製到剪貼簿！', 'success');
                 
                 const originalHtml = copyBtn.innerHTML;
                 copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
@@ -648,7 +669,7 @@
             titleInput.value = '';
             customNotesInput.value = '';
             fileInput.value = '';
-            fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳參考圖片、截圖或 PDF</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>`;
+            fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-7 h-7 mb-1"></i><span class="text-[15px] font-bold text-indigo-700">點擊上傳參考圖片、截圖或 PDF</span><span class="text-sm text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>`;
             
             analyzeDetailedBtn.disabled = true;
             analyzeConciseBtn.disabled = true;
@@ -657,7 +678,7 @@
             
             updateStateAndRender();
             hideModal();
-            showToast('已清除所有設定', 'info');
+            showToast('已清除所有設定，請重新開始', 'info');
         };
 
         clearSelectionsBtn.onclick = () => {
@@ -711,7 +732,6 @@
                 user = u;
                 if (!user) return;
                 
-                // Initialize and update visitor counter
                 try {
                     const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
                     const statsSnap = await getDoc(statsRef);
