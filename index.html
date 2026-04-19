@@ -118,9 +118,9 @@
                     
                     <!-- Custom Notes -->
                     <div class="mt-8 pt-6 border-t-2 border-slate-100">
-                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-4 h-4 text-indigo-500"></i> 12. 原始資料區 (餵養文獻/故事腳本/自訂備註)</h3>
-                        <p class="text-sm text-slate-400 mb-3">若有超大文字量的專業文章、劇本腳本、培訓素材或專案概要，請直接貼在此處，AI 將根據上方選擇的指令進行處理。</p>
-                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、範本內容、故事腳本，或任何需要 AI 參考的原始資料...】" class="w-full h-40 p-4 rounded-lg border-2 border-slate-200 bg-slate-50 text-[16px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
+                        <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="pen-line" class="w-4 h-4 text-indigo-500"></i> 13. 原始資料區 (餵養文獻/故事腳本/程式碼/自訂備註)</h3>
+                        <p class="text-sm text-slate-400 mb-3">若有超大文字量的專業文章、劇本腳本、程式碼或專案概要，請直接貼在此處，AI 將根據上方選擇的指令進行處理。</p>
+                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、範本內容、腳本、程式碼，或任何需要 AI 參考的原始資料...】" class="w-full h-40 p-4 rounded-lg border-2 border-slate-200 bg-slate-50 text-[16px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
                     </div>
                 </div>
             </div>
@@ -133,11 +133,16 @@
 
         <!-- Right Panel: Output -->
         <div id="right-panel" class="h-[45vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-xl shadow-2xl bg-[#1e293b] shrink-0 lg:shrink">
-            <div class="px-5 py-3 bg-[#0f172a] flex justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl">
-                <span class="text-[15px] text-indigo-300 font-sans font-bold tracking-widest flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
-                <button id="copy-btn" class="text-[15px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg transition-all active:scale-95 shadow-lg flex items-center gap-2">
-                    <i data-lucide="copy" class="w-4 h-4"></i> 建立副本 (複製)
-                </button>
+            <div class="px-5 py-3 bg-[#0f172a] flex justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl overflow-x-auto">
+                <span class="text-[15px] text-indigo-300 font-sans font-bold tracking-widest flex items-center gap-2 whitespace-nowrap"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
+                <div class="flex items-center gap-2">
+                    <button id="download-btn" class="text-[14px] font-bold bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-all active:scale-95 shadow-md flex items-center gap-2 whitespace-nowrap border border-slate-600">
+                        <i data-lucide="download" class="w-4 h-4"></i> 下載 TXT
+                    </button>
+                    <button id="copy-btn" class="text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-all active:scale-95 shadow-md flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="copy" class="w-4 h-4"></i> 複製
+                    </button>
+                </div>
             </div>
             <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[17px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar">
                 <pre id="prompt-output" class="whitespace-pre-wrap font-inherit"></pre>
@@ -186,10 +191,21 @@
                 { id: 'dt-serial', label: '長篇連載文章', prompt: '【輸出型式】：請產出「長篇連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性，吸引讀者持續追更。' },
                 { id: 'dt-table', label: '表格化資料', prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
                 { id: 'dt-summary', label: '精煉摘要', prompt: '【輸出型式】：請提供極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' },
+                { id: 'dt-json-csv', label: 'JSON / CSV 資料集', prompt: '【輸出型式】：請將分析結果或數據，嚴格格式化為標準的 JSON 結構或 CSV 逗號分隔格式，以便後續匯入系統。' },
+                { id: 'dt-code-doc', label: '程式碼與技術文件', prompt: '【輸出型式】：請輸出可執行的完整程式碼 (Code Snippet) 與清晰的技術註解，並附上簡單的部署或執行說明文件。' },
                 { id: 'dt-img', label: 'AI 繪圖指令', prompt: '【輸出型式】：請輸出詳細的 AI 繪圖提示詞 (Image Prompt)。務必精確描述主體、畫面細節、環境光影、攝影鏡頭與視覺元素。' },
                 { id: 'dt-video-basic', label: '影片生成指令', prompt: '【輸出型式】：請產出用於 AI 影片生成模型的結構化提示詞。需包含：場景描述、主體動作節拍、鏡頭語言與光影音效。' }
             ],
+            languages: [
+                { id: 'l-zh-tw', label: '繁體中文 (台灣)', prompt: '【輸出語言】：請強制使用「繁體中文 (台灣慣用語)」，嚴格避免使用中國大陸的拼音拼寫或慣用詞彙 (如：將「屏幕」改為「螢幕」、「視頻」改為「影片」)。' },
+                { id: 'l-zh-cn', label: '簡體中文', prompt: '【輸出語言】：請使用標準的「簡體中文」進行輸出。' },
+                { id: 'l-en-us', label: '美式英文', prompt: '【輸出語言】：Please output the response strictly in Native American English, ensuring professional phrasing and correct grammar.' },
+                { id: 'l-ja', label: '日文 (日本語)', prompt: '【輸出語言】：請使用自然流暢的「日文 (日本語)」進行輸出，並依據情境使用適當的敬語 (丁寧語/謙讓語)。' },
+                { id: 'l-bilingual', label: '中英雙語對照', prompt: '【輸出語言】：請提供「繁體中文與英文的雙語對照」版本。每一個主要段落的中文下方，都必須緊接著附上對應的英文翻譯。' }
+            ],
             action_types: [
+                { id: 'act-dev-code', label: '開發型：程式碼生成與重構', prompt: '【進階任務-開發型】：請檢查我提供的程式碼或需求。找出潛在的 Bug、效能瓶頸，並提供最佳化與重構後的乾淨程式碼 (Clean Code)，遵守 SOLID 原則。' },
+                { id: 'act-seo-opt', label: 'SEO型：關鍵字與排名優化', prompt: '【進階任務-SEO優化】：請為此文章/主題進行 SEO 優化。找出長尾關鍵字，並提供包含 H1, H2 標籤、Meta Description 的高排名潛力結構。' },
                 { id: 'act-edu-design', label: '教育型：學習路徑與教案開發', prompt: '【進階任務-教育型】：請根據提供的素材，設計一條由淺入深的學習路徑。需將複雜知識拆解為易於吸收的模組，並為每個模組設計一個互動式隨堂測驗或反思問題。' },
                 { id: 'act-coach', label: '規劃型：人才培訓與能力養成', prompt: '【進階任務-培訓養成】：請為此對象或團隊設計「長期養成計畫」。結合學習曲線與實務驗證，設計出具備明確反饋機制的成長飛輪與進階關卡。' },
                 { id: 'act-plan-opt', label: '規劃型：最佳化與備案設計', prompt: '【進階任務-規劃型】：針對規劃內容，請進一步執行最佳化。找出潛在的時間/資源/交通衝突點，並為最容易出錯的環節提供「Plan B (備用方案)」。' },
@@ -208,6 +224,9 @@
                 { id: 'act-video-pro', label: '影片生成：專業級提示詞', prompt: '【進階任務-影片生成】：請根據提供內容，撰寫符合專業影片生成標準的提示詞。請將提示詞高度結構化，必須包含：視覺風格、鏡頭語言(Camera/Lens/Lighting)、主體動作拆解(Actions)、物理動態(Physics)與精準聲音設計(Sound)。' }
             ],
             roles: [ 
+                { id: 'expert-frontend', label: '前端 UI 工程師', prompt: '【專家角色】：你是一位資深的前端 UI/UX 工程師。精通 React, Vue, Tailwind CSS 等框架，對響應式設計(RWD)與使用者體驗有著極致的追求。' },
+                { id: 'expert-backend', label: '後端系統架構師', prompt: '【專家角色】：你是一位後端系統架構師。精通雲端部署、資料庫設計(SQL/NoSQL)與高併發處理，能提供最穩定、安全、可擴展的技術方案。' },
+                { id: 'expert-seo', label: 'SEO 內容專家', prompt: '【專家角色】：你是一位頂尖的 SEO 內容行銷專家。深諳搜尋引擎演算法，能巧妙佈局長尾關鍵字，同時保持文章對人類讀者的高度吸引力。' },
                 { id: 'expert-coach', label: '高階教練/培訓導師', prompt: '【專家角色】：你是一位擁有豐富經驗的高階企業教練與培訓導師。擅長發掘潛力、建立能力雷達圖，並設計循序漸進的養成計畫與激勵機制。' },
                 { id: 'expert-director', label: '電影導演/攝影指導', prompt: '【專家角色】：你是一位得獎無數的電影導演與攝影指導 (DoP)。精通鏡頭語言 (Camera shot)、焦段運用、電影級光影與視覺敘事節奏，能將文字轉化為極具張力的畫面指示。' },
                 { id: 'expert-scenarist', label: '影視編劇/世界觀架構師', prompt: '【專家角色】：你是一位資深的影視編劇與世界觀架構師。擅長角色弧光設定(Character Arc)、場景氣氛渲染與跌宕起伏的劇情編排。' },
@@ -339,6 +358,14 @@
                 { id: 'c-ice', label: '冰川冷藍', swatches: ['#E0F7FA', '#B2EBF2', '#00BCD4'], prompt: '【色調風格】：冰川冷藍色系。以冰雪般的冷白色、淺藍與青色為主，呈現極度冷靜與科技感。' },
                 { id: 'c-bw', label: '經典黑白灰', swatches: ['#000000', '#7F7F7F', '#FFFFFF'], prompt: '【色調風格】：經典黑白灰色系。完全排除彩色，僅靠黑、白與不同階調的灰色構建純粹的視覺。' }
             ],
+            constraints: [
+                { id: 'con-no-bs', label: '禁用 AI 開場白', prompt: '【嚴格限制】：請直接輸出最終結果，絕對禁止使用「好的」、「了解」、「這就為您產出」等任何寒暄廢話。' },
+                { id: 'con-no-list', label: '禁用條列式', prompt: '【嚴格限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
+                { id: 'con-word-limit', label: '字數嚴格限制', prompt: '【嚴格限制】：請嚴格控制字數，排版需極度緊湊，避免冗言贅字。' },
+                { id: 'con-no-jargon', label: '禁用生僻字', prompt: '【嚴格限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語或過度專業的學術行話。' },
+                { id: 'con-neg-img', label: '反向提示詞 (圖像)', prompt: '【反向提示詞 (Negative Prompt)】：畫面上禁止出現：變形的肢體、錯誤的手指數量、浮水印、簽名、文字、模糊不清的邊緣、低畫質。' },
+                { id: 'con-neg-vid', label: '反向提示詞 (影片)', prompt: '【反向提示詞 (Negative Prompt)】：影片中禁止出現：物理定律錯誤、物體突然消失或穿模、非自然的閃爍、扭曲的人臉、不連貫的背景。' }
+            ],
             notes: [ 
                 { id: 'n-scene', label: '場景替換', prompt: '【細節微調】：將背景換成展現企業團隊合作與數位轉型、具備專業感的商務場景。' },
                 { id: 'n-data', label: '強化數據感', prompt: '【細節微調】：加入數據成長曲線與上升箭頭，強調市場潛力。' },
@@ -377,6 +404,7 @@
         // Centralized initial state function
         const getInitialSelections = () => ({
             data_type: null,
+            language: null,
             action_type: null,
             role: null,
             infographic: null,
@@ -386,6 +414,7 @@
             gender: null,
             age_group: null,
             color: null,
+            constraints: [],
             notes: [],
             custom_inputs: {} // 記錄各分類的自訂輸入文字
         });
@@ -402,6 +431,7 @@
         const customNotesInput = document.getElementById('custom-notes-input');
         const promptOutput = document.getElementById('prompt-output');
         const copyBtn = document.getElementById('copy-btn');
+        const downloadBtn = document.getElementById('download-btn');
         const fileInput = document.getElementById('file-input');
         const fileDisplay = document.getElementById('file-display');
         const analyzeDetailedBtn = document.getElementById('analyze-detailed');
@@ -490,13 +520,16 @@
                 return content ? content + "\n" : "";
             };
 
-            const buildNoteSection = () => {
+            const buildMultiSection = (categoryKey, titlePrefix) => {
+                const selectedItems = selections[categoryKey];
+                const customText = selections.custom_inputs[categoryKey];
+                
                 let content = "";
-                if (selections.notes && selections.notes.length > 0) {
-                    content += selections.notes.map(n => `${n.prompt}`).join('\n') + '\n';
+                if (selectedItems && selectedItems.length > 0) {
+                    content += selectedItems.map(n => `${n.prompt}`).join('\n') + '\n';
                 }
-                if (selections.custom_inputs['notes'] && selections.custom_inputs['notes'].trim() !== '') {
-                    content += `【自訂細節微調】：${selections.custom_inputs['notes'].trim()}\n`;
+                if (customText && customText.trim() !== '') {
+                    content += `【自訂${titlePrefix}】：${customText.trim()}\n`;
                 }
                 return content ? content + "\n" : "";
             };
@@ -511,6 +544,7 @@
             let targetAndFormat = "";
             if (title.trim()) targetAndFormat += `本專案核心主題為：「${title.trim()}」。\n`;
             targetAndFormat += buildSection("data_types", "輸出型式");
+            targetAndFormat += buildSection("languages", "輸出語言");
             
             if (targetAndFormat.trim()) {
                 prompt += `【專案任務與主要型式】：\n${targetAndFormat}\n`;
@@ -535,11 +569,18 @@
             if (visualSection) prompt += visualSection;
 
             // 6. 特定細節要求微調
-            prompt += buildNoteSection();
+            let notesSection = buildMultiSection("notes", "細節微調");
+            if (notesSection) prompt += notesSection;
+
+            // 7. 嚴格限制條件與避雷
+            let constraintsSection = buildMultiSection("constraints", "限制條件");
+            if (constraintsSection) {
+                prompt += `【嚴格禁止與避雷規範】：\n請確保您的產出絕對不違反以下條件：\n${constraintsSection}\n`;
+            }
             
             // Wrap up perfectly
             if (prompt.trim()) {
-                prompt = `請嚴格依照以下設定框架、專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}\n========================================\n\n確認以上所有條件與資料無誤後，請立即開始執行並給出最佳結果。`;
+                prompt = `請嚴格依照以下設定框架、專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}========================================\n\n確認以上所有條件與資料無誤後，請立即開始執行並給出最佳結果。`;
             }
 
             promptOutput.textContent = prompt;
@@ -550,16 +591,18 @@
             
             const groups = [
                 { label: "1. 輸出型式", key: "data_types", icon: 'files', customTitle: "輸出型式" },
-                { label: "2. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架" },
-                { label: "3. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色" },
-                { label: "4. 性別專屬", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
-                { label: "5. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡" },
-                { label: "6. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象" },
-                { label: "7. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境" },
-                { label: "8. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
-                { label: "9. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格" },
-                { label: "10. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
-                { label: "11. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
+                { label: "2. 輸出語言", key: "languages", icon: 'globe', customTitle: "輸出語言" },
+                { label: "3. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架" },
+                { label: "4. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色" },
+                { label: "5. 性別專屬", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
+                { label: "6. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡" },
+                { label: "7. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象" },
+                { label: "8. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境" },
+                { label: "9. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
+                { label: "10. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格" },
+                { label: "11. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
+                { label: "12. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
+                { label: "13. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
             ];
 
             groups.forEach(group => {
@@ -577,10 +620,14 @@
                 // 渲染預設按鈕
                 INITIAL_CONFIG[group.key].forEach(opt => {
                     const btn = document.createElement('button');
-                    const stateKey = group.key.replace(/s$/, '');
-                    const isActive = group.isMulti
-                        ? selections.notes.some(n => n.id === opt.id)
-                        : selections[stateKey]?.id === opt.id;
+                    const stateKey = group.key.replace(/s$/, ''); // e.g., 'notes' -> 'note', but we handle multi manually
+                    
+                    let isActive = false;
+                    if (group.isMulti) {
+                        isActive = selections[group.key].some(n => n.id === opt.id);
+                    } else {
+                        isActive = selections[stateKey]?.id === opt.id;
+                    }
 
                     btn.className = `selection-btn group relative flex flex-col items-center justify-center min-h-[42px] px-3.5 min-w-[90px] rounded-xl transition-all text-[15px] text-center border-2 shrink-0 ${
                         isActive ? 'active' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50/50'
@@ -602,9 +649,9 @@
 
                     btn.onclick = () => {
                         if (group.isMulti) {
-                            const index = selections.notes.findIndex(n => n.id === opt.id);
-                            if (index > -1) selections.notes.splice(index, 1);
-                            else selections.notes.push(opt);
+                            const index = selections[group.key].findIndex(n => n.id === opt.id);
+                            if (index > -1) selections[group.key].splice(index, 1);
+                            else selections[group.key].push(opt);
                         } else {
                             selections[stateKey] = selections[stateKey]?.id === opt.id ? null : opt;
                         }
@@ -766,6 +813,31 @@
                 showToast('複製失敗，請手動圈選複製', 'error');
             }
             document.body.removeChild(el);
+        };
+        
+        // --- 新增：下載 TXT 按鈕邏輯 ---
+        downloadBtn.onclick = () => {
+            const promptText = promptOutput.textContent;
+            if (!promptText.trim()) {
+                showToast('目前沒有可下載的內容', 'error');
+                return;
+            }
+
+            const blob = new Blob([promptText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            // 檔名加上當前時間戳記，避免重複
+            const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            a.download = `AI_Prompt_${dateStr}.txt`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('檔案已成功下載！', 'success');
         };
 
         resetAllBtn.onclick = showModal;
