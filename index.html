@@ -114,7 +114,7 @@
                     
                     <!-- Custom Notes -->
                     <div class="mt-6 pt-4 border-t border-slate-100">
-                        <h3 class="text-sm font-bold text-slate-500 uppercase mb-1.5 flex items-center gap-1"><i data-lucide="pen-line" class="w-4 h-4"></i> 8. 自訂需求 (AI 分析結果也會填入此處)</h3>
+                        <h3 class="text-sm font-bold text-slate-500 uppercase mb-1.5 flex items-center gap-1"><i data-lucide="pen-line" class="w-4 h-4"></i> 9. 自訂需求 (AI 分析結果也會填入此處)</h3>
                         <textarea id="custom-notes-input" placeholder="在此輸入自訂需求、額外細節備註，或由 AI 自動填入分析結果..." class="w-full h-32 p-3 rounded border border-slate-200 bg-slate-50 text-base outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
                     </div>
                 </div>
@@ -166,6 +166,16 @@
 
         // --- Config Data ---
         const INITIAL_CONFIG = {
+            data_types: [
+                { id: 'dt-ppt', label: '簡報 (PPT)', prompt: '輸出格式：完整的簡報大綱與各頁詳細內容規劃。' },
+                { id: 'dt-img', label: '圖片 (Image)', prompt: '輸出格式：詳細的 AI 繪圖提示詞 (Image Prompt)，精確描述畫面細節與視覺元素。' },
+                { id: 'dt-video', label: '影像 (Video)', prompt: '輸出格式：影片腳本 (Video Script)，包含分鏡描述、旁白與畫面動態指示。' },
+                { id: 'dt-report', label: '報告 (Report)', prompt: '輸出格式：結構化的專業文字報告，包含摘要、內文與結論。' },
+                { id: 'dt-table', label: '資料表 (Table)', prompt: '輸出格式：以 Markdown 表格 (Table) 呈現，清晰對齊各項數據與分類。' },
+                { id: 'dt-summary', label: '摘要重點 (Summary)', prompt: '輸出格式：極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' },
+                { id: 'dt-text', label: '文字 (Text)', prompt: '輸出格式：流暢的純文字敘述，適合文章、貼文或一般閱讀。' },
+                { id: 'dt-chart', label: '圖表結構 (Chart)', prompt: '輸出格式：適合轉換為心智圖、流程圖或階層結構圖的文字描述。' }
+            ],
             roles: [
                 { id: 'student', label: '大學學生', prompt: '你現在是一位充滿熱忱、樂於分享學習心得與校園生活的大學學生。' },
                 { id: 'grad-student', label: '研究生', prompt: '你現在是一位講究邏輯、實事求是、擅長文獻回顧與研究分析的研究所學生。' },
@@ -263,6 +273,11 @@
             ]
         };
 
+        // --- Extracted CSS Constants for Clean Code ---
+        const ANALYZE_BTN_DISABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
+        const ANALYZE_DETAILED_ENABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
+        const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
+
         const apiKey = "";
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const app = Object.keys(firebaseConfig).length > 0 ? initializeApp(firebaseConfig) : null;
@@ -272,7 +287,10 @@
 
         // --- Application State ---
         let user = null;
-        let selections = {
+        
+        // Centralized initial state function
+        const getInitialSelections = () => ({
+            data_type: null,
             role: null,
             infographic: null,
             visual_style: null,
@@ -280,7 +298,9 @@
             audience: null,
             color: null,
             notes: [],
-        };
+        });
+        
+        let selections = getInitialSelections();
         let title = '';
         let customNotes = '';
         let analyzing = false;
@@ -343,25 +363,17 @@
             confirmModal.classList.add('opacity-0');
             confirmModalContent.classList.remove('scale-100');
             confirmModalContent.classList.add('scale-95');
-            setTimeout(() => {
-                confirmModal.classList.add('hidden');
-            }, 200);
+            setTimeout(() => confirmModal.classList.add('hidden'), 200);
         };
 
         // Auto Save to Firebase
         const saveState = () => {
             if (!user || !db) return;
-            
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(async () => {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'config');
-                    await setDoc(docRef, {
-                        selections,
-                        title,
-                        customNotes,
-                        updatedAt: new Date().toISOString()
-                    });
+                    await setDoc(docRef, { selections, title, customNotes, updatedAt: new Date().toISOString() });
                 } catch (err) {
                     console.error("Auto-save failed:", err);
                 }
@@ -383,14 +395,14 @@
             };
 
             const buildNoteSection = () => {
-                const selectedNotes = selections.notes;
-                if (!selectedNotes || selectedNotes.length === 0) return "";
-                const list = selectedNotes.map(n => `- ${n.prompt}`).join('\n');
+                if (!selections.notes || selections.notes.length === 0) return "";
+                const list = selections.notes.map(n => `- ${n.prompt}`).join('\n');
                 return `\n# 視覺效果要求\n${list}\n`;
             };
 
             let prompt = "";
             if (title.trim()) prompt += `# 封面標題\n"${title.trim()}"\n`;
+            if (selections.data_type) prompt += buildSection("主要輸出格式", "data_types");
             if (selections.role) prompt += buildSection("角色設定", "roles");
             if (selections.infographic) prompt += buildSection("版型模板", "infographics");
 
@@ -423,13 +435,14 @@
             selectionGroupsContainer.innerHTML = '';
             
             const groups = [
-                { label: "1. 角色", key: "roles", icon: 'user' },
-                { label: "2. 版型模板", key: "infographics", icon: 'layout-template' },
-                { label: "3. 視覺風格", key: "visual_styles", icon: 'palette' },
-                { label: "4. 詮釋情境", key: "tones", icon: 'mic' },
-                { label: "5. 目標對象", key: "audiences", icon: 'users' },
-                { label: "6. 色彩搭配", key: "colors", icon: 'pipette', isColor: true },
-                { label: "7. 視覺效果", key: "notes", icon: 'list-checks', isMulti: true }
+                { label: "1. 輸出格式", key: "data_types", icon: 'files' },
+                { label: "2. 角色", key: "roles", icon: 'user' },
+                { label: "3. 版型模板", key: "infographics", icon: 'layout-template' },
+                { label: "4. 視覺風格", key: "visual_styles", icon: 'palette' },
+                { label: "5. 詮釋情境", key: "tones", icon: 'mic' },
+                { label: "6. 目標對象", key: "audiences", icon: 'users' },
+                { label: "7. 色彩搭配", key: "colors", icon: 'pipette', isColor: true },
+                { label: "8. 視覺效果", key: "notes", icon: 'list-checks', isMulti: true }
             ];
 
             groups.forEach(group => {
@@ -547,7 +560,6 @@
                     } else {
                         throw new Error('No text in response');
                     }
-                    
                     finishAnalysis();
                 };
             } catch (err) {
@@ -568,30 +580,22 @@
 
         // --- Event Listeners ---
 
-        titleInput.oninput = (e) => { 
-            title = e.target.value; 
-            buildPrompt(); 
-            saveState(); 
-        };
-        
-        customNotesInput.oninput = (e) => { 
-            customNotes = e.target.value; 
-            buildPrompt(); 
-            saveState(); 
-        };
+        titleInput.oninput = (e) => { title = e.target.value; buildPrompt(); saveState(); };
+        customNotesInput.oninput = (e) => { customNotes = e.target.value; buildPrompt(); saveState(); };
 
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 const iconType = file.type.includes('pdf') ? 'file-text' : 'image';
                 fileDisplay.innerHTML = `<i data-lucide="${iconType}" class="w-6 h-6 text-indigo-500 mb-1"></i><span class="text-sm font-bold truncate max-w-[200px] text-indigo-700">${file.name}</span><span class="text-xs text-indigo-400">${(file.size / 1024 / 1024).toFixed(2)} MB</span>`;
-                
-                analyzeDetailedBtn.className = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
-                analyzeConciseBtn.className = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
+                analyzeDetailedBtn.className = ANALYZE_DETAILED_ENABLED_CLASS;
+                analyzeConciseBtn.className = ANALYZE_CONCISE_ENABLED_CLASS;
                 analyzeDetailedBtn.disabled = false;
                 analyzeConciseBtn.disabled = false;
             } else {
                 fileDisplay.innerHTML = `<i data-lucide="upload-cloud" class="w-6 h-6 mb-1"></i><span class="text-sm font-bold text-indigo-600">點擊上傳 NotebookLM PDF 或截圖</span><span class="text-xs text-slate-400 font-normal">支援 PNG, JPG, PDF (最大 5MB)</span>`;
+                analyzeDetailedBtn.className = ANALYZE_BTN_DISABLED_CLASS;
+                analyzeConciseBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 analyzeDetailedBtn.disabled = true;
                 analyzeConciseBtn.disabled = true;
             }
@@ -617,7 +621,7 @@
                 showToast('提示詞已複製到剪貼簿！', 'success');
                 
                 const originalHtml = copyBtn.innerHTML;
-                copyBtn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> 已複製`;
+                copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
                 copyBtn.classList.replace('bg-indigo-600', 'bg-emerald-500');
                 copyBtn.classList.replace('hover:bg-indigo-500', 'hover:bg-emerald-400');
                 lucide.createIcons({ root: copyBtn });
@@ -640,11 +644,7 @@
         confirmResetBtn.onclick = () => {
             title = '';
             customNotes = '';
-            selections = {
-                role: null, infographic: null, visual_style: null,
-                tone: null, audience: null, color: null,
-                notes: [],
-            };
+            selections = getInitialSelections();
             titleInput.value = '';
             customNotesInput.value = '';
             fileInput.value = '';
@@ -652,8 +652,8 @@
             
             analyzeDetailedBtn.disabled = true;
             analyzeConciseBtn.disabled = true;
-            analyzeDetailedBtn.className = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
-            analyzeConciseBtn.className = "flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
+            analyzeDetailedBtn.className = ANALYZE_BTN_DISABLED_CLASS;
+            analyzeConciseBtn.className = ANALYZE_BTN_DISABLED_CLASS;
             
             updateStateAndRender();
             hideModal();
@@ -661,11 +661,7 @@
         };
 
         clearSelectionsBtn.onclick = () => {
-            selections = {
-                role: null, infographic: null, visual_style: null,
-                tone: null, audience: null, color: null,
-                notes: [],
-            };
+            selections = getInitialSelections();
             updateStateAndRender();
             showToast('已取消按鈕選取', 'info');
         };
@@ -686,9 +682,7 @@
             if (!isResizing) return;
             const rect = container.getBoundingClientRect();
             let newWidth = ((e.clientX - rect.left) / rect.width) * 100;
-            if (newWidth >= 30 && newWidth <= 80) {
-                leftPanel.style.flexBasis = `${newWidth}%`;
-            }
+            if (newWidth >= 30 && newWidth <= 80) leftPanel.style.flexBasis = `${newWidth}%`;
         };
 
         document.onmouseup = () => {
@@ -713,7 +707,7 @@
                 await signInAnonymously(auth);
             }
 
-            const unsubscribe = onAuthStateChanged(auth, async (u) => {
+            onAuthStateChanged(auth, async (u) => {
                 user = u;
                 if (!user) return;
                 
