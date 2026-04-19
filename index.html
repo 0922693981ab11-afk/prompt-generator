@@ -256,15 +256,15 @@
                 { id: 'g-other', label: '其他 (多元)', prompt: '【專屬性別設定】：採用包容多元性別族群 (LGBTQ+) 的友善敘事方式。' }
             ],
             age_groups: [
-                { id: 'age-any', label: '不限年齡', prompt: '【專屬年齡設定】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
-                { id: 'age-u12', label: '12歲以下', prompt: '【專屬年齡設定】：目標為 12 歲以下兒童。使用極度簡單、童趣且具教育意義的字彙。' },
-                { id: 'age-13-17', label: '13-17歲', prompt: '【專屬年齡設定】：目標為 13-17 歲青少年。結合時下校園流行語與青少年關注議題。' },
-                { id: 'age-18-24', label: '18-24歲', prompt: '【專屬年齡設定】：目標為 18-24 歲 (大學生/新鮮人)。重視自我實現、探索與網路原生代的共鳴。' },
-                { id: 'age-25-34', label: '25-34歲', prompt: '【專屬年齡設定】：目標為 25-34 歲 (職場輕熟齡)。切中工作效率、生活品質與職涯焦慮。' },
-                { id: 'age-35-44', label: '35-44歲', prompt: '【專屬年齡設定】：目標為 35-44 歲 (三明治族群)。重視務實、家庭照顧與投資報酬率。' },
-                { id: 'age-45-54', label: '45-54歲', prompt: '【專屬年齡設定】：目標為 45-54 歲。語氣穩重成熟，強調理財規劃、健康與尊榮感。' },
-                { id: 'age-55-64', label: '55-64歲', prompt: '【專屬年齡設定】：目標為 55-64 歲 (熟齡族)。重視養生、生活傳承與退休準備，用語溫和。' },
-                { id: 'age-65up', label: '65歲以上', prompt: '【專屬年齡設定】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
+                { id: 'age-any', label: '不限年齡', prompt: '【專屬年齡層】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
+                { id: 'age-u12', label: '12歲以下', prompt: '【專屬年齡層】：目標為 12 歲以下兒童。使用極度簡單、童趣且具教育意義的字彙。' },
+                { id: 'age-13-17', label: '13-17歲', prompt: '【專屬年齡層】：目標為 13-17 歲青少年。結合時下校園流行語與青少年關注議題。' },
+                { id: 'age-18-24', label: '18-24歲', prompt: '【專屬年齡層】：目標為 18-24 歲 (大學生/新鮮人)。重視自我實現、探索與網路原生代的共鳴。' },
+                { id: 'age-25-34', label: '25-34歲', prompt: '【專屬年齡層】：目標為 25-34 歲 (職場輕熟齡)。切中工作效率、生活品質與職涯焦慮。' },
+                { id: 'age-35-44', label: '35-44歲', prompt: '【專屬年齡層】：目標為 35-44 歲 (三明治族群)。重視務實、家庭照顧與投資報酬率。' },
+                { id: 'age-45-54', label: '45-54歲', prompt: '【專屬年齡層】：目標為 45-54 歲。語氣穩重成熟，強調理財規劃、健康與尊榮感。' },
+                { id: 'age-55-64', label: '55-64歲', prompt: '【專屬年齡層】：目標為 55-64 歲 (熟齡族)。重視養生、生活傳承與退休準備，用語溫和。' },
+                { id: 'age-65up', label: '65歲以上', prompt: '【專屬年齡層】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
             ],
             audiences: [ 
                 { id: 'a-executives', label: '決策高層', prompt: '【目標對象】：公司決策高層。刪除廢話，直擊核心決策價值與 ROI。' },
@@ -405,17 +405,17 @@
         const getInitialSelections = () => ({
             data_type: null,
             language: null,
-            action_type: null,
-            role: null,
+            action_types: [], // 改為複選陣列
+            roles: [],        // 改為複選陣列
             infographic: null,
-            visual_style: null,
-            tone: null,
-            audience: null,
+            visual_styles: [],// 改為複選陣列
+            tones: [],        // 改為複選陣列
+            audiences: [],    // 改為複選陣列
             gender: null,
-            age_group: null,
+            age_groups: [],   // 改為複選陣列
             color: null,
-            constraints: [],
-            notes: [],
+            constraints: [],  // 已是複選陣列
+            notes: [],        // 已是複選陣列
             custom_inputs: {} // 記錄各分類的自訂輸入文字
         });
         
@@ -506,48 +506,64 @@
             saveState();
         };
 
+        // 核心文字萃取：移除提示詞中的預設標頭 (如：【視覺風格】：)
+        const cleanPromptText = (text) => text.replace(/^【.*?】：\s*/g, '').trim();
+
+        const buildSingleSection = (stateKey, groupKey, defaultTitle) => {
+            const selection = selections[stateKey];
+            const customText = selections.custom_inputs[groupKey];
+            let content = "";
+            
+            if (selection) {
+                content += `${selection.prompt}\n`;
+            }
+            if (customText && customText.trim() !== '') {
+                content += `【自訂${defaultTitle}】：${customText.trim()}\n`;
+            }
+            return content ? content + "\n" : "";
+        };
+
+        const buildMultiSectionMerged = (stateKey, groupKey, sectionTitle) => {
+            const selectedItems = selections[stateKey];
+            const customText = selections.custom_inputs[groupKey];
+            let content = "";
+            let lines = [];
+            
+            if (selectedItems && selectedItems.length > 0) {
+                if (selectedItems.length === 1) {
+                    lines.push(`${cleanPromptText(selectedItems[0].prompt)}`);
+                } else {
+                    // Combine multiple with numeric bullet points for clearer separation
+                    selectedItems.forEach((item, idx) => {
+                        lines.push(`${idx + 1}. ${item.label}：${cleanPromptText(item.prompt)}`);
+                    });
+                }
+            }
+            if (customText && customText.trim() !== '') {
+                lines.push(`📌 自訂要求：${customText.trim()}`);
+            }
+
+            if (lines.length > 0) {
+                content = `【${sectionTitle}】：\n${lines.join('\n')}\n\n`;
+            }
+            return content;
+        };
+
         const buildPrompt = () => {
-            const buildSection = (categoryKey, customTitle) => {
-                const stateKey = categoryKey.replace(/s$/, '');
-                const selection = selections[stateKey];
-                const customText = selections.custom_inputs[categoryKey];
-                
-                let content = "";
-                if (selection) content += `${selection.prompt}\n`;
-                if (customText && customText.trim() !== '') {
-                    content += `【自訂${customTitle}】：${customText.trim()}\n`;
-                }
-                return content ? content + "\n" : "";
-            };
-
-            const buildMultiSection = (categoryKey, titlePrefix) => {
-                const selectedItems = selections[categoryKey];
-                const customText = selections.custom_inputs[categoryKey];
-                
-                let content = "";
-                if (selectedItems && selectedItems.length > 0) {
-                    content += selectedItems.map(n => `${n.prompt}`).join('\n') + '\n';
-                }
-                if (customText && customText.trim() !== '') {
-                    content += `【自訂${titlePrefix}】：${customText.trim()}\n`;
-                }
-                return content ? content + "\n" : "";
-            };
-
             let prompt = "";
             
-            // 1. 專家角色與指令框架
-            let roleAndAction = buildSection("roles", "專家角色") + buildSection("action_types", "進階任務");
-            if (roleAndAction) prompt += roleAndAction;
+            // 1. 專家角色與指令框架 (Multi)
+            prompt += buildMultiSectionMerged("roles", "roles", "多重專家角色設定");
+            prompt += buildMultiSectionMerged("action_types", "action_types", "進階任務與分析框架");
             
             // 2. 任務目標與標題
             let targetAndFormat = "";
-            if (title.trim()) targetAndFormat += `本專案核心主題為：「${title.trim()}」。\n`;
-            targetAndFormat += buildSection("data_types", "輸出型式");
-            targetAndFormat += buildSection("languages", "輸出語言");
+            if (title.trim()) targetAndFormat += `本次專案核心主題為：「${title.trim()}」。\n`;
+            targetAndFormat += buildSingleSection("data_type", "data_types", "輸出型式");
+            targetAndFormat += buildSingleSection("language", "languages", "輸出語言");
             
             if (targetAndFormat.trim()) {
-                prompt += `【專案任務與主要型式】：\n${targetAndFormat}\n`;
+                prompt += `【專案任務與輸出格式】：\n${targetAndFormat}\n`;
             }
 
             // 3. 原始資料餵養區
@@ -555,32 +571,71 @@
                 prompt += `【請先詳細閱讀以下專案/原始文獻資料】：\n---\n${customNotes.trim()}\n---\n\n`;
             }
             
-            // 4. 對標受眾與情境 (性別/年齡/客群)
-            let audienceSection = buildSection("audiences", "目標對象") + 
-                                  buildSection("genders", "性別設定") + 
-                                  buildSection("age_groups", "年齡設定") + 
-                                  buildSection("tones", "語氣情境");
-            if (audienceSection) prompt += audienceSection;
+            // 4. 對標受眾與情境 (Multi & Single)
+            prompt += buildMultiSectionMerged("audiences", "audiences", "目標受眾特徵");
+            
+            let demoGraphics = buildSingleSection("gender", "genders", "專屬性別") + 
+                               buildMultiSectionMerged("age_groups", "age_groups", "專屬年齡層");
+            if (demoGraphics.trim()) {
+                prompt += `【人口統計學設定】：\n${demoGraphics}\n`;
+            }
+            
+            prompt += buildMultiSectionMerged("tones", "tones", "溝通語氣與情境");
 
             // 5. 版型結構與視覺呈現
-            let visualSection = buildSection("infographics", "版型結構") + 
-                                buildSection("visual_styles", "視覺風格") + 
-                                buildSection("colors", "色調風格");
-            if (visualSection) prompt += visualSection;
-
-            // 6. 特定細節要求微調
-            let notesSection = buildMultiSection("notes", "細節微調");
-            if (notesSection) prompt += notesSection;
-
-            // 7. 嚴格限制條件與避雷
-            let constraintsSection = buildMultiSection("constraints", "限制條件");
-            if (constraintsSection) {
-                prompt += `【嚴格禁止與避雷規範】：\n請確保您的產出絕對不違反以下條件：\n${constraintsSection}\n`;
+            let visualSection = buildSingleSection("infographic", "infographics", "版型結構") + 
+                                buildMultiSectionMerged("visual_styles", "visual_styles", "視覺風格") + 
+                                buildSingleSection("color", "colors", "色調風格");
+            if (visualSection.trim()) {
+                prompt += `【視覺呈現與排版規範】：\n${visualSection}\n`;
             }
+
+            // 6. 特定細節要求微調 (Multi)
+            prompt += buildMultiSectionMerged("notes", "notes", "特定細節微調要求");
+
+            // 7. 嚴格限制條件與避雷 (Multi)
+            let constraintsSection = buildMultiSectionMerged("constraints", "constraints", "嚴格限制與避雷規範");
+            if (constraintsSection.trim()) {
+                prompt += constraintsSection;
+            }
+
+            // === 8. THE FINAL SUMMARY (總結指令) ===
+            const getLabels = (stateKey) => (selections[stateKey] || []).map(i => i.label);
+            const getSingleLabel = (stateKey) => selections[stateKey]?.label;
+
+            const sumRoles = getLabels("roles").join('、') || '專業AI助理';
+            const sumFormat = getSingleLabel("data_type") || '最佳成果';
+            const sumLang = getSingleLabel("language") || '繁體中文';
+            
+            let sumElements = [];
+            const sumAction = getLabels("action_types");
+            if (sumAction.length) sumElements.push(`執行「${sumAction.join('、')}」任務`);
+            
+            const sumAudience = getLabels("audiences");
+            if (sumAudience.length) sumElements.push(`針對「${sumAudience.join('、')}」受眾`);
+            
+            const sumTone = getLabels("tones");
+            if (sumTone.length) sumElements.push(`使用「${sumTone.join('、')}」的語氣`);
+
+            const sumStyles = [...getLabels("visual_styles"), getSingleLabel("color")].filter(Boolean);
+            if (sumStyles.length) sumElements.push(`結合「${sumStyles.join('、')}」視覺風格`);
+
+            const constraintsCount = (selections["constraints"] || []).length;
+            const notesCount = (selections["notes"] || []).length;
+            
+            let finalSummary = `【最終統整與執行指令 (Execution Summary)】\n`;
+            finalSummary += `👉 總結以上設定，請您化身為「${sumRoles}」，以「${sumLang}」產出高品質的「${sumFormat}」。\n`;
+            if (sumElements.length > 0) {
+                finalSummary += `👉 過程中請務必：${sumElements.join('，')}。\n`;
+            }
+            if (constraintsCount > 0 || notesCount > 0) {
+                finalSummary += `👉 並嚴格遵守上述提及的 ${constraintsCount} 項避雷限制與 ${notesCount} 項細節微調。\n`;
+            }
+            finalSummary += `\n確認無誤後，請略過不必要的寒暄，立即開始處理資料並給出最終結果！`;
             
             // Wrap up perfectly
             if (prompt.trim()) {
-                prompt = `請嚴格依照以下設定框架、專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}========================================\n\n確認以上所有條件與資料無誤後，請立即開始執行並給出最佳結果。`;
+                prompt = `請嚴格依照以下疊加設定、多重專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}\n${finalSummary}\n========================================`;
             }
 
             promptOutput.textContent = prompt;
@@ -592,14 +647,14 @@
             const groups = [
                 { label: "1. 輸出型式", key: "data_types", icon: 'files', customTitle: "輸出型式" },
                 { label: "2. 輸出語言", key: "languages", icon: 'globe', customTitle: "輸出語言" },
-                { label: "3. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架" },
-                { label: "4. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色" },
+                { label: "3. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架", isMulti: true },
+                { label: "4. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色", isMulti: true },
                 { label: "5. 性別專屬", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
-                { label: "6. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡" },
-                { label: "7. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象" },
-                { label: "8. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境" },
+                { label: "6. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡", isMulti: true },
+                { label: "7. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象", isMulti: true },
+                { label: "8. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境", isMulti: true },
                 { label: "9. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
-                { label: "10. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格" },
+                { label: "10. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格", isMulti: true },
                 { label: "11. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
                 { label: "12. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
                 { label: "13. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
@@ -611,20 +666,23 @@
                 
                 const titleEl = document.createElement('h3');
                 titleEl.className = 'text-[15px] font-bold text-slate-600 mb-3 flex items-center gap-1.5';
-                titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400 font-normal ml-1 text-[13px] tracking-wide">(此區塊可複選)</span>' : ''}`;
+                titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400 font-normal ml-1 text-[13px] tracking-wide">(此區塊開放複選)</span>' : ''}`;
                 groupEl.appendChild(titleEl);
 
                 const grid = document.createElement('div');
                 grid.className = 'flex flex-wrap gap-2.5';
 
+                // stateKey 對應：如果是複選，stateKey 直接用 group.key (例如 roles, action_types)
+                // 如果是單選，將字尾 s 去除 (例如 data_types -> data_type)
+                const stateKey = group.isMulti ? group.key : group.key.replace(/s$/, '');
+
                 // 渲染預設按鈕
                 INITIAL_CONFIG[group.key].forEach(opt => {
                     const btn = document.createElement('button');
-                    const stateKey = group.key.replace(/s$/, ''); // e.g., 'notes' -> 'note', but we handle multi manually
                     
                     let isActive = false;
                     if (group.isMulti) {
-                        isActive = selections[group.key].some(n => n.id === opt.id);
+                        isActive = selections[stateKey].some(n => n.id === opt.id);
                     } else {
                         isActive = selections[stateKey]?.id === opt.id;
                     }
@@ -649,9 +707,9 @@
 
                     btn.onclick = () => {
                         if (group.isMulti) {
-                            const index = selections[group.key].findIndex(n => n.id === opt.id);
-                            if (index > -1) selections[group.key].splice(index, 1);
-                            else selections[group.key].push(opt);
+                            const index = selections[stateKey].findIndex(n => n.id === opt.id);
+                            if (index > -1) selections[stateKey].splice(index, 1);
+                            else selections[stateKey].push(opt);
                         } else {
                             selections[stateKey] = selections[stateKey]?.id === opt.id ? null : opt;
                         }
@@ -911,6 +969,27 @@
                 } catch(e) {}
             };
 
+            // 將舊版的單選設定自動無痛升級為陣列複選 (Migration Logic)
+            const migrateLegacyData = (loaded) => {
+                const toMigrate = [
+                    { old: 'action_type', new: 'action_types' },
+                    { old: 'role', new: 'roles' },
+                    { old: 'age_group', new: 'age_groups' },
+                    { old: 'audience', new: 'audiences' },
+                    { old: 'tone', new: 'tones' },
+                    { old: 'visual_style', new: 'visual_styles' }
+                ];
+                toMigrate.forEach(pair => {
+                    if (loaded[pair.old]) {
+                        if (!Array.isArray(loaded[pair.old])) {
+                            loaded[pair.new] = [loaded[pair.old]]; 
+                        }
+                        delete loaded[pair.old];
+                    }
+                });
+                return loaded;
+            };
+
             // 讀取本地儲存的設定
             const loadLocalSettings = () => {
                 try {
@@ -918,7 +997,8 @@
                     if (savedData) {
                         const data = JSON.parse(savedData);
                         if (data.selections) {
-                            selections = { ...getInitialSelections(), ...data.selections };
+                            const migratedSelections = migrateLegacyData(data.selections);
+                            selections = { ...getInitialSelections(), ...migratedSelections };
                             if(!selections.custom_inputs) selections.custom_inputs = {};
                         }
                         if (data.title) { title = data.title; titleInput.value = title; }
@@ -981,7 +1061,8 @@
                     if (snap.exists()) {
                         const data = snap.data();
                         if (data.selections) {
-                            selections = { ...getInitialSelections(), ...data.selections };
+                            const migratedSelections = migrateLegacyData(data.selections);
+                            selections = { ...getInitialSelections(), ...migratedSelections };
                             // 確保舊資料升級不會覆蓋掉新的自訂屬性
                             if(!selections.custom_inputs) selections.custom_inputs = {};
                         }
