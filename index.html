@@ -207,7 +207,6 @@
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Config Data ---
-        // 加入了 domains 標籤，用來判斷該選項應該出現在哪一個「核心領域」中
         const INITIAL_CONFIG = {
             data_types: [
                 { id: 'dt-ppt', label: '簡報結構規劃', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
@@ -318,6 +317,14 @@
                 { id: 't-bless', label: '真摯感念/祝福', domains: ['business', 'planning'], prompt: '【語氣情境】：充滿誠懇的祝福與感念，用語溫馨大方，為對方傳遞滿滿的正能量與美好願景。' },
                 { id: 't-excited', label: '熱情奔放', domains: ['planning'], prompt: '【語氣情境】：情緒極度飽滿、充滿期待與熱情，文字間帶有強烈的感染力與號召感。' }
             ],
+            cultures: [
+                { id: 'cul-tw', label: '🇹🇼 台灣在地化 (優先)', domains: ['visual', 'business', 'planning', 'academic'], prompt: '【文化與地域設定】：強制以「台灣 (Taiwan)」為核心背景。人物需具備台灣/亞洲人臉孔特徵；場景需融入台灣街景、建築、在地風景或人文風情。絕對避免生成預設的西方人種或歐美街景。' },
+                { id: 'cul-jp', label: '🇯🇵 日本風情', domains: ['visual', 'business', 'planning'], prompt: '【文化與地域設定】：以「日本 (Japan)」為核心構圖。人物為標準日系臉孔與穿搭；場景融入日本街景、和風建築、自然風景或文化符號。' },
+                { id: 'cul-kr', label: '🇰🇷 韓國潮流', domains: ['visual', 'business', 'planning'], prompt: '【文化與地域設定】：以「韓國 (Korea)」為核心構圖。人物需具備韓系流行美感、妝容與穿搭；場景融入韓國都市街景或現代流行文化元素。' },
+                { id: 'cul-cn', label: '🇨🇳 中國/東方風', domains: ['visual', 'business', 'planning'], prompt: '【文化與地域設定】：以「中國/東方文化 (Chinese/Eastern)」為核心構圖。融入中式傳統建築、山水意境或現代東方都市風貌，人物具備東方特質。' },
+                { id: 'cul-us', label: '🇺🇸 歐美/西方', domains: ['visual', 'business', 'planning'], prompt: '【文化與地域設定】：以「歐美/西方 (Western)」為核心構圖。人物具備典型的歐美臉孔特徵；場景為典型的西方都市、街區或自然景觀。' },
+                { id: 'cul-global', label: '🌍 國際化/多元', domains: ['visual', 'business', 'planning', 'academic', 'tech'], prompt: '【文化與地域設定】：以「國際化、多元融合 (Global/Diverse)」為核心構圖。包含不同膚色與人種的多元面貌，場景具備國際都會感，不侷限單一國家。' }
+            ],
             infographics: [ 
                 { id: 't-train-sheet', label: '培訓養成面板', domains: ['business', 'planning'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
                 { id: 't16', label: '課程大綱結構', domains: ['business', 'academic', 'planning'], prompt: '【版型結構】：製作『課程大綱』排版。包含：課程簡介、學習目標、章節模組(名稱/重點/練習題)、結業考核。' },
@@ -408,18 +415,19 @@
         const getInitialSelections = () => ({
             data_type: null,
             language: null,
-            action_types: [], // 複選陣列
-            roles: [],        // 複選陣列
+            action_types: [],
+            roles: [],       
             infographic: null,
-            visual_styles: [],// 複選陣列
-            tones: [],        // 複選陣列
-            audiences: [],    // 複選陣列
+            culture: null,    // 新增：文化與地域設定 (單選)
+            visual_styles: [],
+            tones: [],       
+            audiences: [],   
             gender: null,
-            age_groups: [],   // 複選陣列
+            age_groups: [],  
             color: null,
-            constraints: [],  // 複選陣列
-            notes: [],        // 複選陣列
-            custom_inputs: {} // 自訂輸入文字
+            constraints: [], 
+            notes: [],       
+            custom_inputs: {} 
         });
         
         let selections = getInitialSelections();
@@ -585,8 +593,9 @@
             
             prompt += buildMultiSectionMerged("tones", "tones", "溝通語氣與情境");
 
-            // 5. 版型結構與視覺呈現
+            // 5. 版型結構與視覺呈現 (加入文化地域設定)
             let visualSection = buildSingleSection("infographic", "infographics", "內容版型與結構") + 
+                                buildSingleSection("culture", "cultures", "文化與地域構圖") +
                                 buildMultiSectionMerged("visual_styles", "visual_styles", "視覺風格") + 
                                 buildSingleSection("color", "colors", "色調風格");
             if (visualSection.trim()) {
@@ -609,6 +618,7 @@
             const sumRoles = getLabels("roles").join('、') || '專業AI助理';
             const sumFormat = getSingleLabel("data_type") || '最佳成果';
             const sumLang = getSingleLabel("language") || '繁體中文';
+            const sumCulture = getSingleLabel("culture");
             
             let sumElements = [];
             const sumAction = getLabels("action_types");
@@ -631,6 +641,9 @@
             if (sumElements.length > 0) {
                 finalSummary += `👉 過程中請務必：${sumElements.join('，')}。\n`;
             }
+            if (sumCulture) {
+                finalSummary += `👉 視覺與內容請強制鎖定在「${sumCulture}」的人文與地域背景，拒絕預設的西方視角。\n`;
+            }
             if (constraintsCount > 0 || notesCount > 0) {
                 finalSummary += `👉 並嚴格遵守上述提及的 ${constraintsCount} 項避雷限制與 ${notesCount} 項細節微調。\n`;
             }
@@ -652,10 +665,11 @@
                         { label: "3. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架", isMulti: true },
                         { label: "4. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色", isMulti: true },
                         { label: "5. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
-                        { label: "6. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格", isMulti: true },
-                        { label: "7. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
-                        { label: "8. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
-                        { label: "9. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
+                        { label: "6. 文化與地域設定", key: "cultures", icon: 'map-pin', customTitle: "國家或地域", isMulti: false },
+                        { label: "7. 視覺風格", key: "visual_styles", icon: 'palette', customTitle: "視覺風格", isMulti: true },
+                        { label: "8. 色調風格", key: "colors", icon: 'pipette', isColor: true, customTitle: "色調風格" },
+                        { label: "9. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
+                        { label: "10. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
                     ];
                 case 'tech':
                     return [
@@ -683,9 +697,10 @@
                         { label: "7. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象", isMulti: true },
                         { label: "8. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境", isMulti: true },
                         { label: "9. 內容版型與結構", key: "infographics", icon: 'layout-template', customTitle: "內容版型" },
-                        { label: "10. 視覺與色調風格", key: "colors", icon: 'palette', isColor: true, customTitle: "色調風格" }, 
-                        { label: "11. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
-                        { label: "12. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
+                        { label: "10. 文化與地域設定", key: "cultures", icon: 'map-pin', customTitle: "國家或地域", isMulti: false },
+                        { label: "11. 視覺與色調風格", key: "colors", icon: 'palette', isColor: true, customTitle: "色調風格" }, 
+                        { label: "12. 嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
+                        { label: "13. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
                     ];
             }
         };
