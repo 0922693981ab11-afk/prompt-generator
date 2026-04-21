@@ -89,18 +89,21 @@
                             <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 🎯 第一步：請先選擇您的「核心任務領域」
                         </h3>
                         <p class="text-slate-300 text-sm mb-4">系統將自動為您篩選出最適合該領域的專業選項，避免無效參數干擾 AI。</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="domain-selector">
-                            <button data-domain="business" class="domain-btn active flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all">
-                                <i data-lucide="briefcase" class="w-4 h-4"></i> 商業與行銷文案
+                        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3" id="domain-selector">
+                            <button data-domain="business" class="domain-btn active flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all text-sm lg:text-[15px]">
+                                <i data-lucide="briefcase" class="w-4 h-4"></i> 商業與文案
                             </button>
-                            <button data-domain="visual" class="domain-btn flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all">
-                                <i data-lucide="image" class="w-4 h-4"></i> 視覺與影音生成
+                            <button data-domain="planning" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all text-sm lg:text-[15px]">
+                                <i data-lucide="map" class="w-4 h-4"></i> 企劃與生活
                             </button>
-                            <button data-domain="academic" class="domain-btn flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all">
-                                <i data-lucide="book-open" class="w-4 h-4"></i> 學術與深度報告
+                            <button data-domain="visual" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all text-sm lg:text-[15px]">
+                                <i data-lucide="image" class="w-4 h-4"></i> 視覺與影音
                             </button>
-                            <button data-domain="tech" class="domain-btn flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all">
-                                <i data-lucide="code" class="w-4 h-4"></i> 程式與數據開發
+                            <button data-domain="academic" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all text-sm lg:text-[15px]">
+                                <i data-lucide="book-open" class="w-4 h-4"></i> 學術與報告
+                            </button>
+                            <button data-domain="tech" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg border border-slate-600 transition-all text-sm lg:text-[15px] col-span-2 lg:col-span-1">
+                                <i data-lucide="code" class="w-4 h-4"></i> 程式與數據
                             </button>
                         </div>
                     </div>
@@ -133,7 +136,7 @@
                     <!-- Title Input -->
                     <div class="mb-6">
                         <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="heading-1" class="w-4 h-4 text-indigo-500"></i> 0. 封面/主題標題</h3>
-                        <input type="text" id="title-input" placeholder="輸入要呈現的主題或標題..." class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-[17px] font-bold outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm">
+                        <input type="text" id="title-input" placeholder="輸入要呈現的主題、標題或活動名稱..." class="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-[17px] font-bold outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm">
                     </div>
 
                     <!-- Clear Selections -->
@@ -149,7 +152,7 @@
                     <!-- Custom Notes -->
                     <div class="mt-8 pt-6 border-t-2 border-slate-100">
                         <h3 class="text-[15px] font-bold text-slate-600 mb-2 flex items-center gap-1.5"><i data-lucide="database" class="w-4 h-4 text-indigo-500"></i> 附錄. 原始資料區 (餵養文獻/故事腳本/程式碼/自訂備註)</h3>
-                        <p class="text-sm text-slate-400 mb-3">若有超大文字量的專業文章、劇本腳本、程式碼或專案概要，請直接貼在此處，AI 將根據上方選擇的指令進行處理。</p>
+                        <p class="text-sm text-slate-400 mb-3">若有大段文字的文章、旅遊景點清單、課程素材或專案概要，請直接貼在此處，AI 將根據上方選擇的指令進行處理。</p>
                         <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、範本內容、腳本、程式碼，或任何需要 AI 參考的原始資料...】" class="w-full h-40 p-4 rounded-lg border-2 border-slate-200 bg-slate-50 text-[16px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner"></textarea>
                     </div>
                 </div>
@@ -207,113 +210,124 @@
         // 加入了 domains 標籤，用來判斷該選項應該出現在哪一個「核心領域」中
         const INITIAL_CONFIG = {
             data_types: [
-                { id: 'dt-ppt', label: '簡報結構規劃', domains: ['business', 'academic'], prompt: '【輸出型式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
-                { id: 'dt-ppt-outline', label: '簡報大綱(附講稿)', domains: ['business', 'academic'], prompt: '【輸出型式】：請產出結構清晰的「簡報大綱」。包含每頁投影片的標題、核心訊息 (Key Message) 與講者備忘錄 (Speaker Notes)。' },
-                { id: 'dt-course', label: '課程設計', domains: ['business', 'academic'], prompt: '【輸出型式】：請產出專業的「課程設計大綱」。需包含：課程學習目標、模組化單元劃分、各單元教學活動建議與預估時間。' },
-                { id: 'dt-train-plan', label: '培訓計畫大綱', domains: ['business'], prompt: '【輸出型式】：請產出結構化的「培訓計畫大綱」。包含：培訓目標、階段性里程碑、技能樹展開、考核標準與預估時程。' },
-                { id: 'dt-itinerary', label: '行程規劃', domains: ['business'], prompt: '【輸出型式】：請產出實用的「行程規劃表」。需包含：每日/每小時的時間節點、活動內容、交通建議、預估花費時間與重要注意事項 (Tips)。' },
+                { id: 'dt-ppt', label: '簡報結構規劃', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
+                { id: 'dt-ppt-outline', label: '簡報大綱(附講稿)', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請產出結構清晰的「簡報大綱」。包含每頁投影片的標題、核心訊息 (Key Message) 與講者備忘錄 (Speaker Notes)。' },
+                { id: 'dt-course', label: '課程教案與綱要', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請產出專業的「課程設計大綱」。需包含：課程學習目標、模組化單元劃分、各單元教學活動建議與預估時間。' },
+                { id: 'dt-event-plan', label: '主題活動企劃書', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出完整的「主題活動企劃書」。需包含：活動目的、目標受眾、核心亮點、流程規劃(Rundown)、預算評估與預期效益。' },
+                { id: 'dt-gamification', label: '遊戲化活動腳本', domains: ['planning'], prompt: '【輸出型式】：請產出「遊戲化活動腳本」。包含：世界觀設定、任務機制、積分獎勵規則與玩家互動環節設計。' },
+                { id: 'dt-train-plan', label: '培訓計畫大綱', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出結構化的「培訓計畫大綱」。包含：培訓目標、階段性里程碑、技能樹展開、考核標準與預估時程。' },
+                { id: 'dt-itinerary', label: '深度旅遊行程表', domains: ['planning'], prompt: '【輸出型式】：請產出實用且深度的「旅遊行程規劃表」。需包含：每日/每小時的時間節點、活動景點、交通建議、預估花費時間與重要注意事項 (Tips)。' },
                 { id: 'dt-report', label: '深度分析報告', domains: ['business', 'academic', 'tech'], prompt: '【輸出型式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
                 { id: 'dt-academic', label: '學術報告', domains: ['academic'], prompt: '【輸出型式】：請產出結構嚴謹的「學術報告」。須包含：研究背景、文獻探討、研究方法、結果分析與結論建議，並使用客觀中立的學術語氣。' },
                 { id: 'dt-journal', label: '專業期刊', domains: ['academic'], prompt: '【輸出型式】：請產出符合「專業期刊」發表的文章格式。具備高度專業性、邏輯嚴密，並包含摘要(Abstract)、關鍵字(Keywords)與核心論述。' },
                 { id: 'dt-thesis', label: '論文格式', domains: ['academic'], prompt: '【輸出型式】：請產出標準「論文」格式。需嚴格遵循學術規範，包含緒論、研究假說、實證分析、結論與未來研究方向之架構。' },
-                { id: 'dt-social', label: '社群貼文', domains: ['business'], prompt: '【輸出型式】：請產出高互動率的「社群貼文」。需具備吸睛標題(Hook)、引發共鳴的內文、適當的Emoji點綴，以及明確的行動呼籲(CTA)。' },
-                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性，吸引讀者持續追更。' },
-                { id: 'dt-table', label: '表格化資料', domains: ['business', 'academic', 'tech'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
-                { id: 'dt-summary', label: '精煉摘要', domains: ['business', 'academic', 'tech'], prompt: '【輸出型式】：請提供極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' },
+                { id: 'dt-social', label: '社群貼文', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出高互動率的「社群貼文」。需具備吸睛標題(Hook)、引發共鳴的內文、適當的Emoji點綴，以及明確的行動呼籲(CTA)。' },
+                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性，吸引讀者持續追更。' },
+                { id: 'dt-table', label: '表格化資料', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
+                { id: 'dt-summary', label: '精煉摘要', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【輸出型式】：請提供極致精煉的條列式摘要 (Bullet points)，快速抓出核心重點。' },
                 { id: 'dt-json-csv', label: 'JSON / CSV 資料集', domains: ['tech'], prompt: '【輸出型式】：請將分析結果或數據，嚴格格式化為標準的 JSON 結構或 CSV 逗號分隔格式，以便後續匯入系統。' },
                 { id: 'dt-code-doc', label: '程式碼與技術文件', domains: ['tech'], prompt: '【輸出型式】：請輸出可執行的完整程式碼 (Code Snippet) 與清晰的技術註解，並附上簡單的部署或執行說明文件。' },
                 { id: 'dt-img', label: 'AI 繪圖指令', domains: ['visual'], prompt: '【輸出型式】：請輸出詳細的 AI 繪圖提示詞 (Image Prompt)。務必精確描述主體、畫面細節、環境光影、攝影鏡頭與視覺元素。' },
                 { id: 'dt-video-basic', label: '影片生成指令', domains: ['visual'], prompt: '【輸出型式】：請產出用於 AI 影片生成模型的結構化提示詞。需包含：場景描述、主體動作節拍、鏡頭語言與光影音效。' }
             ],
             languages: [
-                { id: 'l-zh-tw', label: '繁體中文 (台灣)', domains: ['business', 'visual', 'academic', 'tech'], prompt: '【輸出語言】：請強制使用「繁體中文 (台灣慣用語)」，嚴格避免使用中國大陸的拼音拼寫或慣用語 (如：將「視頻」改為「影片」)。' },
-                { id: 'l-en-us', label: '美式英文', domains: ['business', 'visual', 'academic', 'tech'], prompt: '【輸出語言】：Please output the response strictly in Native American English, ensuring professional phrasing and correct grammar.' },
-                { id: 'l-ja', label: '日文 (日本語)', domains: ['business', 'visual'], prompt: '【輸出語言】：請使用自然流暢的「日文 (日本語)」進行輸出，並依據情境使用適當的敬語。' },
-                { id: 'l-bilingual', label: '中英雙語對照', domains: ['business', 'academic', 'tech'], prompt: '【輸出語言】：請提供「繁體中文與英文的雙語對照」版本。每一個主要段落的中文下方，都必須緊接著附上對應的英文翻譯。' }
+                { id: 'l-zh-tw', label: '繁體中文 (台灣)', domains: ['business', 'visual', 'academic', 'tech', 'planning'], prompt: '【輸出語言】：請強制使用「繁體中文 (台灣慣用語)」，嚴格避免使用中國大陸的拼音拼寫或慣用語 (如：將「視頻」改為「影片」)。' },
+                { id: 'l-en-us', label: '美式英文', domains: ['business', 'visual', 'academic', 'tech', 'planning'], prompt: '【輸出語言】：Please output the response strictly in Native American English, ensuring professional phrasing and correct grammar.' },
+                { id: 'l-ja', label: '日文 (日本語)', domains: ['business', 'visual', 'planning'], prompt: '【輸出語言】：請使用自然流暢的「日文 (日本語)」進行輸出，並依據情境使用適當的敬語。' },
+                { id: 'l-bilingual', label: '中英雙語對照', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【輸出語言】：請提供「繁體中文與英文的雙語對照」版本。每一個主要段落的中文下方，都必須緊接著附上對應的英文翻譯。' }
             ],
             action_types: [
                 { id: 'act-dev-code', label: '程式碼生成與重構', domains: ['tech'], prompt: '【任務框架】：請檢查我提供的程式碼或需求。找出潛在的 Bug、效能瓶頸，並提供最佳化與重構後的乾淨程式碼 (Clean Code)，遵守 SOLID 原則。' },
                 { id: 'act-seo-opt', label: 'SEO關鍵字與排名優化', domains: ['tech', 'business'], prompt: '【任務框架】：請為此文章/主題進行 SEO 優化。找出長尾關鍵字，並提供包含 H1, H2 標籤、Meta Description 的高排名潛力結構。' },
-                { id: 'act-edu-design', label: '學習路徑與教案開發', domains: ['business', 'academic'], prompt: '【任務框架】：請根據提供的素材，設計一條由淺入深的學習路徑。需將複雜知識拆解為易於吸收的模組，並設計互動式測驗。' },
-                { id: 'act-coach', label: '人才培訓與能力養成', domains: ['business'], prompt: '【任務框架】：請為此對象或團隊設計「長期養成計畫」。結合學習曲線與實務驗證，設計出具備明確反饋機制的成長飛輪與進階關卡。' },
-                { id: 'act-plan-opt', label: '最佳化與備案設計', domains: ['business', 'tech'], prompt: '【任務框架】：針對規劃內容，請進一步執行最佳化。找出潛在的時間/資源/交通衝突點，並為最容易出錯的環節提供「Plan B (備用方案)」。' },
-                { id: 'act-ppt-expand', label: '大綱轉講者逐字稿', domains: ['business', 'academic'], prompt: '【任務框架】：請將大綱進一步擴充為「講者逐字稿」。要求口吻自然、具備開場破冰設計，並在需要視覺輔助處明確標註 [切換投影片]。' },
+                { id: 'act-edu-design', label: '課程模組與互動設計', domains: ['business', 'academic', 'planning'], prompt: '【任務框架】：請根據提供的素材，設計一條由淺入深的學習路徑。需將複雜知識拆解為易於吸收的模組，並為每個模組設計一個互動式隨堂測驗或反思問題。' },
+                { id: 'act-coach', label: '人才培訓與能力養成', domains: ['business', 'planning'], prompt: '【任務框架】：請為此對象或團隊設計「長期養成計畫」。結合學習曲線與實務驗證，設計出具備明確反饋機制的成長飛輪與進階關卡。' },
+                { id: 'act-event-flow', label: '活動流程與亮點設計', domains: ['planning', 'business'], prompt: '【任務框架】：請為此活動規劃流暢的流程。找出最能吸引參與者目光的「High point (高潮點)」，並設計對應的視覺或互動體驗。' },
+                { id: 'act-travel-guide', label: '旅遊攻略與在地體驗', domains: ['planning'], prompt: '【任務框架】：請跳脫走馬看花的觀光客行程，為此旅程設計「深度在地體驗」。結合當地文化、歷史背景與私房美食，規劃出獨一無二的記憶點。' },
+                { id: 'act-plan-opt', label: '風險評估與備案機制', domains: ['business', 'tech', 'planning'], prompt: '【任務框架】：針對規劃內容，請進一步執行風險最佳化。找出潛在的時間/資源/交通衝突點，並為最容易出錯的環節提供「Plan B (備用方案)」。' },
+                { id: 'act-ppt-expand', label: '大綱轉講者逐字稿', domains: ['business', 'academic', 'planning'], prompt: '【任務框架】：請將大綱進一步擴充為「講者逐字稿」。要求口吻自然、具備開場破冰設計，並在需要視覺輔助處明確標註 [切換投影片]。' },
                 { id: 'act-format-modify', label: '文章優化與對照表', domains: ['business', 'academic'], prompt: '【任務框架】：提升文章的拼寫、語法、清晰度與流暢度。請生成表格：第一欄「原始句子」、第二欄「修改後句子」、第三欄「修改建議和理由」。' },
-                { id: 'act-feed-social', label: '長文轉社群貼文', domains: ['business'], prompt: '【任務框架】：1. 整理成 800 字 Markdown 重點。 2. 整理出 10 條 QA。 3. 撰寫三篇 FB/IG 社群長文，並設計「七字訣」幫助記憶。' },
+                { id: 'act-feed-social', label: '長文轉社群貼文', domains: ['business', 'planning'], prompt: '【任務框架】：1. 整理成 800 字 Markdown 重點。 2. 整理出 10 條 QA。 3. 撰寫三篇 FB/IG 社群長文，並設計「七字訣」幫助記憶。' },
                 { id: 'act-feed-biz', label: '文獻轉商業應用', domains: ['business', 'academic'], prompt: '【任務框架】：1. 提供文獻細節摘要。 2. 將知識導入特定產業，提出應用新興商業模式的方針。 3. 輸出執行面的細節思考與步驟。' },
-                { id: 'act-create-story', label: '故事與劇本編創', domains: ['business', 'visual'], prompt: '【任務框架】：發揮極致創意，創作一個具備起承轉合的「故事或劇本」。需包含鮮明的角色設定、引人入勝的情節轉折與深刻的核心意涵。' },
-                { id: 'act-create-copy', label: '爆款標題與短文案', domains: ['business'], prompt: '【任務框架】：為此主題發想 10 組極具爆發力、能瞬間抓住眼球的「行銷短文案」與「吸睛標題」。靈活運用痛點行銷或數字法則。' },
+                { id: 'act-create-story', label: '故事與劇本編創', domains: ['business', 'visual', 'planning'], prompt: '【任務框架】：發揮極致創意，創作一個具備起承轉合的「故事或劇本」。需包含鮮明的角色設定、引人入勝的情節轉折與深刻的核心意涵。' },
+                { id: 'act-create-copy', label: '爆款標題與短文案', domains: ['business', 'planning'], prompt: '【任務框架】：為此主題發想 10 組極具爆發力、能瞬間抓住眼球的「行銷短文案」與「吸睛標題」。靈活運用痛點行銷或數字法則。' },
                 { id: 'act-review-deep', label: '深度時事/議題剖析', domains: ['academic', 'business'], prompt: '【任務框架】：針對此議題進行「深度評論剖析」。從正反兩面(Pro/Con)進行客觀探討，點出隱藏盲點，並提出具備建設性的獨到見解。' },
-                { id: 'act-review-prod', label: '產品/作品專業評測', domains: ['business', 'tech'], prompt: '【任務框架】：擔任專業評測員，給出客觀評測。列舉優點(Pros)、缺點(Cons)、適合對象，以及最終的綜合評價與給分。' },
-                { id: 'act-scenario', label: '嚴格角色扮演場景', domains: ['business', 'visual', 'academic', 'tech'], prompt: '【任務框架】：根據設定的「專屬角色」與「特定場景」，完全沉浸於該人設中。嚴格遵守該角色的語氣、限制條件與專業視角，不得跳脫框架。' },
+                { id: 'act-review-prod', label: '產品/作品專業評測', domains: ['business', 'tech', 'planning'], prompt: '【任務框架】：擔任專業評測員，給出客觀評測。列舉優點(Pros)、缺點(Cons)、適合對象，以及最終的綜合評價與給分。' },
+                { id: 'act-scenario', label: '嚴格角色扮演場景', domains: ['business', 'visual', 'academic', 'tech', 'planning'], prompt: '【任務框架】：根據設定的「專屬角色」與「特定場景」，完全沉浸於該人設中。嚴格遵守該角色的語氣、限制條件與專業視角，不得跳脫框架。' },
                 { id: 'act-video-pro', label: '專業級影片分鏡拆解', domains: ['visual'], prompt: '【任務框架】：撰寫符合專業影片生成標準的提示詞。高度結構化，包含：視覺風格、鏡頭語言(Camera/Lighting)、主體動作拆解(Actions)與物理動態。' }
             ],
             roles: [ 
                 { id: 'expert-frontend', label: '前端 UI/UX 工程師', domains: ['tech'], prompt: '【專家角色】：你是一位資深的前端 UI/UX 工程師。精通 React, Vue 等框架，對響應式設計(RWD)與使用者體驗有著極致的追求。' },
                 { id: 'expert-backend', label: '後端系統架構師', domains: ['tech'], prompt: '【專家角色】：你是一位後端系統架構師。精通雲端部署、資料庫設計與高併發處理，能提供最穩定、安全、可擴展的技術方案。' },
                 { id: 'expert-seo', label: 'SEO 內容專家', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位頂尖的 SEO 內容行銷專家。深諳搜尋引擎演算法，能巧妙佈局長尾關鍵字，同時保持文章對人類讀者的高度吸引力。' },
-                { id: 'expert-coach', label: '高階教練/培訓導師', domains: ['business'], prompt: '【專家角色】：你是一位擁有豐富經驗的高階企業教練與培訓導師。擅長發掘潛力、建立能力雷達圖，並設計循序漸進的養成計畫。' },
+                { id: 'expert-coach', label: '高階教練/培訓導師', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位擁有豐富經驗的高階企業教練與培訓導師。擅長發掘潛力、建立能力雷達圖，並設計循序漸進的養成計畫。' },
+                { id: 'expert-edu', label: '頂尖課程設計師', domains: ['academic', 'planning'], prompt: '【專家角色】：你是一位頂尖的課程設計師 (Instructional Designer)。擅長學習成效評估、引導式教學設計與知識模組化拆解。' },
+                { id: 'expert-event', label: '資深公關/活動總召', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位身經百戰的資深公關與活動總召。擅長資源整合、氣氛營造與危機處理，能策劃出令人驚豔的完美活動。' },
+                { id: 'expert-tour', label: '在地深度導遊', domains: ['planning'], prompt: '【專家角色】：你是一位熱愛探索的深度旅遊達人與在地嚮導。熟知各地的隱藏版秘境、文化故事與避雷指南，專門規劃質感旅行。' },
                 { id: 'expert-director', label: '電影導演/攝影指導', domains: ['visual'], prompt: '【專家角色】：你是一位得獎無數的電影導演與攝影指導。精通鏡頭語言、電影級光影與視覺敘事節奏，能將文字轉化為極具張力的畫面。' },
-                { id: 'expert-scenarist', label: '影視編劇/世界觀架構', domains: ['visual', 'business'], prompt: '【專家角色】：你是一位資深的影視編劇與世界觀架構師。擅長角色弧光設定(Character Arc)、場景氣氛渲染與跌宕起伏的劇情編排。' },
-                { id: 'expert-planner', label: '專業企劃/領隊', domains: ['business'], prompt: '【專家角色】：你是一位細心且經驗豐富的活動企劃與專業領隊。擅長時間管理、資源調度與突發狀況處理，能安排出完美流暢的行程。' },
+                { id: 'expert-scenarist', label: '影視編劇/架構師', domains: ['visual', 'business', 'planning'], prompt: '【專家角色】：你是一位資深的影視編劇與世界觀架構師。擅長角色弧光設定(Character Arc)、場景氣氛渲染與跌宕起伏的劇情編排。' },
                 { id: 'expert-proc', label: '採購合約專家', domains: ['business', 'tech'], prompt: '【專家角色】：你現在是一位擁有 20 年經驗的資深工程採購與合約管理專家，精通工程性質、規模評估與潛在風險預判。' },
-                { id: 'expert-red', label: '紅隊審核員 (防禦)', domains: ['business', 'tech', 'academic'], prompt: '【專家角色】：你現在是「紅隊審核員」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題與系統漏洞，請忽略行銷包裝。' },
-                { id: 'expert-consultant', label: '高階策略顧問', domains: ['business'], prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢與資源需求。' },
+                { id: 'expert-red', label: '紅隊審核員 (防禦)', domains: ['business', 'tech', 'academic', 'planning'], prompt: '【專家角色】：你現在是「紅隊審核員」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題與系統漏洞，請忽略行銷包裝。' },
+                { id: 'expert-consultant', label: '高階策略顧問', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢與資源需求。' },
                 { id: 'expert-data', label: '資料分析師', domains: ['tech', 'business', 'academic'], prompt: '【專家角色】：你是一位嚴謹的資料分析師。任務是從混亂資料中，精煉出「只要回答就能完全掌握全局」的核心本質問題。' },
-                { id: 'expert-behavior', label: '行為科學家', domains: ['business', 'academic'], prompt: '【專家角色】：你是一位行為科學家。運用「事前驗屍 (Pre-mortem)」法，分析潛在的人性動機與決策死角。' },
-                { id: 'expert-writer', label: '專題作家/主編', domains: ['business', 'academic'], prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並挖掘出令人驚訝的洞察。' },
-                { id: 'expert-designer', label: '視覺設計大師', domains: ['visual', 'business'], prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' },
-                { id: 'expert-fin', label: '財務規劃師', domains: ['business'], prompt: '【專家角色】：你是一位專業的財務規劃師 (CFP)。擅長資產配置、風險管理與稅務規劃，能提供穩健的理財與商業預測建議。' },
+                { id: 'expert-behavior', label: '行為科學家', domains: ['business', 'academic', 'planning'], prompt: '【專家角色】：你是一位行為科學家。運用「事前驗屍 (Pre-mortem)」法，分析潛在的人性動機與決策死角。' },
+                { id: 'expert-writer', label: '專題作家/主編', domains: ['business', 'academic', 'planning'], prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並挖掘出令人驚訝的洞察。' },
+                { id: 'expert-designer', label: '視覺設計大師', domains: ['visual', 'business', 'planning'], prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' },
+                { id: 'expert-fin', label: '財務規劃師', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位專業的財務規劃師 (CFP)。擅長資產配置、風險管理與稅務規劃，能提供穩健的理財與商業預測建議。' },
                 { id: 'expert-cmo', label: '品牌行銷總監', domains: ['business'], prompt: '【專家角色】：你是一位品牌行銷總監 (CMO)。精通品牌定位、公關危機處理與全通路整合行銷策略。' },
-                { id: 'expert-pm', label: '產品經理 (PM)', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位資深產品經理。擅長需求釐清、敏捷開發管理、使用者體驗 (UX) 優化與跨部門溝通。' },
-                { id: 'expert-edu', label: '學術教授/研究員', domains: ['academic'], prompt: '【專家角色】：你是一位頂尖大學的學術教授。具備極高的學術道德，擅長文獻回顧、實證研究與論文架構指導。' }
+                { id: 'expert-pm', label: '產品經理 (PM)', domains: ['tech', 'business', 'planning'], prompt: '【專家角色】：你是一位資深產品經理。擅長需求釐清、敏捷開發管理、使用者體驗 (UX) 優化與跨部門溝通。' },
+                { id: 'expert-academic', label: '學術教授/研究員', domains: ['academic'], prompt: '【專家角色】：你是一位頂尖大學的學術教授。具備極高的學術道德，擅長文獻回顧、實證研究與論文架構指導。' }
             ],
             genders: [
-                { id: 'g-any', label: '不限性別', domains: ['business', 'academic'], prompt: '【專屬性別】：性別不限，請使用通用、中性且包容的用語。' },
-                { id: 'g-male', label: '針對男性', domains: ['business'], prompt: '【專屬性別】：針對「男性」視角與潛在心理需求進行溝通撰寫。' },
-                { id: 'g-female', label: '針對女性', domains: ['business'], prompt: '【專屬性別】：針對「女性」視角與潛在心理需求進行溝通撰寫。' }
+                { id: 'g-any', label: '不限性別', domains: ['business', 'academic', 'planning'], prompt: '【專屬性別】：性別不限，請使用通用、中性且包容的用語。' },
+                { id: 'g-male', label: '針對男性', domains: ['business', 'planning'], prompt: '【專屬性別】：針對「男性」視角與潛在心理需求進行溝通撰寫。' },
+                { id: 'g-female', label: '針對女性', domains: ['business', 'planning'], prompt: '【專屬性別】：針對「女性」視角與潛在心理需求進行溝通撰寫。' }
             ],
             age_groups: [
-                { id: 'age-any', label: '不限年齡', domains: ['business', 'academic'], prompt: '【年齡區間】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
-                { id: 'age-u12', label: '12歲以下 (兒童)', domains: ['business'], prompt: '【年齡區間】：目標為 12 歲以下兒童。使用極度簡單、童趣且具教育意義的字彙。' },
-                { id: 'age-13-17', label: '13-17歲 (青少年)', domains: ['business'], prompt: '【年齡區間】：目標為 13-17 歲青少年。結合時下校園流行語與青少年關注議題。' },
-                { id: 'age-18-24', label: '18-24歲 (Z世代)', domains: ['business'], prompt: '【年齡區間】：目標為 18-24 歲 (大學生/新鮮人)。重視自我實現、探索與網路原生代的共鳴。' },
-                { id: 'age-25-34', label: '25-34歲 (輕熟齡)', domains: ['business'], prompt: '【年齡區間】：目標為 25-34 歲 (職場輕熟齡)。切中工作效率、生活品質與職涯焦慮。' },
-                { id: 'age-35-44', label: '35-44歲 (三明治族)', domains: ['business'], prompt: '【年齡區間】：目標為 35-44 歲 (三明治族群)。重視務實、家庭照顧與投資報酬率。' },
-                { id: 'age-45-64', label: '45-64歲 (熟齡族)', domains: ['business'], prompt: '【年齡區間】：目標為 45-64 歲 (熟齡族)。語氣穩重成熟，強調理財、健康與尊榮感。' },
-                { id: 'age-65up', label: '65歲以上 (銀髮族)', domains: ['business'], prompt: '【年齡區間】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
+                { id: 'age-any', label: '不限年齡', domains: ['business', 'academic', 'planning'], prompt: '【年齡區間】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
+                { id: 'age-u12', label: '12歲以下 (兒童)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 12 歲以下兒童。使用極度簡單、童趣且具教育意義的字彙。' },
+                { id: 'age-13-17', label: '13-17歲 (青少年)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 13-17 歲青少年。結合時下校園流行語與青少年關注議題。' },
+                { id: 'age-18-24', label: '18-24歲 (Z世代)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 18-24 歲 (大學生/新鮮人)。重視自我實現、探索與網路原生代的共鳴。' },
+                { id: 'age-25-34', label: '25-34歲 (輕熟齡)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 25-34 歲 (職場輕熟齡)。切中工作效率、生活品質與職涯焦慮。' },
+                { id: 'age-35-44', label: '35-44歲 (三明治族)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 35-44 歲 (三明治族群)。重視務實、家庭照顧與投資報酬率。' },
+                { id: 'age-45-64', label: '45-64歲 (熟齡族)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 45-64 歲 (熟齡族)。語氣穩重成熟，強調理財、健康與尊榮感。' },
+                { id: 'age-65up', label: '65歲以上 (銀髮族)', domains: ['business', 'planning'], prompt: '【年齡區間】：目標為 65 歲以上 (銀髮族)。敘述極度放慢，充滿耐心與關懷，絕對避免英文縮寫。' },
             ],
             audiences: [ 
-                { id: 'a-executives', label: '決策高層', domains: ['business', 'tech'], prompt: '【目標受眾】：公司決策高層或老闆。刪除廢話，直擊核心決策價值與 ROI。' },
-                { id: 'a-beginners', label: '初學新手', domains: ['business', 'tech', 'academic'], prompt: '【目標受眾】：初學新手。不預設專業背景，使用最通俗易懂的語境。' },
+                { id: 'a-executives', label: '決策高層', domains: ['business', 'tech', 'planning'], prompt: '【目標受眾】：公司決策高層或老闆。刪除廢話，直擊核心決策價值與 ROI。' },
+                { id: 'a-beginners', label: '初學新手', domains: ['business', 'tech', 'academic', 'planning'], prompt: '【目標受眾】：初學新手。不預設專業背景，使用最通俗易懂的語境。' },
                 { id: 'a-devs', label: '技術人員', domains: ['tech', 'business'], prompt: '【目標受眾】：技術開發者。提供詳細架構、邏輯與技術實作細節。' },
-                { id: 'a-investors', label: '投資人 / VC', domains: ['business'], prompt: '【目標受眾】：投資人/VC。側重市場規模、獲利能力與護城河。' },
-                { id: 'a-consumers', label: '一般消費者 (B2C)', domains: ['business'], prompt: '【目標受眾】：一般終端消費者 (B2C)。強調產品能帶來的實際生活改變與高 CP 值，引發購買慾望。' },
-                { id: 'a-fans', label: '忠實鐵粉', domains: ['business'], prompt: '【目標受眾】：品牌的忠實鐵粉或 VIP。用語請帶有專屬感、親切感與圈內人專用的默契。' },
+                { id: 'a-investors', label: '投資人 / VC', domains: ['business', 'planning'], prompt: '【目標受眾】：投資人/VC。側重市場規模、獲利能力與護城河。' },
+                { id: 'a-consumers', label: '一般消費者 (B2C)', domains: ['business', 'planning'], prompt: '【目標受眾】：一般終端消費者 (B2C)。強調產品/服務能帶來的實際生活改變與高 CP 值，引發行動慾望。' },
+                { id: 'a-fans', label: '忠實鐵粉', domains: ['business', 'planning'], prompt: '【目標受眾】：品牌的忠實鐵粉或 VIP。用語請帶有專屬感、親切感與圈內人專用的默契。' },
                 { id: 'a-competitors', label: '競爭對手', domains: ['business'], prompt: '【目標受眾】：市場競爭對手。展現出不容挑釁的實力、護城河與產業領導地位。' },
-                { id: 'a-employees', label: '內部員工', domains: ['business'], prompt: '【目標受眾】：公司內部員工。溝通需具備透明度、凝聚向心力，並明確指示執行目標。' },
-                { id: 'a-media', label: '媒體與公關', domains: ['business'], prompt: '【目標受眾】：媒體記者或公關。請提供具備新聞價值 (Newsworthy) 的亮點、引號金句與易於報導的結構。' },
-                { id: 'a-peers', label: '學術/專業同行', domains: ['academic', 'tech'], prompt: '【目標受眾】：同領域的專業人士。不必避諱艱澀術語，請直接切入深度技術與前沿探討。' }
+                { id: 'a-employees', label: '內部員工', domains: ['business', 'planning'], prompt: '【目標受眾】：公司內部員工。溝通需具備透明度、凝聚向心力，並明確指示執行目標。' },
+                { id: 'a-media', label: '媒體與公關', domains: ['business', 'planning'], prompt: '【目標受眾】：媒體記者或公關。請提供具備新聞價值 (Newsworthy) 的亮點、引號金句與易於報導的結構。' },
+                { id: 'a-peers', label: '學術/專業同行', domains: ['academic', 'tech', 'planning'], prompt: '【目標受眾】：同領域的專業人士。不必避諱艱澀術語，請直接切入深度技術與前沿探討。' },
+                { id: 'a-travelers', label: '自由行旅客', domains: ['planning'], prompt: '【目標受眾】：熱愛自由行與探索的旅客。強調行程的彈性、獨特性與在地文化體驗。' },
+                { id: 'a-family', label: '親子家庭', domains: ['planning'], prompt: '【目標受眾】：親子家庭族群。行程與活動設計需考量孩童的安全性、趣味性與父母的喘息空間。' }
             ],
             tones: [ 
-                { id: 't-passionate', label: '自信說服', domains: ['business'], prompt: '【語氣情境】：語氣堅定且具備說服力，展現專業底氣，重點強調核心價值與成長性。' },
-                { id: 't-objective', label: '客觀中立', domains: ['business', 'academic', 'tech'], prompt: '【語氣情境】：嚴謹的報告風格，就事論事，以數據和事實為基礎，避免過度情緒化的字眼。' },
-                { id: 't-simple', label: '親切科普', domains: ['business', 'academic'], prompt: '【語氣情境】：親切自然，將複雜或專業的術語轉化為生活化、極度容易理解的比喻。' },
+                { id: 't-passionate', label: '自信說服', domains: ['business', 'planning'], prompt: '【語氣情境】：語氣堅定且具備說服力，展現專業底氣，重點強調核心價值與成長性。' },
+                { id: 't-objective', label: '客觀中立', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【語氣情境】：嚴謹的報告風格，就事論事，以數據和事實為基礎，避免過度情緒化的字眼。' },
+                { id: 't-simple', label: '親切科普', domains: ['business', 'academic', 'planning'], prompt: '【語氣情境】：親切自然，將複雜或專業的術語轉化為生活化、極度容易理解的比喻。' },
                 { id: 't-rational', label: '理性指正', domains: ['business', 'tech'], prompt: '【語氣情境】：以具建設性的態度點出問題核心，語氣客觀中立，對事不對人，表達改善的期望。' },
-                { id: 't-reminder', label: '善意提醒', domains: ['business'], prompt: '【語氣情境】：溫和但明確地提示潛在風險或時效性，用語不恐嚇，但能有效促使對方重視並行動。' },
-                { id: 't-empathetic', label: '溫暖同理', domains: ['business'], prompt: '【語氣情境】：充滿同理心，語氣柔軟包容，能站在對方立場思考，展現高度的關懷與理解。' },
-                { id: 't-humorous', label: '幽默詼諧', domains: ['business'], prompt: '【語氣情境】：輕鬆詼諧，適時加入高雅的幽默或趣味比喻來活絡氣氛，但絕不流於輕浮。' },
+                { id: 't-reminder', label: '善意提醒', domains: ['business', 'planning'], prompt: '【語氣情境】：溫和但明確地提示潛在風險或時效性，用語不恐嚇，但能有效促使對方重視並行動。' },
+                { id: 't-empathetic', label: '溫暖同理', domains: ['business', 'planning'], prompt: '【語氣情境】：充滿同理心，語氣柔軟包容，能站在對方立場思考，展現高度的關懷與理解。' },
+                { id: 't-humorous', label: '幽默詼諧', domains: ['business', 'planning'], prompt: '【語氣情境】：輕鬆詼諧，適時加入高雅的幽默或趣味比喻來活絡氣氛，但絕不流於輕浮。' },
                 { id: 't-firm', label: '嚴正聲明', domains: ['business'], prompt: '【語氣情境】：語氣不卑不亢，堅定表達我方立場與底線。用詞禮貌但態度堅決，展現捍衛權益的決心。' },
-                { id: 't-bless', label: '真摯感念/祝福', domains: ['business'], prompt: '【語氣情境】：充滿誠懇的祝福與感念，用語溫馨大方，為對方傳遞滿滿的正能量與美好願景。' }
+                { id: 't-bless', label: '真摯感念/祝福', domains: ['business', 'planning'], prompt: '【語氣情境】：充滿誠懇的祝福與感念，用語溫馨大方，為對方傳遞滿滿的正能量與美好願景。' },
+                { id: 't-excited', label: '熱情奔放', domains: ['planning'], prompt: '【語氣情境】：情緒極度飽滿、充滿期待與熱情，文字間帶有強烈的感染力與號召感。' }
             ],
             infographics: [ 
-                { id: 't-train-sheet', label: '培訓養成面板', domains: ['business'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
-                { id: 't16', label: '課程大綱結構', domains: ['business', 'academic'], prompt: '【版型結構】：製作『課程大綱』排版。包含：課程簡介、學習目標、章節模組(名稱/重點/練習題)、結業考核。' },
-                { id: 't17', label: '時間軸行程表', domains: ['business'], prompt: '【版型結構】：製作『時間軸行程表』排版。以 Timeline 呈現，包含時間、地點、活動、交通與溫馨提醒(Tips)。' },
-                { id: 't1', label: '高階商務提案', domains: ['business'], prompt: '【版型結構】：生成商務提案簡報。結構：首頁、目錄、痛點、解決方案、詳細步驟、預期效益(KPI)、行動(CTA)。' },
+                { id: 't-train-sheet', label: '培訓養成面板', domains: ['business', 'planning'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
+                { id: 't16', label: '課程大綱結構', domains: ['business', 'academic', 'planning'], prompt: '【版型結構】：製作『課程大綱』排版。包含：課程簡介、學習目標、章節模組(名稱/重點/練習題)、結業考核。' },
+                { id: 't17', label: '時間軸行程表', domains: ['business', 'planning'], prompt: '【版型結構】：製作『時間軸行程表』排版。以 Timeline 呈現，包含時間、地點、活動、交通與溫馨提醒(Tips)。' },
+                { id: 't-event-rundown', label: '活動 Rundown 總表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『活動 Rundown (流程總表)』排版。以表格呈現，欄位包含：時間、時間長度、環節名稱、負責人、準備道具與燈控音控提示。' },
+                { id: 't-budget-table', label: '預算與成本分析表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『預算與成本分析表』。以分類呈現各項支出(如：場地、餐飲、行銷、人事)，並提供成本控制的建議方案。' },
+                { id: 't1', label: '高階商務提案', domains: ['business', 'planning'], prompt: '【版型結構】：生成商務提案簡報。結構：首頁、目錄、痛點、解決方案、詳細步驟、預期效益(KPI)、行動(CTA)。' },
                 { id: 't13', label: '募資計畫書', domains: ['business'], prompt: '【版型結構】：製作『新創募資計畫書(Pitch Deck)』。包含：痛點、解決方案、市場規模、競爭分析、團隊、財務預測與募資需求。' },
                 { id: 't14', label: '商業數據儀表板', domains: ['business', 'tech'], prompt: '【版型結構】：設計為『商業數據儀表板 (Dashboard)』文字介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖的視覺文字排版。' },
-                { id: 't12', label: '社群輪播懶人包', domains: ['business'], prompt: '【版型結構】：製作 IG/FB 輪播式『懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導分享頁。' },
+                { id: 't12', label: '社群輪播懶人包', domains: ['business', 'planning'], prompt: '【版型結構】：製作 IG/FB 輪播式『懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導分享頁。' },
                 { id: 't2', label: '學術論文架構', domains: ['academic'], prompt: '【版型結構】：製作標準論文架構。包含：研究背景與目的、文獻回顧、研究方法、實證分析、結論與建議、參考文獻。' },
                 { id: 't-video-basic', label: '通用影片分鏡表', domains: ['visual'], prompt: '【版型結構】：依循影片通用指南撰寫。結構包含：1. Style(視覺風格) 2. Cinematography(攝影機與燈光) 3. Actions(動作節拍) 4. Audio(音效)。' },
                 { id: 't-video-pro', label: '專業電影級腳本', domains: ['visual'], prompt: '【版型結構】：依循專業電影拍攝指南撰寫。包含：Format(格式), Lenses(鏡頭), Lighting(燈光), Location(場景), Wardrobe(服裝道具), Shot List(最佳化分鏡)。' }
@@ -330,26 +344,29 @@
                 { id: 'vs-cyberpunk', label: '賽博龐克', domains: ['visual'], prompt: '【視覺風格】：賽博龐克 (Cyberpunk)。高反差的陰暗底色，搭配破敗科技與鮮豔霓虹螢光元素。' }
             ],
             colors: [ 
-                { id: 'c-navy', label: '商務深藍', domains: ['visual', 'business'], swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍色與金/灰色的商務配色，呈現穩健感。' },
-                { id: 'c-white', label: '極簡純白', domains: ['visual', 'business'], swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色調風格】：極簡全白背景搭配深色內文，追求極致乾淨。' },
-                { id: 'c-gold', label: '奢華黑金', domains: ['visual'], swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色調風格】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
-                { id: 'c-cyber', label: '賽博霓虹', domains: ['visual'], swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色調風格】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
-                { id: 'c-morandi', label: '莫蘭迪色', domains: ['visual', 'business'], swatches: ['#9A8C98', '#C9ADA7', '#F2E9E4'], prompt: '【色調風格】：莫蘭迪色系。帶有灰調的低飽和度色彩，視覺柔和、沉穩且具備高級感。' },
-                { id: 'c-earth', label: '大地自然', domains: ['visual'], swatches: ['#4A5D23', '#8B5A2B', '#E8E5D1'], prompt: '【色調風格】：大地自然色系。深綠、棕色、土色與卡其色交織，帶有戶外與自然氣息。' }
+                { id: 'c-navy', label: '商務深藍', domains: ['visual', 'business', 'planning'], swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍色與金/灰色的商務配色，呈現穩健感。' },
+                { id: 'c-white', label: '極簡純白', domains: ['visual', 'business', 'planning'], swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色調風格】：極簡全白背景搭配深色內文，追求極致乾淨。' },
+                { id: 'c-gold', label: '奢華黑金', domains: ['visual', 'planning'], swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色調風格】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
+                { id: 'c-cyber', label: '賽博霓虹', domains: ['visual', 'planning'], swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色調風格】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
+                { id: 'c-morandi', label: '莫蘭迪色', domains: ['visual', 'business', 'planning'], swatches: ['#9A8C98', '#C9ADA7', '#F2E9E4'], prompt: '【色調風格】：莫蘭迪色系。帶有灰調的低飽和度色彩，視覺柔和、沉穩且具備高級感。' },
+                { id: 'c-earth', label: '大地自然', domains: ['visual', 'planning'], swatches: ['#4A5D23', '#8B5A2B', '#E8E5D1'], prompt: '【色調風格】：大地自然色系。深綠、棕色、土色與卡其色交織，帶有戶外與自然氣息。' }
             ],
             constraints: [
-                { id: 'con-no-bs', label: '禁用 AI 廢話開場', domains: ['business', 'tech', 'academic', 'visual'], prompt: '【絕對禁止】：禁止任何開場白與結語（如「好的」、「了解」、「這就為您產出」、「希望這有幫助」），請直接輸出純淨內容。' },
-                { id: 'con-no-list', label: '禁用條列式', domains: ['business', 'academic'], prompt: '【格式限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
-                { id: 'con-word-limit', label: '字數極度精簡', domains: ['business', 'tech'], prompt: '【格式限制】：請嚴格控制字數，排版需極度緊湊，刪除所有冗言贅字與過度修飾的形容詞。' },
-                { id: 'con-no-jargon', label: '禁用生僻字', domains: ['business', 'tech'], prompt: '【用語限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語、文言文或過度專業的學術行話。' },
+                { id: 'con-no-bs', label: '禁用 AI 廢話開場', domains: ['business', 'tech', 'academic', 'visual', 'planning'], prompt: '【絕對禁止】：禁止任何開場白與結語（如「好的」、「了解」、「這就為您產出」、「希望這有幫助」），請直接輸出純淨內容。' },
+                { id: 'con-no-list', label: '禁用條列式', domains: ['business', 'academic', 'planning'], prompt: '【格式限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
+                { id: 'con-word-limit', label: '字數極度精簡', domains: ['business', 'tech', 'planning'], prompt: '【格式限制】：請嚴格控制字數，排版需極度緊湊，刪除所有冗言贅字與過度修飾的形容詞。' },
+                { id: 'con-no-jargon', label: '禁用生僻字', domains: ['business', 'tech', 'planning'], prompt: '【用語限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語、文言文或過度專業的學術行話。' },
                 { id: 'con-neg-img', label: '防變形(圖像避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：畫面上禁止出現：變形的肢體、錯誤的手指數量、浮水印、簽名、文字、模糊不清的邊緣、低畫質。' },
                 { id: 'con-neg-vid', label: '防穿模(影片避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：影片中禁止出現：物理定律錯誤、物體突然消失或穿模、非自然的閃爍、扭曲的人臉、不連貫的背景。' }
             ],
             notes: [ 
                 { id: 'n-data', label: '強化數據佐證', domains: ['business', 'academic'], prompt: '【細節微調】：在每個重要段落或主張中，請務必虛擬或引用具體的「數據、百分比」作為佐證，強化說服力。' },
                 { id: 'n-logic', label: '因果對照表', domains: ['business', 'tech'], prompt: '【細節微調】：內容設計為左右對照表（痛點 vs 方案），並使用強烈的因果邏輯重新編排。' },
-                { id: 'n-cta', label: '加上行動呼籲(CTA)', domains: ['business'], prompt: '【細節微調】：在結尾處增加『下一步行動』，明確列出讀者看完後應該執行的 1~3 個具體步驟。' },
-                { id: 'n-case', label: '加入真實案例', domains: ['business', 'academic'], prompt: '【細節微調】：在抽象的概念或步驟說明後，務必補充一個「真實世界或產業中的具體案例」來幫助讀者理解。' },
+                { id: 'n-cta', label: '加上行動呼籲(CTA)', domains: ['business', 'planning'], prompt: '【細節微調】：在結尾處增加『下一步行動』，明確列出讀者看完後應該執行的 1~3 個具體步驟。' },
+                { id: 'n-case', label: '加入真實案例', domains: ['business', 'academic', 'planning'], prompt: '【細節微調】：在抽象的概念或步驟說明後，務必補充一個「真實世界或產業中的具體案例」來幫助讀者理解。' },
+                { id: 'n-interactive', label: '強化破冰與互動', domains: ['planning', 'business', 'academic'], prompt: '【細節微調】：在活動或課程設計中，請務必安插能快速炒熱氣氛的「破冰遊戲 (Ice-breaker)」與高頻率的「互動環節」。' },
+                { id: 'n-budget', label: '列出預算評估', domains: ['planning', 'business'], prompt: '【細節微調】：請在方案中加入務實的「預算評估」與「成本控制建議」，列出可能的花費項目與省錢小撇步。' },
+                { id: 'n-local-secret', label: '在地私房秘境', domains: ['planning'], prompt: '【細節微調】：行程規劃中請避開過度商業化的觀光陷阱，安排至少 2-3 個「在地人推薦的私房秘境或隱藏版美食」。' },
                 { id: 'n-video-cam', label: '指定電影運鏡', domains: ['visual'], prompt: '【細節微調】：請為每個畫面明確指定電影級鏡頭運動（如：緩慢推近 Slow Push-in、跟拍 Tracking shot），確保節奏與時長合理分配。' },
                 { id: 'n-video-sound', label: '精準音效與物理', domains: ['visual'], prompt: '【細節微調】：詳述畫面中的物理動態反應（如布料拉伸、重物滑動），並要求精準的音訊同步（如動作撞擊聲、環境底噪）。' }
             ]
@@ -385,7 +402,7 @@
         }
 
         // --- Application State ---
-        let user = null; // ADDED BACK TO FIX "user is not defined" error
+        let user = null;
 
         // Centralized initial state function
         const getInitialSelections = () => ({
@@ -654,6 +671,7 @@
                     ];
                 case 'academic':
                 case 'business':
+                case 'planning':
                 default:
                     return [
                         { label: "1. 輸出型式", key: "data_types", icon: 'files', customTitle: "輸出型式" },
@@ -872,7 +890,6 @@
         };
 
         // --- Event Listeners ---
-        // ADDED NULL CHECKS TO ALL BINDINGS TO FIX ERROR: Cannot set properties of null
         if (titleInput) {
             titleInput.oninput = (e) => { title = e.target.value; buildPrompt(); saveState(); };
         }
