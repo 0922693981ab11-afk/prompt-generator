@@ -79,7 +79,7 @@
     <main class="flex-grow flex flex-col lg:flex-row flex-nowrap overflow-hidden lg:p-3 lg:gap-1" id="container">
         
         <!-- Left Panel: Configuration -->
-        <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-xl bg-white shadow-sm flex-1 lg:flex-none" style="flex-basis: 58%;">
+        <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-xl bg-white shadow-sm flex-1 lg:flex-none" style="flex-basis: 55%;">
             <div class="flex-grow overflow-y-auto overflow-x-hidden p-4 lg:p-6 scrollbar-thin">
                 <div class="min-w-[300px] max-w-4xl mx-auto" id="config-sections">
                     
@@ -122,8 +122,8 @@
                                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
                                 <div id="file-display" class="flex flex-col items-center gap-1 text-indigo-500 text-center">
                                     <i data-lucide="upload-cloud" class="w-7 h-7 mb-1"></i>
-                                    <span class="text-[15px] font-bold text-indigo-700">點擊上傳參考圖片、截圖或 PDF</span>
-                                    <span class="text-sm text-slate-400 font-normal">支援 PNG, JPG, PDF (單頁佳，最大 5MB)</span>
+                                    <span class="text-[15px] font-bold text-indigo-700">點擊上傳圖片、截圖或 PDF</span>
+                                    <span class="text-sm text-slate-400 font-normal">單頁佳，最大 5MB</span>
                                 </div>
                             </label>
                             <div class="flex flex-col gap-2 w-full lg:w-auto shrink-0">
@@ -177,19 +177,29 @@
         </div>
 
         <!-- Right Panel: Output -->
-        <div id="right-panel" class="h-[45vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-xl shadow-2xl bg-[#1e293b] shrink-0 lg:shrink">
-            <div class="px-5 py-3 bg-[#0f172a] flex justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl overflow-x-auto">
+        <div id="right-panel" class="h-[45vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-xl shadow-2xl bg-[#1e293b] shrink-0 lg:shrink relative">
+            <div class="px-4 lg:px-5 py-3 bg-[#0f172a] flex flex-wrap justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl gap-3">
                 <span class="text-[15px] text-indigo-300 font-sans font-bold tracking-widest flex items-center gap-2 whitespace-nowrap"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
-                <div class="flex items-center gap-2">
-                    <button id="download-btn" class="text-[14px] font-bold bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-all active:scale-95 shadow-md flex items-center gap-2 whitespace-nowrap border border-slate-600">
-                        <i data-lucide="download" class="w-4 h-4"></i> 下載 TXT
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <!-- 新增：產生/重組提示詞的主按鈕 -->
+                    <button id="generate-prompt-btn" class="flex-1 lg:flex-none text-[14px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-4 py-2.5 rounded-lg transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> 產生提示詞
                     </button>
-                    <button id="copy-btn" class="text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-all active:scale-95 shadow-md flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="copy" class="w-4 h-4"></i> 複製提示詞
+                    <button id="download-btn" class="text-[14px] font-bold bg-slate-700 hover:bg-slate-600 text-white px-3 py-2.5 rounded-lg transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 whitespace-nowrap border border-slate-600" title="下載純文本">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                    </button>
+                    <button id="copy-btn" class="text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="copy" class="w-4 h-4"></i> 複製純文本
                     </button>
                 </div>
             </div>
-            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[17px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar">
+            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[17px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative">
+                <!-- 預設提示文字 -->
+                <div id="empty-state-msg" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 opacity-60 pointer-events-none p-6 text-center">
+                    <i data-lucide="layout-template" class="w-16 h-16 mb-4 text-slate-600"></i>
+                    <p class="text-lg font-bold mb-2">尚未產生提示詞</p>
+                    <p class="text-sm">請於左側設定您的條件後，點擊上方的「產生提示詞」按鈕。<br>系統將會為您融合成一篇通順、邏輯嚴密的專業提示詞。</p>
+                </div>
                 <pre id="prompt-output" class="whitespace-pre-wrap font-inherit"></pre>
             </div>
         </div>
@@ -219,7 +229,6 @@
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Config Data ---
-        // 加入了 domains 標籤，判斷該選項出現在哪個領域
         const INITIAL_CONFIG = {
             data_types: [
                 { id: 'dt-audit-report', label: '合約/文件檢核報告', domains: ['audit', 'business'], prompt: '【輸出型式】：請產出結構化的「文獻/條款檢核報告」。須列出：整體風險評估、不合理/缺失條款、具體修正與補充建議。' },
@@ -234,7 +243,10 @@
                 { id: 'dt-itinerary', label: '深度旅遊行程表', domains: ['planning'], prompt: '【輸出型式】：請產出實用且深度的「旅遊行程規劃表」。需包含：每日/每小時的時間節點、活動景點、交通建議、預估花費時間與重要注意事項 (Tips)。' },
                 { id: 'dt-report', label: '深度分析報告', domains: ['business', 'academic', 'tech'], prompt: '【輸出型式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
                 { id: 'dt-academic', label: '學術報告', domains: ['academic'], prompt: '【輸出型式】：請產出結構嚴謹的「學術報告」。須包含：研究背景、文獻探討、研究方法、結果分析與結論建議，並使用客觀中立的學術語氣。' },
+                { id: 'dt-journal', label: '專業期刊', domains: ['academic'], prompt: '【輸出型式】：請產出符合「專業期刊」發表的文章格式。具備高度專業性、邏輯嚴密，並包含摘要(Abstract)、關鍵字(Keywords)與核心論述。' },
+                { id: 'dt-thesis', label: '論文格式', domains: ['academic'], prompt: '【輸出型式】：請產出標準「論文」格式。需嚴格遵循學術規範，包含緒論、研究假說、實證分析、結論與未來研究方向之架構。' },
                 { id: 'dt-social', label: '社群貼文', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出高互動率的「社群貼文」。需具備吸睛標題(Hook)、引發共鳴的內文、適當的Emoji點綴，以及明確的行動呼籲(CTA)。' },
+                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性，吸引讀者持續追更。' },
                 { id: 'dt-table', label: '表格化資料', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
                 { id: 'dt-json-csv', label: 'JSON / CSV 資料集', domains: ['tech'], prompt: '【輸出型式】：請將分析結果或數據，嚴格格式化為標準的 JSON 結構或 CSV 逗號分隔格式，以便後續匯入系統。' },
                 { id: 'dt-code-doc', label: '程式碼與技術文件', domains: ['tech'], prompt: '【輸出型式】：請輸出可執行的完整程式碼 (Code Snippet) 與清晰的技術註解，並附上簡單的部署或執行說明文件。' },
@@ -399,6 +411,7 @@
         // UI 狀態：目前選取的領域
         let currentDomain = 'business'; // 預設為商業行銷
         let uploadedFileCount = 0; // 用於記憶文件的計數器
+        let isPromptOutdated = true; // 追蹤提示詞是否需要重新生成
 
         // --- Extracted CSS Constants ---
         const ANALYZE_BTN_DISABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
@@ -460,6 +473,8 @@
         const titleInput = document.getElementById('title-input');
         const customNotesInput = document.getElementById('custom-notes-input');
         const promptOutput = document.getElementById('prompt-output');
+        const emptyStateMsg = document.getElementById('empty-state-msg');
+        const generatePromptBtn = document.getElementById('generate-prompt-btn');
         const copyBtn = document.getElementById('copy-btn');
         const downloadBtn = document.getElementById('download-btn');
         const fileInput = document.getElementById('file-input');
@@ -533,9 +548,26 @@
             }
         };
 
+        // UI 變更時，提示需要重新產生
+        const markPromptOutdated = () => {
+            isPromptOutdated = true;
+            if (generatePromptBtn) {
+                generatePromptBtn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> 產生提示詞`;
+                generatePromptBtn.classList.replace('bg-indigo-500', 'bg-amber-500');
+                generatePromptBtn.classList.replace('hover:bg-indigo-400', 'hover:bg-amber-400');
+                generatePromptBtn.classList.add('text-slate-900');
+                generatePromptBtn.classList.remove('text-white');
+                if (typeof lucide !== 'undefined') lucide.createIcons({ root: generatePromptBtn });
+            }
+            // 讓使用者知道設定已變更
+            if (promptOutput && promptOutput.textContent && !promptOutput.textContent.includes('設定已變更')) {
+                // 不直接清空，而是讓使用者知道需要重按
+            }
+        };
+
         const updateStateAndRender = () => {
             renderSelections();
-            buildPrompt();
+            markPromptOutdated();
             saveState();
         };
 
@@ -581,14 +613,13 @@
             return content;
         };
 
-        const buildPrompt = () => {
+        // 僅負責將使用者的選項組合出「原始結構化字串」，供 AI 潤飾使用或作為備用輸出
+        const getStructuredPromptString = () => {
             let prompt = "";
             
-            // 1. 專家角色與指令框架 (Multi)
             prompt += buildMultiSectionMerged("roles", "roles", "多重專家角色設定");
             prompt += buildMultiSectionMerged("action_types", "action_types", "進階任務與分析框架");
             
-            // 2. 任務目標與標題
             let targetAndFormat = "";
             if (title && title.trim()) targetAndFormat += `本次專案核心主題為：「${title.trim()}」。\n`;
             targetAndFormat += buildSingleSection("data_type", "data_types", "輸出型式");
@@ -598,12 +629,10 @@
                 prompt += `【專案任務與輸出格式】：\n${targetAndFormat}\n`;
             }
 
-            // 3. 原始資料餵養區
             if (customNotes && customNotes.trim()) {
                 prompt += `【請先詳細閱讀並記憶以下專案/文獻參考資料】：\n---\n${customNotes.trim()}\n---\n\n`;
             }
             
-            // 4. 對標受眾與情境
             prompt += buildMultiSectionMerged("audiences", "audiences", "目標受眾特徵");
             
             let demoGraphics = buildSingleSection("gender", "genders", "專屬性別") + 
@@ -614,7 +643,6 @@
             
             prompt += buildMultiSectionMerged("tones", "tones", "溝通語氣與情境");
 
-            // 5. 版型結構與視覺呈現
             let visualSection = buildSingleSection("infographic", "infographics", "內容版型與結構") + 
                                 buildSingleSection("culture", "cultures", "文化與地域構圖") +
                                 buildMultiSectionMerged("visual_styles", "visual_styles", "視覺風格") + 
@@ -623,16 +651,13 @@
                 prompt += `【視覺呈現與排版規範】：\n${visualSection}\n`;
             }
 
-            // 6. 特定細節要求微調 (Multi)
             prompt += buildMultiSectionMerged("notes", "notes", "特定細節微調要求");
 
-            // 7. 嚴格限制條件與避雷 (Multi)
             let constraintsSection = buildMultiSectionMerged("constraints", "constraints", "嚴格限制與避雷規範");
             if (constraintsSection.trim()) {
                 prompt += constraintsSection;
             }
 
-            // === 8. 最終總結指令 ===
             const getLabels = (stateKey) => (selections[stateKey] || []).map(i => i.label);
             const getSingleLabel = (stateKey) => selections[stateKey]?.label;
 
@@ -674,8 +699,72 @@
                 prompt = `請嚴格依照以下疊加設定、多重專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}\n${finalSummary}\n========================================`;
             }
 
-            if (promptOutput) promptOutput.textContent = prompt;
+            return prompt;
         };
+
+        // --- 觸發 AI 統整與生成流暢提示詞 ---
+        const generateAIPrompt = async () => {
+            if (!generatePromptBtn) return;
+            
+            const structuredStr = getStructuredPromptString();
+            if (!structuredStr.trim()) {
+                 showToast('請先在左側選擇條件或輸入內容', 'error');
+                 return;
+            }
+
+            const originalText = generatePromptBtn.innerHTML;
+            generatePromptBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 系統編譯中...';
+            generatePromptBtn.disabled = true;
+            if (typeof lucide !== 'undefined') lucide.createIcons({ root: generatePromptBtn });
+
+            try {
+                // 如果沒有金鑰，直接拋出錯誤進入 Fallback，輸出結構化版本
+                if (!apiKey) throw new Error('No API Key');
+
+                const aiPrompt = "你是一個頂尖的 Prompt Engineer。請根據以下使用者選擇的條件，幫他撰寫出一套給 AI 執行的「最終完美提示詞」。\n\n要求：\n1. 邏輯通順、語氣專業、指令明確。\n2. 將零散的條件融合成連貫的指令說明。\n3. 請直接輸出最終的提示詞文本，絕對不要包含任何開場白、結語或引言（例如不要說「好的，這為您產生...」）。\n\n使用者設定的條件如下：\n\n" + structuredStr;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: aiPrompt }] }]
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Error');
+
+                const result = await response.json();
+                let finalPrompt = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (finalPrompt) {
+                    // 清理可能出現的 markdown 區塊格式
+                    finalPrompt = finalPrompt.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
+                    if (promptOutput) promptOutput.textContent = finalPrompt;
+                    if (emptyStateMsg) emptyStateMsg.style.display = 'none';
+                    isPromptOutdated = false;
+                    showToast('專業提示詞產生完成！', 'success');
+                } else {
+                     throw new Error('No content');
+                }
+            } catch (err) {
+                console.info("無法連線至 AI 潤飾服務，已為您降級切換至「結構化提示詞」模式");
+                if (promptOutput) promptOutput.textContent = structuredStr;
+                if (emptyStateMsg) emptyStateMsg.style.display = 'none';
+                isPromptOutdated = false;
+                showToast('已為您快速整理結構化提示詞', 'success');
+            }
+
+            // 按鈕狀態改為「更新提示詞版本」
+            generatePromptBtn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> 更新提示詞版本';
+            generatePromptBtn.classList.remove('text-slate-900', 'bg-amber-500', 'hover:bg-amber-400');
+            generatePromptBtn.classList.add('text-white', 'bg-indigo-500', 'hover:bg-indigo-400');
+            generatePromptBtn.disabled = false;
+            if (typeof lucide !== 'undefined') lucide.createIcons({ root: generatePromptBtn });
+        };
+
+        if (generatePromptBtn) {
+            generatePromptBtn.onclick = generateAIPrompt;
+        }
 
         const getGroupsForDomain = (domain) => {
             switch(domain) {
@@ -811,7 +900,7 @@
                 customInput.value = selections.custom_inputs[group.key] || '';
                 customInput.oninput = (e) => {
                     selections.custom_inputs[group.key] = e.target.value;
-                    buildPrompt(); 
+                    markPromptOutdated();
                     saveState();
                 };
                 customInputWrapper.appendChild(customInput);
@@ -840,6 +929,9 @@
                     if(titleInput) titleInput.value = '';
                     
                     updateStateAndRender();
+                    if(promptOutput) promptOutput.textContent = '';
+                    if(emptyStateMsg) emptyStateMsg.style.display = 'flex';
+                    
                     showToast(`已切換至「${targetBtn.innerText.trim()}」領域面板`, 'info');
                 };
             });
@@ -966,11 +1058,11 @@
 
         // --- Event Listeners ---
         if (titleInput) {
-            titleInput.oninput = (e) => { title = e.target.value; buildPrompt(); saveState(); };
+            titleInput.oninput = (e) => { title = e.target.value; markPromptOutdated(); saveState(); };
         }
         
         if (customNotesInput) {
-            customNotesInput.oninput = (e) => { customNotes = e.target.value; buildPrompt(); saveState(); };
+            customNotesInput.oninput = (e) => { customNotes = e.target.value; markPromptOutdated(); saveState(); };
         }
 
         if (clearNotesBtn) {
@@ -978,7 +1070,7 @@
                 customNotes = '';
                 if(customNotesInput) customNotesInput.value = '';
                 uploadedFileCount = 0;
-                buildPrompt();
+                markPromptOutdated();
                 saveState();
                 showToast('已清空記憶庫與所有文獻！', 'info');
             }
@@ -1030,8 +1122,12 @@
         if (copyBtn) {
             copyBtn.onclick = () => {
                 if (!promptOutput || !promptOutput.textContent.trim()) {
-                    showToast('沒有可複製的內容', 'error');
+                    showToast('目前沒有可複製的內容，請先點擊產生', 'error');
                     return;
+                }
+
+                if (isPromptOutdated) {
+                    showToast('提示：您已修改設定，目前複製的是尚未更新的版本', 'info');
                 }
 
                 const el = document.createElement('textarea');
@@ -1041,7 +1137,7 @@
                 
                 try {
                     document.execCommand('copy');
-                    showToast('完美！提示詞已完整複製到剪貼簿！', 'success');
+                    showToast('完美！純淨的提示詞文本已完整複製到剪貼簿！', 'success');
                     
                     const originalHtml = copyBtn.innerHTML;
                     copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
@@ -1065,7 +1161,7 @@
         if (downloadBtn) {
             downloadBtn.onclick = () => {
                 if (!promptOutput || !promptOutput.textContent.trim()) {
-                    showToast('目前沒有可下載的內容', 'error');
+                    showToast('目前沒有可下載的內容，請先點擊產生', 'error');
                     return;
                 }
 
@@ -1082,7 +1178,7 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                showToast('檔案已成功下載！', 'success');
+                showToast('純文本檔案已成功下載！', 'success');
             };
         }
 
@@ -1112,6 +1208,9 @@
                     analyzeConciseBtn.disabled = true;
                     analyzeConciseBtn.className = ANALYZE_BTN_DISABLED_CLASS;
                 }
+                
+                if (promptOutput) promptOutput.textContent = '';
+                if (emptyStateMsg) emptyStateMsg.style.display = 'flex';
                 
                 updateStateAndRender();
                 hideModal();
@@ -1220,7 +1319,10 @@
             loadPublicCounter();
             loadLocalSettings();
             renderSelections();
-            buildPrompt();
+            // 在初始載入時不自動產生提示詞，等待使用者主動點擊
+            if(promptOutput && promptOutput.textContent.trim() !== '') {
+                if (emptyStateMsg) emptyStateMsg.style.display = 'none';
+            }
         };
 
         init();
