@@ -181,7 +181,7 @@
             <div class="px-4 lg:px-5 py-3 bg-[#0f172a] flex flex-wrap justify-between items-center border-b border-slate-700/50 shrink-0 rounded-t-xl gap-3">
                 <span class="text-[15px] text-indigo-300 font-sans font-bold tracking-widest flex items-center gap-2 whitespace-nowrap"><i data-lucide="terminal" class="w-4 h-4"></i> PROMPT OUTPUT</span>
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <!-- 新增：產生/重組提示詞的主按鈕 -->
+                    <!-- 產生/重組提示詞的主按鈕 -->
                     <button id="generate-prompt-btn" class="flex-1 lg:flex-none text-[14px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-4 py-2.5 rounded-lg transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
                         <i data-lucide="sparkles" class="w-4 h-4"></i> 產生提示詞
                     </button>
@@ -419,8 +419,9 @@
         const ANALYZE_DETAILED_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
         const ANALYZE_CONCISE_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
 
-        // ⚠️ 在目前的線上預覽環境中，API Key 必須保持為空字串 ("")
-        const apiKey = "";
+        // ⚠️ 核心設定：如果您將網頁發布給公眾使用，請務必在此填入您的 Gemini API 金鑰！
+        // 否則在外部環境無法啟動 AI 思考，只能產出「生硬的基礎排版」。
+        const apiKey = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
         
         // Safe Firebase initialization
         let app = null, auth = null, db = null;
@@ -718,14 +719,14 @@
             if (typeof lucide !== 'undefined') lucide.createIcons({ root: generatePromptBtn });
 
             try {
-                // 移除原有的空金鑰阻擋機制，讓系統可以順利接管並呼叫 AI
                 const aiPrompt = `你是一個頂尖的 Prompt Engineer。請根據以下使用者設定的條件，撰寫出一套給 AI 執行的「最終完美提示詞」。
 要求：
 1. 將所有條件融合成流暢、連貫、專業的長文指令，絕對不要只是生硬的堆疊條列。
 2. 語氣必須符合使用者設定的專家角色與情境。
-3. 【絕對限制】：直接輸出最終的提示詞純文本！不要加上 markdown 標記 (如 \`\`\`)，絕對不要有任何開場白或結語（例如不要說「好的」、「為您產出」）。
+3. 【絕對限制】：直接輸出最終的提示詞純文本！不要加上 markdown 標記 (如 \`\`\`)，絕對不要有任何開場白或結語。
 
-[隨機亂數種子: ${Date.now()}] (請用全新的句型與排版重新詮釋，確保每次產出版本都不同)
+[強制變異指令：亂數 ${Math.random()}] 
+這是一次「重新生成」的要求！請你務必使用與之前「完全不同」的開場、句型結構與敘事角度來重新詮釋這份提示詞。確保文字充滿新意，切勿與一般常見的格式重複！
 
 使用者設定條件如下：
 ${structuredStr}`;
@@ -734,7 +735,9 @@ ${structuredStr}`;
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: aiPrompt }] }]
+                        systemInstruction: { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] },
+                        contents: [{ parts: [{ text: aiPrompt }] }],
+                        generationConfig: { temperature: 1.0 }
                     })
                 });
 
@@ -754,11 +757,16 @@ ${structuredStr}`;
                      throw new Error('No content');
                 }
             } catch (err) {
-                console.info("無法連線至 AI 潤飾服務，已為您降級切換至「結構化提示詞」模式");
+                console.info("AI 潤飾服務異常:", err);
                 if (promptOutput) promptOutput.textContent = structuredStr;
                 if (emptyStateMsg) emptyStateMsg.style.display = 'none';
                 isPromptOutdated = false;
-                showToast('已為您快速整理結構化提示詞', 'success');
+                
+                if (!apiKey) {
+                    showToast('未設定 API 金鑰，已切換為「基礎結構排版」', 'error');
+                } else {
+                    showToast('AI 潤飾失敗，已切換為「基礎結構排版」', 'error');
+                }
             }
 
             // 按鈕狀態改為「更新提示詞版本」
@@ -1270,7 +1278,7 @@ ${structuredStr}`;
                 try {
                     let response = null;
                     try {
-                        response = await fetch('https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up');
+                        response = await fetch('[https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up](https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up)');
                     } catch (fetchErr) {
                         // Silent catch for network block
                     }
