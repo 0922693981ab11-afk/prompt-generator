@@ -419,8 +419,8 @@
         const ANALYZE_DETAILED_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
         const ANALYZE_CONCISE_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
 
-        // 用戶提供的 API 金鑰
-        const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
+        // 用戶提供的 API 金鑰 (已核對圖片修正為 0frIC)
+        const USER_API_KEY = "AIzaSyCNHgPF0frIC-1Y0QyGVSBQ3LDMUANCqbk"; 
         
         // Safe Firebase initialization
         let app = null, auth = null, db = null;
@@ -502,7 +502,7 @@
         // === 智慧雙軌 API 呼叫系統 ===
         // 在內部測試環境(Canvas)優先使用無金鑰專用模型，在外部則使用用戶提供的金鑰與主流模型
         async function callGeminiAPI(promptStr, base64Data = null, mimeType = 'image/jpeg') {
-            const isCanvas = window.location.href.includes("usercontent.goog") || window.location.href.includes("csb.app");
+            const isPreviewEnv = typeof __app_id !== 'undefined';
             let errorLog = [];
             
             const runFetch = async (key, model) => {
@@ -534,7 +534,7 @@
             };
 
             // 如果是在 Canvas 預覽環境，優先嘗試使用預覽版專屬模型
-            if (isCanvas) {
+            if (isPreviewEnv) {
                 try {
                     return await runFetch("", "gemini-2.5-flash-preview-09-2025");
                 } catch (e) {
@@ -1295,8 +1295,7 @@ ${structuredStr}`;
                 try {
                     let response = null;
                     try {
-                        // 修復：徹底移除錯誤包覆的 Markdown 網址標記，確保計數器正常連線
-                        response = await fetch('https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up').catch(() => null);
+                        response = await fetch('[https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up](https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up)').catch(() => null);
                     } catch (fetchErr) {
                         // Silent catch for network block
                     }
