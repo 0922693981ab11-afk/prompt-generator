@@ -419,8 +419,8 @@
         const ANALYZE_DETAILED_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200";
         const ANALYZE_CONCISE_ENABLED_CLASS = "w-full lg:w-auto flex-1 px-4 py-2.5 rounded-lg text-[15px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-800 text-white hover:bg-slate-900 active:scale-95 shadow-md border border-slate-700";
 
-        // ⚠️ 核心設定：精確還原您提供的 Gemini API 金鑰
-        const apiKey = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
+        // 用戶提供的 API 金鑰
+        const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
         
         // Safe Firebase initialization
         let app = null, auth = null, db = null;
@@ -498,6 +498,61 @@
         }
 
         // --- Functions ---
+        
+        // === 智慧雙軌 API 呼叫系統 ===
+        // 在內部測試環境(Canvas)優先使用無金鑰專用模型，在外部則使用用戶提供的金鑰與主流模型
+        async function callGeminiAPI(promptStr, base64Data = null, mimeType = 'image/jpeg') {
+            const isCanvas = window.location.href.includes("usercontent.goog") || window.location.href.includes("csb.app");
+            let errorLog = [];
+            
+            const runFetch = async (key, model) => {
+                const parts = [{ text: promptStr }];
+                if (base64Data) {
+                    parts.push({ inlineData: { mimeType: mimeType, data: base64Data } });
+                }
+                
+                let reqBody = { contents: [{ parts: parts }] };
+                
+                // 只有在純文字生成 (不包含圖片檔案) 的情況下，才附上系統指令強制純輸出
+                if (!base64Data) {
+                    reqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
+                    reqBody.generationConfig = { temperature: 1.0 };
+                }
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqBody)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error?.message || `HTTP ${response.status}`);
+                }
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text;
+            };
+
+            // 如果是在 Canvas 預覽環境，優先嘗試使用預覽版專屬模型
+            if (isCanvas) {
+                try {
+                    return await runFetch("", "gemini-2.5-flash-preview-09-2025");
+                } catch (e) {
+                    errorLog.push(`預覽模型失敗: ${e.message}`);
+                    console.warn("預覽模型連線失敗，正在嘗試自動降級使用使用者金鑰連線...");
+                }
+            }
+
+            // 在外部發布環境，或是預覽環境失敗時，使用正規模型與用戶金鑰
+            try {
+                // 修正：外部公開金鑰必須使用對外開放的正式版模型 gemini-1.5-flash
+                return await runFetch(USER_API_KEY, "gemini-1.5-flash");
+            } catch (e) {
+                errorLog.push(`自訂金鑰連線失敗: ${e.message}`);
+                throw new Error(errorLog.join(' | '));
+            }
+        }
+        
         const showToast = (message, type = 'success') => {
             const toast = document.createElement('div');
             const bgClass = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-slate-800');
@@ -726,29 +781,7 @@
 使用者設定條件如下：
 ${structuredStr}`;
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] },
-                        contents: [{ parts: [{ text: aiPrompt }] }],
-                        generationConfig: { temperature: 1.0 }
-                    })
-                });
-
-                if (!response.ok) {
-                    let errorMsg = '未知的網路錯誤';
-                    try {
-                        const errData = await response.json();
-                        errorMsg = errData.error?.message || `HTTP ${response.status}`;
-                    } catch(e) {
-                        errorMsg = `HTTP ${response.status}`;
-                    }
-                    throw new Error(errorMsg);
-                }
-
-                const result = await response.json();
-                let finalPrompt = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                let finalPrompt = await callGeminiAPI(aiPrompt);
 
                 if (finalPrompt) {
                     // 清理可能出現的 markdown 區塊格式
@@ -766,11 +799,7 @@ ${structuredStr}`;
                 if (emptyStateMsg) emptyStateMsg.style.display = 'none';
                 isPromptOutdated = false;
                 
-                if (!apiKey) {
-                    showToast('未設定 API 金鑰，已切換為「基礎結構排版」', 'error');
-                } else {
-                    showToast(`AI 潤飾失敗 (${err.message})，已切換為基礎排版`, 'error');
-                }
+                showToast(`AI 潤飾失敗，已切換為基礎排版`, 'error');
             }
 
             // 按鈕狀態改為「更新提示詞版本」
@@ -1011,23 +1040,7 @@ ${structuredStr}`;
                         promptStr = "你是一位專業的分析師。請以「極其精煉」的條列式文字，快速擷取這張圖/文件的最核心資訊。排除贅字，總字數控制在 150 字以內，使用「繁體中文」。請直接回傳核心條列內容。";
                     }
 
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [
-                                    { text: promptStr },
-                                    { inlineData: { mimeType: file.type || 'image/jpeg', data: base64Data } }
-                                ]
-                            }]
-                        })
-                    });
-
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                    
-                    const result = await response.json();
-                    const analysisText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    const analysisText = await callGeminiAPI(promptStr, base64Data, file.type || 'image/jpeg');
                     
                     if (analysisText) {
                         let header = "";
@@ -1282,8 +1295,8 @@ ${structuredStr}`;
                 try {
                     let response = null;
                     try {
-                        // 修復：已將原本錯誤包覆的 Markdown 網址標記移除，確保正常連線
-                        response = await fetch('[https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up](https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up)').catch(() => null);
+                        // 修復：徹底移除錯誤包覆的 Markdown 網址標記，確保計數器正常連線
+                        response = await fetch('https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up').catch(() => null);
                     } catch (fetchErr) {
                         // Silent catch for network block
                     }
