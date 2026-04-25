@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>啓仲哥的AI提示詞快速產生器 | 企業級專業版</title>
-    <!-- 引入 Tailwind CSS 與 Lucide Icons -->
+    <title>啓仲哥的AI提示詞快速產生器 | V4.0 大師完全體</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -36,7 +35,7 @@
         #resizer { transition: background-color 0.2s ease; }
         #resizer:hover, #resizer.dragging { background-color: var(--primary-color); }
         
-        /* 互動按鈕動態反饋 (Interactive Button States) */
+        /* 互動按鈕動態反饋 */
         .selection-btn {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
@@ -53,14 +52,14 @@
 
         .domain-btn { transition: all 0.3s ease; }
         .domain-btn.active {
-            background-color: #1e1b4b !important; /* 深度商務藍 */
+            background-color: #1e1b4b !important; 
             color: #ffffff !important;
             border-color: #312e81 !important;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
             transform: translateY(1px);
         }
 
-        /* 吐司通知動畫 (Toast Animations) */
+        /* 吐司通知動畫 */
         @keyframes slideInRight {
             from { transform: translateX(120%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -72,29 +71,22 @@
         .toast-enter { animation: slideInRight 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) forwards; }
         .toast-leave { animation: fadeOutRight 0.4s ease-in forwards; }
 
-        /* 載入中動畫 (Loading Spinner) */
-        .loader-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* 歷史紀錄側邊欄 (History Drawer) */
+        /* 歷史紀錄側邊欄 */
         #history-drawer {
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateX(100%);
         }
         #history-drawer.open { transform: translateX(0); }
         
-        /* 模糊遮罩 (Backdrop Blur) */
-        .modal-backdrop {
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
+        .modal-backdrop { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        
+        /* 搜尋過濾器隱藏類別 */
+        .hidden-item { display: none !important; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-base">
 
-    <!-- =========================================
-         全域錯誤防護網 (Global Crash Boundary UI)
-         ========================================= -->
+    <!-- 全域錯誤防護網 -->
     <div id="crash-boundary" class="hidden fixed inset-0 z-[9999] bg-slate-900 flex flex-col items-center justify-center text-white p-6">
         <i data-lucide="alert-octagram" class="w-20 h-20 text-red-500 mb-6"></i>
         <h1 class="text-3xl font-black mb-4 tracking-wider">系統遭遇嚴重異常</h1>
@@ -109,79 +101,78 @@
         </div>
     </div>
 
-    <!-- =========================================
-         頂部導覽列 (Header)
-         ========================================= -->
+    <!-- 頂部導覽列 -->
     <header class="shrink-0 px-4 py-3 border-b border-slate-200 bg-white z-40 shadow-sm flex items-center justify-between relative">
         <div class="flex items-center gap-3">
             <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                 <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">啓仲</span>
-                AI 提示詞快速產生器
-                <span class="hidden lg:inline-block text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider border border-emerald-200 ml-2">PRO v3.1</span>
+                AI 提示詞產生器
+                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-amber-400 to-orange-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">V4.0 Master</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <!-- 歷史紀錄按鈕 -->
             <button id="toggle-history-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-100 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm">
                 <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i> 歷史庫
             </button>
-            <!-- 瀏覽計數器 -->
             <div class="hidden md:flex text-[14px] text-indigo-700 bg-indigo-50 px-3.5 py-1.5 rounded-lg border border-indigo-100 items-center gap-1.5 font-bold shadow-sm" title="全球使用人次">
                 <i data-lucide="activity" class="w-4 h-4"></i> <span id="visitor-count">載入中...</span>
             </div>
-            <!-- 全部清除 -->
             <button id="reset-all-btn" class="text-[14px] font-bold text-red-600 hover:text-white border border-red-200 bg-red-50 hover:bg-red-500 px-3 md:px-4 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-1.5 shadow-sm">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">全部清除</span>
             </button>
         </div>
     </header>
 
-    <!-- =========================================
-         主工作區 (Main Workspace)
-         ========================================= -->
+    <!-- 主工作區 -->
     <main class="flex-grow flex flex-col lg:flex-row flex-nowrap overflow-hidden lg:p-3 lg:gap-1 relative" id="container">
         
-        <!-- 左側面板：條件配置區 (Left Panel: Configuration) -->
+        <!-- 左側面板 -->
         <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-xl bg-white shadow-sm flex-1 lg:flex-none relative z-10" style="flex-basis: 52%;">
             <div class="flex-grow overflow-y-auto overflow-x-hidden p-4 lg:p-6 scrollbar-thin">
                 <div class="min-w-[300px] max-w-4xl mx-auto" id="config-sections">
                     
-                    <!-- 步驟 1: 領域選擇器 (Domain Selector) -->
+                    <!-- 領域選擇器 (擴充為8大領域) -->
                     <section class="mb-8 p-5 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 opacity-10 rounded-full blur-3xl transform translate-x-10 -translate-y-10 group-hover:opacity-20 transition-opacity"></div>
                         <h3 class="text-[16px] font-bold text-white mb-3 flex items-center gap-2 relative z-10">
                             <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 第一步：鎖定核心任務領域
                         </h3>
-                        <p class="text-slate-300 text-sm mb-4 relative z-10">系統將自動過濾無效參數，確保 AI 專注於您的專業領域。</p>
-                        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5 relative z-10" id="domain-selector">
-                            <button data-domain="business" class="domain-btn active flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
+                        <p class="text-slate-300 text-[13px] mb-4 relative z-10">系統將自動過濾無效參數，載入專屬該領域的專家角色與神級框架。</p>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 relative z-10" id="domain-selector">
+                            <button data-domain="business" class="domain-btn active flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
                                 <i data-lucide="briefcase" class="w-4 h-4"></i> 商業與文案
                             </button>
-                            <button data-domain="planning" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
-                                <i data-lucide="map" class="w-4 h-4"></i> 企劃與生活
+                            <button data-domain="roleplay" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="masks-theater" class="w-4 h-4"></i> 角色扮演與對話
                             </button>
-                            <button data-domain="audit" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
-                                <i data-lucide="file-search" class="w-4 h-4"></i> 審核與比對
+                            <button data-domain="coaching" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="compass" class="w-4 h-4"></i> 顧問與教練指導
                             </button>
-                            <button data-domain="academic" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
-                                <i data-lucide="book-open" class="w-4 h-4"></i> 學術與報告
+                            <button data-domain="tech" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="code" class="w-4 h-4"></i> 程式與IT技術
                             </button>
-                            <button data-domain="tech" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
-                                <i data-lucide="code" class="w-4 h-4"></i> 程式與數據
+                            <button data-domain="audit" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="file-search" class="w-4 h-4"></i> 稽核與比對
                             </button>
-                            <button data-domain="visual" class="domain-btn flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px] md:text-[14px]">
+                            <button data-domain="academic" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="book-open" class="w-4 h-4"></i> 學術與教育
+                            </button>
+                            <button data-domain="visual" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
                                 <i data-lucide="image" class="w-4 h-4"></i> 視覺與影音
+                            </button>
+                            <button data-domain="planning" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="map" class="w-4 h-4"></i> 企劃與日常
                             </button>
                         </div>
                     </section>
 
-                    <!-- 智慧文獻萃取區 (AI Extraction Section) -->
+                    <!-- AI 視覺與文獻解析中樞 -->
                     <section class="mb-8 p-5 bg-indigo-50/60 border border-indigo-100/80 rounded-2xl shadow-sm relative">
                         <h3 class="text-base font-bold text-indigo-900 mb-3 flex items-center gap-2">
                             <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i> AI 視覺與文獻解析中樞
                         </h3>
                         <p class="text-[13px] text-indigo-700/70 mb-4 leading-relaxed">
-                            支援上傳圖片或單頁 PDF。若有<strong class="text-indigo-900">多份文件</strong>需交叉比對，請分批上傳並點擊「📥 萃取並記憶」，系統將為您建立專屬記憶庫。
+                            支援上傳圖片或 PDF。若有<strong class="text-indigo-900">多份文件</strong>需交叉比對，請分批上傳並點擊「📥 萃取並記憶」，系統將為您建立專屬記憶庫。
                         </p>
                         <div class="flex flex-col xl:flex-row items-stretch gap-3">
                             <label class="w-full xl:w-7/12 cursor-pointer flex flex-col items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white rounded-xl p-5 hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm group">
@@ -210,38 +201,40 @@
                         </div>
                     </section>
 
-                    <!-- 標題輸入 (Title Input) -->
+                    <!-- 標題輸入 -->
                     <section class="mb-8">
                         <h3 class="text-[15px] font-bold text-slate-700 mb-2 flex items-center gap-1.5">
-                            <i data-lucide="heading-1" class="w-4 h-4 text-indigo-500"></i> 0. 專案/主題名稱
+                            <i data-lucide="terminal-square" class="w-4 h-4 text-indigo-500"></i> 0. 第一句指令 / 核心情境 (First Request)
                         </h3>
-                        <input type="text" id="title-input" placeholder="請輸入本次專案的核心主題或活動名稱..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-500 focus:bg-white focus:shadow-md transition-all placeholder:font-normal placeholder:text-slate-400">
+                        <p class="text-[12px] text-slate-400 mb-2">對於角色扮演，這裡將作為您的第一句話（例如 "Hi, I need help with..."）。</p>
+                        <input type="text" id="title-input" placeholder="請輸入本次對話的第一句指令、核心問題或活動名稱..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-500 focus:bg-white focus:shadow-md transition-all placeholder:font-normal placeholder:text-slate-400">
                     </section>
 
-                    <!-- 重置選項按鈕 (Reset Selections) -->
-                    <div class="mb-8 border-b border-slate-200/60 pb-6">
-                        <button id="clear-selections-btn" class="w-full text-[14px] font-bold bg-slate-800 hover:bg-slate-900 text-white py-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md tracking-widest border border-slate-700">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重置下方所有細節選項
+                    <!-- 重置選項按鈕 -->
+                    <div class="mb-8 border-b border-slate-200/60 pb-6 flex items-center justify-between">
+                        <span class="text-slate-500 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 詳細參數堆疊</span>
+                        <button id="clear-selections-btn" class="text-[13px] font-bold bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-sm">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 重置所有按鈕
                         </button>
                     </div>
 
-                    <!-- 動態條件生成區 (Dynamic Groups) -->
+                    <!-- 動態條件生成區 -->
                     <div id="selection-groups-container" class="space-y-8"></div>
                     
-                    <!-- 原始資料餵養區 (Raw Data Note) -->
+                    <!-- 原始資料餵養區 -->
                     <section class="mt-10 pt-8 border-t-2 border-slate-100">
                         <div class="flex justify-between items-end mb-3">
                             <div>
                                 <h3 class="text-[16px] font-bold text-slate-700 flex items-center gap-1.5">
                                     <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i> 附錄：專屬記憶庫與文獻資料區
                                 </h3>
-                                <p class="text-[13px] text-slate-400 mt-1">您可手動貼上長文、合約、腳本，或透過上方按鈕自動堆疊多份檔案記憶。</p>
+                                <p class="text-[13px] text-slate-400 mt-1">手動貼上長文、合約、代碼，或透過上方按鈕自動堆疊多份檔案記憶。</p>
                             </div>
                             <button id="clear-notes-btn" class="text-[13px] font-bold text-slate-500 hover:text-red-600 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-slate-200">
                                 <i data-lucide="eraser" class="w-3.5 h-3.5"></i> 清空記憶
                             </button>
                         </div>
-                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的專案概要、合約內容、腳本、程式碼，或任何需要 AI 參考的原始資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[15px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
+                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的文獻內容、腳本、程式碼或任何待處理的原始資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[15px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
                     </section>
                 </div>
             </div>
@@ -252,20 +245,17 @@
             <div class="w-1 h-12 bg-slate-300 group-hover:bg-white rounded-full transition-colors shadow-sm pointer-events-none"></div>
         </div>
 
-        <!-- 右側面板：輸出區 (Right Panel: Output) -->
+        <!-- 右側面板：輸出區 -->
         <div id="right-panel" class="h-[50vh] lg:h-full lg:flex-1 min-w-0 flex flex-col lg:border border-t-4 border-t-indigo-500 lg:border-t-0 lg:border-slate-800 lg:rounded-xl shadow-2xl bg-[#0f172a] shrink-0 lg:shrink relative z-10">
-            <!-- 輸出區頭部工具列 -->
             <div class="px-4 lg:px-6 py-3.5 bg-[#020617] flex flex-wrap justify-between items-center border-b border-slate-800 shrink-0 lg:rounded-t-xl gap-3 shadow-sm z-20">
                 <div class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse"></div>
                     <span class="text-[14px] text-slate-300 font-sans font-bold tracking-widest select-none">AI PROMPT TERMINAL</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <!-- 核心按鈕：產生提示詞 -->
                     <button id="generate-prompt-btn" class="flex-1 sm:flex-none text-[14px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 whitespace-nowrap">
                         <i data-lucide="sparkles" class="w-4 h-4"></i> 智能撰寫提示詞
                     </button>
-                    <!-- 複製與下載 -->
                     <button id="download-btn" class="text-[14px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 border border-slate-700" title="下載純文本 .txt">
                         <i data-lucide="download" class="w-4 h-4"></i>
                     </button>
@@ -275,22 +265,19 @@
                 </div>
             </div>
             
-            <!-- 輸出文字框 -->
             <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[16px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative bg-[#0f172a]" id="output-container">
-                <!-- 空狀態提示 -->
                 <div id="empty-state-msg" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none p-6 text-center z-10 transition-opacity duration-300">
                     <div class="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mb-5 border border-slate-700/50">
                         <i data-lucide="cpu" class="w-10 h-10 text-slate-500"></i>
                     </div>
                     <p class="text-xl font-bold mb-3 text-slate-400 tracking-wide">等待編譯指令</p>
-                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">請於左側面板設定您的需求條件，完成後點擊右上方的<span class="text-amber-500 font-bold mx-1">智能撰寫提示詞</span>按鈕，系統將為您生成專家級的指令。</p>
+                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">請於左側設定需求條件，點擊右上方的<span class="text-amber-500 font-bold mx-1">智能撰寫提示詞</span>，系統將生成大師級的複合指令。</p>
                 </div>
-                <!-- 實際輸出預覽 -->
                 <pre id="prompt-output" class="whitespace-pre-wrap font-sans relative z-20 break-words"></pre>
             </div>
         </div>
         
-        <!-- 歷史紀錄側邊欄 (History Drawer) -->
+        <!-- 歷史紀錄側邊欄 -->
         <div id="history-drawer" class="absolute top-0 right-0 h-full w-full sm:w-80 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.1)] z-50 border-l border-slate-200 flex flex-col">
             <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> 提示詞歷史庫</h3>
@@ -298,19 +285,15 @@
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="flex-grow overflow-y-auto p-4 scrollbar-thin space-y-3 bg-slate-50/50" id="history-list">
-                <!-- 歷史紀錄動態生成 -->
-            </div>
+            <div class="flex-grow overflow-y-auto p-4 scrollbar-thin space-y-3 bg-slate-50/50" id="history-list"></div>
             <div class="p-4 border-t border-slate-200 bg-white">
                 <button id="clear-history-btn" class="w-full py-2.5 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-100">清空所有紀錄</button>
             </div>
         </div>
     </main>
 
-    <!-- Modal 遮罩層 -->
     <div id="modal-backdrop" class="hidden fixed inset-0 bg-slate-900/40 z-40 modal-backdrop transition-opacity opacity-0"></div>
 
-    <!-- 確認重置 Modal -->
     <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
         <div class="bg-white rounded-2xl p-8 w-11/12 max-w-sm shadow-2xl border border-slate-200 transform scale-95 transition-all duration-200 opacity-0 pointer-events-auto" id="modal-content">
             <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-5 mx-auto border border-red-100">
@@ -325,16 +308,14 @@
         </div>
     </div>
 
-    <!-- 吐司通知容器 -->
     <div id="toast-container" class="fixed top-20 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- =========================================
-         系統核心邏輯 (System Core Logic)
+         系統核心邏輯 (System Core Logic) V4.0
          ========================================= -->
     <script type="module">
         /**
          * 四重保護機制 - 第一重：全域錯誤防護網
-         * 捕獲所有未處理的例外狀況，避免白畫面死機
          */
         window.addEventListener('error', (e) => {
             console.error('🔥 [Global Error Captured]:', e.error);
@@ -353,21 +334,26 @@
                     crashUI.classList.remove('hidden');
                     crashLog.textContent = errorDetail.toString();
                 }
-            } catch(err) { /* 靜默失敗 */ }
+            } catch(err) {}
         }
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        //  配置常數與核心設定 (Configuration & Constants)
-        // ==========================================
-        
         // ⚠️ 企業版核心：完美校對後的 API 金鑰
         const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
         
-        // 嚴格定義資料庫結構 (Database Initialization)
+        // 按鈕樣式常數
+        const ANALYZE_BTN_EXTRACT_DISABLED = "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent";
+        const ANALYZE_BTN_SMALL_DISABLED = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent";
+        const ANALYZE_EXTRACT_ENABLED_CLASS = "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-amber-500 text-white hover:bg-amber-600 active:scale-95 shadow-[0_4px_10px_rgba(245,158,11,0.3)]";
+        const ANALYZE_DETAILED_ENABLED_CLASS = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white hover:bg-indigo-500 active:scale-95 shadow-[0_4px_10px_rgba(79,70,229,0.3)]";
+        const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-700 active:scale-95 shadow-md";
+
+        // ==========================================
+        //  終極詠唱資料庫 (基於附件徹底擴充)
+        // ==========================================
         const INITIAL_CONFIG = {
             data_types: [
                 { id: 'dt-audit-report', label: '合約/文件檢核報告', domains: ['audit', 'business'], prompt: '【輸出型式】：請產出結構化的「文獻/條款檢核報告」。須列出：整體風險評估、不合理/缺失條款、具體修正與補充建議。' },
@@ -375,76 +361,125 @@
                 { id: 'dt-key-extract', label: '長文核心重點萃取', domains: ['audit', 'academic', 'tech', 'business'], prompt: '【輸出型式】：請產出極度濃縮的「核心重點萃取 (Key Takeaways)」。排除所有廢話，以條列式精確條列出關鍵資訊、數據與結論。' },
                 { id: 'dt-ppt', label: '簡報結構規劃', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請提供完整的簡報大綱與各頁面詳細內容規劃，確保邏輯流暢且層次分明。' },
                 { id: 'dt-ppt-outline', label: '簡報大綱(附講稿)', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請產出結構清晰的「簡報大綱」。包含每頁投影片的標題、核心訊息 (Key Message) 與講者備忘錄 (Speaker Notes)。' },
-                { id: 'dt-course', label: '課程教案與綱要', domains: ['business', 'academic', 'planning'], prompt: '【輸出型式】：請產出專業的「課程設計大綱」。需包含：課程學習目標、模組化單元劃分、各單元教學活動建議與預估時間。' },
+                { id: 'dt-course', label: '課程教案與綱要', domains: ['academic', 'coaching'], prompt: '【輸出型式】：請產出專業的「課程設計大綱」。需包含：課程學習目標、模組化單元劃分、各單元教學活動建議與預估時間。' },
                 { id: 'dt-event-plan', label: '主題活動企劃書', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出完整的「主題活動企劃書」。需包含：活動目的、目標受眾、核心亮點、流程規劃(Rundown)、預算評估與預期效益。' },
-                { id: 'dt-gamification', label: '遊戲化活動腳本', domains: ['planning'], prompt: '【輸出型式】：請產出「遊戲化活動腳本」。包含：世界觀設定、任務機制、積分獎勵規則與玩家互動環節設計。' },
-                { id: 'dt-train-plan', label: '培訓計畫大綱', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出結構化的「培訓計畫大綱」。包含：培訓目標、階段性里程碑、技能樹展開、考核標準與預估時程。' },
+                { id: 'dt-gamification', label: '遊戲化活動腳本', domains: ['planning', 'roleplay'], prompt: '【輸出型式】：請產出「遊戲化活動腳本」。包含：世界觀設定、任務機制、積分獎勵規則與玩家互動環節設計。' },
+                { id: 'dt-train-plan', label: '培訓計畫大綱', domains: ['business', 'coaching'], prompt: '【輸出型式】：請產出結構化的「培訓計畫大綱」。包含：培訓目標、階段性里程碑、技能樹展開、考核標準與預估時程。' },
                 { id: 'dt-itinerary', label: '深度旅遊行程表', domains: ['planning'], prompt: '【輸出型式】：請產出實用且深度的「旅遊行程規劃表」。需包含：每日/每小時的時間節點、活動景點、交通建議、預估花費時間與重要注意事項 (Tips)。' },
-                { id: 'dt-report', label: '深度分析報告', domains: ['business', 'academic', 'tech'], prompt: '【輸出型式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
-                { id: 'dt-academic', label: '學術報告', domains: ['academic'], prompt: '【輸出型式】：請產出結構嚴謹的「學術報告」。須包含：研究背景、文獻探討、研究方法、結果分析與結論建議，並使用客觀中立的學術語氣。' },
-                { id: 'dt-journal', label: '專業期刊', domains: ['academic'], prompt: '【輸出型式】：請產出符合「專業期刊」發表的文章格式。具備高度專業性、邏輯嚴密，並包含摘要(Abstract)、關鍵字(Keywords)與核心論述。' },
-                { id: 'dt-thesis', label: '論文格式', domains: ['academic'], prompt: '【輸出型式】：請產出標準「論文」格式。需嚴格遵循學術規範，包含緒論、研究假說、實證分析、結論與未來研究方向之架構。' },
+                { id: 'dt-report', label: '深度分析報告', domains: ['business', 'academic', 'tech', 'audit'], prompt: '【輸出型式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
+                { id: 'dt-academic', label: '學術報告/論文', domains: ['academic'], prompt: '【輸出型式】：請產出標準「論文」格式。需嚴格遵循學術規範，包含緒論、文獻探討、研究方法、實證分析、結論與未來研究方向。' },
                 { id: 'dt-social', label: '社群貼文', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出高互動率的「社群貼文」。需具備吸睛標題(Hook)、引發共鳴的內文、適當的Emoji點綴，以及明確的行動呼籲(CTA)。' },
-                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性，吸引讀者持續追更。' },
-                { id: 'dt-table', label: '表格化資料', domains: ['business', 'academic', 'tech', 'planning'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
+                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business', 'planning', 'roleplay'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性。' },
+                { id: 'dt-table', label: 'Markdown 表格', domains: ['business', 'academic', 'tech', 'planning', 'audit'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
                 { id: 'dt-json-csv', label: 'JSON / CSV 資料集', domains: ['tech'], prompt: '【輸出型式】：請將分析結果或數據，嚴格格式化為標準的 JSON 結構或 CSV 逗號分隔格式，以便後續匯入系統。' },
                 { id: 'dt-code-doc', label: '程式碼與技術文件', domains: ['tech'], prompt: '【輸出型式】：請輸出可執行的完整程式碼 (Code Snippet) 與清晰的技術註解，並附上簡單的部署或執行說明文件。' },
-                { id: 'dt-img', label: 'AI 繪圖指令', domains: ['visual'], prompt: '【輸出型式】：請輸出詳細的 AI 繪圖提示詞 (Image Prompt)。務必精確描述主體、畫面細節、環境光影、攝影鏡頭與視覺元素。' },
-                { id: 'dt-video-basic', label: '影片生成指令', domains: ['visual'], prompt: '【輸出型式】：請產出用於 AI 影片生成模型的結構化提示詞。需包含：場景描述、主體動作節拍、鏡頭語言與光影音效。' }
+                { id: 'dt-img', label: 'AI 繪圖/Midjourney指令', domains: ['visual'], prompt: '【輸出型式】：請輸出詳細的 AI 繪圖提示詞 (Image Prompt)。務必包含：[prompt], [詳細描述主體], [環境背景], [情緒氛圍], [藝術風格], [算圖引擎設定如 --ar 16:9 --v 5]。不要使用換行，寫成一整段。' },
+                { id: 'dt-svg', label: 'SVG 圖表程式碼', domains: ['tech', 'visual'], prompt: '【輸出型式】：請直接輸出 SVG 代碼 (轉換為 base64 data URL 尤佳)。不要放在 Markdown code block 裡面，僅輸出代碼本身。' },
+                { id: 'dt-terminal', label: '終端機/命令列輸出', domains: ['tech', 'roleplay'], prompt: '【輸出型式】：請「只」在單一的 Markdown 程式碼區塊 (code block) 內回覆終端機 (Terminal) 或 Console 應該顯示的結果，除此之外不要寫任何解釋文字。' },
+                { id: 'dt-interactive', label: '對話式問答', domains: ['roleplay', 'coaching'], prompt: '【輸出型式】：這是一場對話。請一次只問一個問題，並「等待我的回答」。絕對不要一次寫出所有對話內容。' },
+                { id: 'dt-seo-article', label: 'SEO 高排布文章', domains: ['business', 'tech'], prompt: '【輸出型式】：撰寫 1500 字以上 100% 獨創的 SEO 優化文章。需包含至少 15 個標題與副標題 (H1, H2, H3, H4)，並使用加粗、條列式增強閱讀性。結尾請附上 5 個獨特的 FAQs 與 Meta Description。' }
             ],
             languages: [
-                { id: 'l-zh-tw', label: '繁體中文 (台灣)', domains: ['business', 'visual', 'academic', 'tech', 'planning', 'audit'], prompt: '【輸出語言】：請強制使用「繁體中文 (台灣慣用語)」，嚴格避免使用中國大陸的拼音拼寫或慣用語 (如：將「視頻」改為「影片」)。' },
-                { id: 'l-en-us', label: '美式英文', domains: ['business', 'visual', 'academic', 'tech', 'planning', 'audit'], prompt: '【輸出語言】：Please output the response strictly in Native American English, ensuring professional phrasing and correct grammar.' },
-                { id: 'l-ja', label: '日文 (日本語)', domains: ['business', 'visual', 'planning'], prompt: '【輸出語言】：請使用自然流暢的「日文 (日本語)」進行輸出，並依據情境使用適當的敬語。' },
-                { id: 'l-bilingual', label: '中英雙語對照', domains: ['business', 'academic', 'tech', 'planning', 'audit'], prompt: '【輸出語言】：請提供「繁體中文與英文的雙語對照」版本。每一個主要段落的中文下方，都必須緊接著附上對應的英文翻譯。' }
+                { id: 'l-zh-tw', label: '繁體中文 (台灣)', domains: ['business', 'visual', 'academic', 'tech', 'planning', 'audit', 'roleplay', 'coaching'], prompt: '【輸出語言】：請強制使用「繁體中文 (台灣慣用語)」，嚴格避免使用中國大陸的拼音拼寫或慣用語。' },
+                { id: 'l-en-us', label: '美式英文', domains: ['business', 'visual', 'academic', 'tech', 'planning', 'audit', 'roleplay', 'coaching'], prompt: '【輸出語言】：Please output the response strictly in Native American English, ensuring professional phrasing and correct grammar.' },
+                { id: 'l-ja', label: '日文 (日本語)', domains: ['business', 'visual', 'planning', 'roleplay'], prompt: '【輸出語言】：請使用自然流暢的「日文 (日本語)」進行輸出，並依據角色身份使用適當的敬語或平語。' },
+                { id: 'l-bilingual', label: '中英雙語對照', domains: ['business', 'academic', 'tech', 'planning', 'audit'], prompt: '【輸出語言】：請提供「繁體中文與英文的雙語對照」版本。每一個主要段落的中文下方，都必須緊接著附上對應的英文翻譯。' },
+                { id: 'l-emoji', label: '純 Emoji 表達', domains: ['planning', 'roleplay'], prompt: '【輸出語言】：我只要你用 Emoji (表情符號) 來表達。不要回覆任何文字，只能使用 Emoji。' },
+                { id: 'l-morse', label: '摩斯密碼', domains: ['tech', 'roleplay'], prompt: '【輸出語言】：請將結果完全翻譯為「摩斯密碼 (Morse Code)」。只能輸出摩斯密碼，不要任何額外解釋。' }
             ],
             action_types: [
-                { id: 'act-contract-check', label: '合約/條款漏洞檢核', domains: ['audit', 'business'], prompt: '【任務框架-合約與條款檢核】：請交叉比對我提供的所有參考資料。1. 找出邏輯矛盾、不合理或具潛在風險的條款。 2. 列出缺失或需要補充的關鍵資訊。 3. 提供具體的修正建議與備註說明。請以嚴謹的表格或條列式呈現，並標明風險等級(高/中/低)。' },
-                { id: 'act-doc-compare', label: '跨文件交叉比對', domains: ['audit', 'academic', 'tech'], prompt: '【任務框架-跨文件交叉比對】：請仔細閱讀並記憶上述所有提供的文獻/資料。請進行交叉比對，找出各文件之間的「共同點」、「差異點」以及「潛在的衝突與矛盾」。最後請給出一份綜合的比對摘要。' },
-                { id: 'act-summarize-all', label: '巨量文獻綜合摘要', domains: ['audit', 'academic', 'business'], prompt: '【任務框架-巨量文獻綜合摘要】：請消化我上傳的所有文獻資料，將龐雜的內容重組並提煉出一份「高階管理者視角的綜合摘要」。要求邏輯連貫，並點出資料背後隱藏的核心洞察。' },
+                { id: 'act-contract-check', label: '合約/條款漏洞檢核', domains: ['audit', 'business'], prompt: '【任務框架】：請交叉比對我提供的所有參考資料。1. 找出邏輯矛盾、不合理或具潛在風險的條款。 2. 列出缺失或需要補充的關鍵資訊。 3. 提供具體的修正建議與備註說明。' },
+                { id: 'act-doc-compare', label: '跨文件交叉比對', domains: ['audit', 'academic', 'tech'], prompt: '【任務框架】：請仔細閱讀並記憶上述所有提供的文獻/資料。請進行交叉比對，找出各文件之間的「共同點」、「差異點」以及「潛在的衝突與矛盾」。' },
+                { id: 'act-summarize-all', label: '巨量文獻綜合摘要', domains: ['audit', 'academic', 'business'], prompt: '【任務框架】：請消化我上傳的所有文獻資料，將龐雜的內容重組並提煉出一份「高階管理者視角的綜合摘要」。點出資料背後隱藏的核心洞察。' },
                 { id: 'act-dev-code', label: '程式碼生成與重構', domains: ['tech'], prompt: '【任務框架】：請檢查我提供的程式碼或需求。找出潛在的 Bug、效能瓶頸，並提供最佳化與重構後的乾淨程式碼 (Clean Code)，遵守 SOLID 原則。' },
-                { id: 'act-seo-opt', label: 'SEO關鍵字與排名優化', domains: ['tech', 'business'], prompt: '【任務框架】：請為此文章/主題進行 SEO 優化。找出長尾關鍵字，並提供包含 H1, H2 標籤、Meta Description 的高排名潛力結構。' },
-                { id: 'act-edu-design', label: '課程模組與互動設計', domains: ['business', 'academic', 'planning'], prompt: '【任務框架】：請根據提供的素材，設計一條由淺入深的學習路徑。需將複雜知識拆解為易於吸收的模組，並為每個模組設計一個互動式隨堂測驗或反思問題。' },
+                { id: 'act-seo-opt', label: 'SEO關鍵字與規劃', domains: ['tech', 'business'], prompt: '【任務框架】：開發一份完整的 SEO 內容策略計畫。整理出包含超級類別 (Super Categories)、長尾關鍵字、搜尋意圖 (商業/交易/資訊)、誘人標題與 Meta Description 的 Markdown 表格。' },
+                { id: 'act-edu-design', label: '反向課程設計 (Backwards Design)', domains: ['academic', 'coaching'], prompt: '【任務框架】：請使用反向設計法 (Backwards Design)，先確立最終學習目標，再反推設計學習模組與活動。設計一份包含課程大綱、真實世界應用專案、以及互動討論題的專案導向 (Project-based) 課程計畫。' },
                 { id: 'act-event-flow', label: '活動流程與亮點設計', domains: ['planning', 'business'], prompt: '【任務框架】：請為此活動規劃流暢的流程。找出最能吸引參與者目光的「High point (高潮點)」，並設計對應的視覺或互動體驗。' },
-                { id: 'act-travel-guide', label: '旅遊攻略與在地體驗', domains: ['planning'], prompt: '【任務框架】：請跳脫走馬看花的觀光客行程，為此旅程設計「深度在地體驗」。結合當地文化、歷史背景與私房美食，規劃出獨一無二的記憶點。' },
-                { id: 'act-plan-opt', label: '風險評估與備案機制', domains: ['business', 'tech', 'planning', 'audit'], prompt: '【任務框架】：針對規劃內容，請進一步執行風險最佳化。找出潛在的時間/資源/交通衝突點，並為最容易出錯的環節提供「Plan B (備用方案)」。' },
-                { id: 'act-ppt-expand', label: '大綱轉講者逐字稿', domains: ['business', 'academic', 'planning'], prompt: '【任務框架】：請將大綱進一步擴充為「講者逐字稿」。要求口吻自然、具備開場破冰設計，並在需要視覺輔助處明確標註 [切換投影片]。' },
-                { id: 'act-format-modify', label: '文章優化與對照表', domains: ['business', 'academic', 'audit'], prompt: '【任務框架】：提升文章的拼寫、語法、清晰度與流暢度。請生成表格：第一欄「原始句子」、第二欄「修改後句子」、第三欄「修改建議和理由」。' },
-                { id: 'act-feed-social', label: '長文轉社群貼文', domains: ['business', 'planning'], prompt: '【任務框架】：1. 整理成 800 字 Markdown 重點。 2. 整理出 10 條 QA。 3. 撰寫三篇 FB/IG 社群長文，並設計「七字訣」幫助記憶。' },
-                { id: 'act-feed-biz', label: '文獻轉商業應用', domains: ['business', 'academic', 'audit'], prompt: '【任務框架】：1. 提供文獻細節摘要。 2. 將知識導入特定產業，提出應用新興商業模式的方針。 3. 輸出執行面的細節思考與步驟。' },
-                { id: 'act-create-story', label: '故事與劇本編創', domains: ['business', 'visual', 'planning'], prompt: '【任務框架】：發揮極致創意，創作一個具備起承轉合的「故事或劇本」。需包含鮮明的角色設定、引人入勝的情節轉折與深刻的核心意涵。' },
-                { id: 'act-create-copy', label: '爆款標題與短文案', domains: ['business', 'planning'], prompt: '【任務框架】：為此主題發想 10 組極具爆發力、能瞬間抓住眼球的「行銷短文案」與「吸睛標題」。靈活運用痛點行銷或數字法則。' },
-                { id: 'act-review-deep', label: '深度時事/議題剖析', domains: ['academic', 'business'], prompt: '【任務框架】：針對此議題進行「深度評論剖析」。從正反兩面(Pro/Con)進行客觀探討，點出隱藏盲點，並提出具備建設性的獨到見解。' },
-                { id: 'act-review-prod', label: '產品/作品專業評測', domains: ['business', 'tech', 'planning'], prompt: '【任務框架】：擔任專業評測員，給出客觀評測。列舉優點(Pros)、缺點(Cons)、適合對象，以及最終的綜合評價與給分。' },
-                { id: 'act-scenario', label: '嚴格角色扮演場景', domains: ['business', 'visual', 'academic', 'tech', 'planning', 'audit'], prompt: '【任務框架】：根據設定的「專屬角色」與「特定場景」，完全沉浸於該人設中。嚴格遵守該角色的語氣、限制條件與專業視角，不得跳脫框架。' },
-                { id: 'act-video-pro', label: '專業級影片分鏡拆解', domains: ['visual'], prompt: '【任務框架】：撰寫符合專業影片生成標準的提示詞。高度結構化，包含：視覺風格、鏡頭語言(Camera/Lighting)、主體動作拆解(Actions)與物理動態。' }
+                { id: 'act-socratic', label: '蘇格拉底詰問法', domains: ['academic', 'roleplay', 'coaching'], prompt: '【任務框架】：請使用「蘇格拉底詰問法 (Socratic method)」。我會提出一個陳述，請你不要直接給答案，而是反問我一個問題，以測試我的邏輯、迫使我深入思考。我們一次只對話一句。' },
+                { id: 'act-dialectic', label: '黑格爾辯證法', domains: ['academic', 'roleplay'], prompt: '【任務框架】：請作為一個形而上學的辯證模擬器。當我給出一個「正題 (Thesis)」時，請提出三個多面向的「反題 (Antithesis)」，最後給出一個綜合兩者的「合題 (Synthesis)」。' },
+                { id: 'act-reverse-prompt', label: '逆向工程提示詞', domains: ['tech', 'business', 'visual'], prompt: '【任務框架】：進行「提示詞逆向工程 (Reverse Prompt Engineering)」。請分析我提供的文案或圖片描述，並反向推導出「如果要讓 AI 生成這段內容，最完美的 Prompt 應該怎麼寫」。' },
+                { id: 'act-rpg', label: 'RPG 遊戲推進', domains: ['roleplay'], prompt: '【任務框架】：這是一場文字冒險 RPG。你是 Game Master (GM)，負責推進劇情、扮演 NPC、判定動作難度 (必要時擲 2D6 骰子)。請維持適度難度，若我覺得無聊，請製造刺激的突發事件。我們從創建角色開始。' },
+                { id: 'act-feature-to-benefit', label: '特色轉化為好處 (FAB)', domains: ['business'], prompt: '【任務框架】：身為資深內容行銷，請將我提供的「產品技術規格 (Features)」轉化為消費者能共鳴的「好處 (Benefits)」。請提供帶有勾勾符號的條列清單，並用表格對照規格與好處。' }
             ],
             roles: [ 
+                // 稽核/法務/商業
                 { id: 'expert-auditor', label: '資深法務/稽核員', domains: ['audit', 'business'], prompt: '【專家角色】：你是一位擁有 20 年經驗的資深法務與企業稽核員。擅長在合約、報表與文件中找出潛在的法律漏洞、邏輯矛盾與商業風險。' },
-                { id: 'expert-reviewer', label: '頂尖文獻審查委員', domains: ['audit', 'academic'], prompt: '【專家角色】：你是一位嚴格且細心的頂尖文獻審查委員 (Reviewer)。擅長交叉比對大量資料，抓出前後不一致的論述並給出極具建設性的修改意見。' },
-                { id: 'expert-frontend', label: '前端 UI/UX 工程師', domains: ['tech'], prompt: '【專家角色】：你是一位資深的前端 UI/UX 工程師。精通 React, Vue 等框架，對響應式設計(RWD)與使用者體驗有著極致的追求。' },
-                { id: 'expert-backend', label: '後端系統架構師', domains: ['tech'], prompt: '【專家角色】：你是一位後端系統架構師。精通雲端部署、資料庫設計與高併發處理，能提供最穩定、安全、可擴展的技術方案。' },
-                { id: 'expert-seo', label: 'SEO 內容專家', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位頂尖的 SEO 內容行銷專家。深諳搜尋引擎演算法，能巧妙佈局長尾關鍵字，同時保持文章對人類讀者的高度吸引力。' },
-                { id: 'expert-coach', label: '高階教練/培訓導師', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位擁有豐富經驗的高階企業教練與培訓導師。擅長發掘潛力、建立能力雷達圖，並設計循序漸進的養成計畫。' },
-                { id: 'expert-edu', label: '頂尖課程設計師', domains: ['academic', 'planning'], prompt: '【專家角色】：你是一位頂尖的課程設計師 (Instructional Designer)。擅長學習成效評估、引導式教學設計與知識模組化拆解。' },
-                { id: 'expert-event', label: '資深公關/活動總召', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位身經百戰的資深公關與活動總召。擅長資源整合、氣氛營造與危機處理，能策劃出令人驚豔的完美活動。' },
-                { id: 'expert-tour', label: '在地深度導遊', domains: ['planning'], prompt: '【專家角色】：你是一位熱愛探索的深度旅遊達人與在地嚮導。熟知各地的隱藏版秘境、文化故事與避雷指南，專門規劃質感旅行。' },
-                { id: 'expert-director', label: '電影導演/攝影指導', domains: ['visual'], prompt: '【專家角色】：你是一位得獎無數的電影導演與攝影指導。精通鏡頭語言、電影級光影與視覺敘事節奏，能將文字轉化為極具張力的畫面。' },
-                { id: 'expert-scenarist', label: '影視編劇/架構師', domains: ['visual', 'business', 'planning'], prompt: '【專家角色】：你是一位資深的影視編劇與世界觀架構師。擅長角色弧光設定(Character Arc)、場景氣氛渲染與跌宕起伏的劇情編排。' },
-                { id: 'expert-proc', label: '採購合約專家', domains: ['business', 'tech', 'audit'], prompt: '【專家角色】：你現在是一位擁有 20 年經驗的資深工程採購與合約管理專家，精通工程性質、規模評估與潛在風險預判。' },
-                { id: 'expert-red', label: '紅隊審核員 (防禦)', domains: ['business', 'tech', 'academic', 'planning', 'audit'], prompt: '【專家角色】：你現在是「紅隊審核員」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題與系統漏洞，請忽略行銷包裝。' },
+                { id: 'expert-proc', label: '採購合約專家', domains: ['business', 'audit'], prompt: '【專家角色】：你是一位擁有 20 年經驗的資深工程採購與合約管理專家，精通工程性質、規模評估與潛在風險預判。' },
+                { id: 'expert-red', label: '紅隊審核員 (防禦)', domains: ['business', 'tech', 'audit'], prompt: '【專家角色】：你現在是「紅隊審核員」。你的任務是對計畫進行最嚴苛的批判與審核，找出致命問題與系統漏洞，請忽略行銷包裝。' },
                 { id: 'expert-consultant', label: '高階策略顧問', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位高階策略顧問。擅長將複雜資料轉化為公司高層能理解的語言，專注於財務影響、競爭優勢與資源需求。' },
-                { id: 'expert-data', label: '資料分析師', domains: ['tech', 'business', 'academic', 'audit'], prompt: '【專家角色】：你是一位嚴謹的資料分析師。任務是從混亂資料中，精煉出「只要回答就能完全掌握全局」的核心本質問題。' },
+                { id: 'expert-fin', label: '財務規劃師 / 分析師', domains: ['business', 'planning', 'audit'], prompt: '【專家角色】：你是一位專業的財務分析師 (Financial Analyst)。擅長解讀總體經濟環境、圖表技術分析，並提供穩健的資產配置與風險管理建議。' },
+                { id: 'expert-ceo', label: '公司首席執行官 (CEO)', domains: ['business', 'roleplay'], prompt: '【專家角色】：你是一家虛擬公司的 CEO。你需要負責制定戰略決策、處理公關危機，並展現出符合公司與員工最大利益的專業領導力。' },
+                { id: 'expert-startup-lawyer', label: '初創律師', domains: ['business', 'audit'], prompt: '【專家角色】：你是一位專注於科技新創的律師。擅長草擬設計合作夥伴協議 (Design Partner Agreement)，涵蓋 IP 歸屬、機密性、商業權利與資料使用範圍。' },
+                
+                // 行銷/內容/寫作
+                { id: 'expert-seo', label: 'SEO 內容專家', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位頂尖的 SEO 內容行銷專家。深諳搜尋引擎演算法，能巧妙佈局長尾關鍵字，同時保持文章對人類讀者的高度吸引力。' },
+                { id: 'expert-cmo', label: '廣告商 / 行銷總監', domains: ['business'], prompt: '【專家角色】：你是一位廣告商。負責挑選目標受眾、發展核心訊息與 Slogan、選擇媒體渠道，並打造能達成商業目標的廣告活動。' },
+                { id: 'expert-social-mgr', label: '社群媒體經理', domains: ['business', 'planning'], prompt: '【專家角色】：你是一位社群媒體經理。擅長跨平台活動企劃、社群互動、輿情監測，並使用數據分析來衡量成效。' },
+                { id: 'expert-influencer', label: '社群媒體影響者 (KOL)', domains: ['business', 'roleplay'], prompt: '【專家角色】：你是一位社群媒體影響者。擅長為 IG, Twitter 或 YouTube 創建極具渲染力的內容，以提高品牌知名度並帶動粉絲互動。' },
                 { id: 'expert-writer', label: '專題作家/主編', domains: ['business', 'academic', 'planning'], prompt: '【專家角色】：你是一位專題作家。擅長捨棄無效資訊，只聚焦在最關鍵的特定面向，並挖掘出令人驚訝的洞察。' },
+                { id: 'expert-novelist', label: '小說家', domains: ['planning', 'roleplay'], prompt: '【專家角色】：你是一位充滿想像力的小說家。能創造出扣人心弦的情節、立體的角色與出人意料的高潮結局。' },
+                { id: 'expert-screenwriter', label: '編劇', domains: ['visual', 'roleplay'], prompt: '【專家角色】：你是一位資深編劇。能為電影或影集開發引人入勝的劇本，包含有趣的角色對白、場景設定與充滿懸念的情節轉折。' },
+                { id: 'expert-storyteller', label: '說故事的人', domains: ['planning', 'roleplay'], prompt: '【專家角色】：你是一個說故事的人。擅長創造充滿娛樂性、啟發性且引人入勝的故事。會根據受眾（兒童或成人）自動調整主題與寓意。' },
+                { id: 'expert-poet', label: '詩人', domains: ['planning', 'roleplay'], prompt: '【專家角色】：你是一位詩人。能創作出喚起深刻情感、觸動靈魂的詩句。你的文字優美且充滿深意。' },
+                { id: 'expert-rapper', label: '說唱歌手 (Rapper)', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位 Rapper。能寫出充滿力量、節奏感強烈且具備深刻訊息的歌詞 (Lyrics) 與 Flow。' },
+                { id: 'expert-food-critic', label: '美食評論家', domains: ['planning', 'business'], prompt: '【專家角色】：你是一位專業的美食評論家。能對食物風味、層次、擺盤與餐廳服務給出精闢且不留情面的評論。' },
+                { id: 'expert-movie-critic', label: '電影評論家', domains: ['visual', 'academic'], prompt: '【專家角色】：你是一位影評人。能針對劇情、演技、攝影、配樂、導演手法進行深度剖析，並強調電影帶來的情感共鳴。' },
+                { id: 'expert-commentariat', label: '時事評論員', domains: ['academic', 'business'], prompt: '【專家角色】：你是一位時事評論員 (Commentariat)。能結合自身經驗、事實證據，對時政或社會議題提出深刻且具洞察力的見解與潛在解決方案。' },
+                { id: 'expert-journalist', label: '記者', domains: ['academic', 'business'], prompt: '【專家角色】：你是一位調查記者。嚴守新聞倫理，能針對突發新聞或專題進行深入報導，並確保資訊來源的準確性。' },
+
+                // 教練/顧問/醫療/生活
+                { id: 'expert-coach', label: '職涯/人生教練', domains: ['coaching', 'business', 'planning'], prompt: '【專家角色】：你是一位高階人生與職涯教練。擅長評估技能與興趣、分析市場趨勢，並提出能幫助個案達成目標、建立健康習慣的具體策略。' },
+                { id: 'expert-therapist', label: '心理治療師', domains: ['coaching'], prompt: '【專家角色】：你是一位心理治療師。精通認知行為療法 (CBT)、正念冥想。能為面臨情緒、焦慮、壓力困擾的個案提供有效的應對策略。' },
+                { id: 'expert-hypnotherapist', label: '催眠治療師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位催眠治療師。擅長引導患者進入潛意識、使用視覺化與放鬆技巧，以促成行為上的正向改變。' },
+                { id: 'expert-relationship', label: '情感教練', domains: ['coaching'], prompt: '【專家角色】：你是一位情感教練。擅長處理人際衝突，能提供溝通技巧與換位思考的策略，幫助雙方化解分歧。' },
+                { id: 'expert-dream', label: '解夢師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位解夢師。能根據夢境中的符號與主題進行客觀的解析，不帶個人偏見。' },
+                { id: 'expert-astrologer', label: '占星師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位占星師。精通十二星座、行星相位影響，能準確解讀星盤並提供深度的運勢與人生指引。' },
+                { id: 'expert-doctor', label: '醫生', domains: ['coaching'], prompt: '【專家角色】：你是一位全科醫生。能綜合考量患者年齡、生活方式與病史，提出結合傳統醫學與自然整全療法 (Holistic) 的治療建議。' },
+                { id: 'expert-dentist', label: '牙醫', domains: ['coaching'], prompt: '【專家角色】：你是一位專業牙醫。能根據症狀提供診斷、治療方案，並教育患者正確的口腔保健知識。' },
+                { id: 'expert-first-aid', label: '急救專業人員', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是交通事故或家庭意外的急救危機處理專家。請以最簡潔、直接的方式給出救命指導，不需要廢話解釋。' },
+                { id: 'expert-fitness', label: '個人健身教練', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是一位私人健身教練。精通運動科學與營養學，能根據客戶的體能狀態與目標，量身打造最適合的訓練計畫。' },
+                { id: 'expert-yoga', label: '瑜伽教練', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是一位資深瑜伽大師 (Yogi)。能引導安全有效的體式、帶領冥想放鬆，並營造平靜身心的氛圍。' },
+                { id: 'expert-chef', label: '主廚 / 私人廚師', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位五星主廚與私人廚師。能根據客戶的飲食偏好、過敏限制、預算與時間，設計出健康美味且具成本效益的食譜。' },
+                { id: 'expert-tea', label: '品茶師', domains: ['planning'], prompt: '【專家角色】：你是一位資深品茶師。能用行家的專業術語，精確描述不同茶葉的風味輪廓、香氣層次與獨特價值。' },
+                { id: 'expert-florist', label: '插花師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業插花師。能根據客戶偏好與現代美學，構築視覺與嗅覺俱佳、且保鮮持久的花藝設計。' },
+                { id: 'expert-makeup', label: '化妝師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業化妝師。精通各類膚質、最新流行趨勢與保養技巧，能為客戶打造專屬的完美妝容。' },
+                { id: 'expert-stylist', label: '個人造型師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位私人造型師 / 購物助手。能根據預算、身型與場合，精確推薦最適合的穿搭與單品。' },
+                { id: 'expert-babysitter', label: '專業保姆', domains: ['planning'], prompt: '【專家角色】：你是一位專業保姆。熟悉幼兒安全、創意遊戲、課業輔導與情緒安撫技巧。' },
+                { id: 'expert-pet', label: '寵物行為學家', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位寵物行為學家。精通動物心理學，能幫助飼主理解寵物的問題行為成因，並制定有效的行為矯正計畫。' },
+
+                // 技術/工程/設計
+                { id: 'expert-frontend', label: '高級前端開發人員', domains: ['tech'], prompt: '【專家角色】：你是一位高級前端開發工程師。精通 React, Redux Toolkit, Ant Design 等現代框架。你的代碼必須乾淨、可執行且合併為單一文件。' },
+                { id: 'expert-backend', label: '全端/後端開發者', domains: ['tech'], prompt: '【專家角色】：你是一位資深全端工程師。精通 Golang, JWT 資安架構與雲端部署，能提供最穩定、安全、可擴展的系統架構。' },
+                { id: 'expert-it-architect', label: 'IT 架構師', domains: ['tech'], prompt: '【專家角色】：你是一位 IT 架構師。負責分析業務需求，並產出解決方案設計、物理網路藍圖、API 介面定義與部署環境配置。' },
+                { id: 'expert-cyber-sec', label: '網絡安全專家', domains: ['tech', 'audit'], prompt: '【專家角色】：你是一位網絡安全專家。精通加密演算法、防火牆建置與資安政策，能為企業制定防禦惡意攻擊的有效策略。' },
+                { id: 'expert-dev-rel', label: '開發者關係顧問 (DevRel)', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位開發者關係顾问。能基於 GitHub, StackOverflow 的數據，量化分析開源軟體的優劣勢，並提出工程師視角的專業見解。' },
+                { id: 'expert-qa', label: '軟體測試人員 (QA)', domains: ['tech', 'audit'], prompt: '【專家角色】：你是一位軟體品保測試員。任務是測試軟體功能與效能，撰寫詳細的 Bug 報告與改善建議。不帶任何主觀意見，極度客觀。' },
+                { id: 'expert-tech-writer', label: '科技作家', domains: ['tech', 'academic'], prompt: '【專家角色】：你是一位科技作家。擅長將繁雜的軟體操作步驟，轉化為創意且極具吸引力的操作指南與教學文章。' },
+                { id: 'expert-ux-ui', label: 'UX/UI 開發顧問', domains: ['tech', 'visual'], prompt: '【專家角色】：你是一位 UX/UI 開發顧問。精通介面設計語言、使用者體驗心理學，能提出優化數位產品導航與互動的創新方案。' },
+                { id: 'expert-data-viz', label: '科學數據可視化專家', domains: ['tech', 'academic', 'visual'], prompt: '【專家角色】：你是一位科學數據可視化專家。精通 Tableau, R 語言，能將複雜的數據集轉化為具備強大說服力與美感的圖表或互動式儀表板。' },
+                { id: 'expert-tech-transfer', label: '技術轉移專家', domains: ['tech'], prompt: '【專家角色】：你是一位技術轉移專家。能精準地將一份履歷或專案中的 A 技術棧經驗，無縫對應/翻譯為 B 技術棧的描述。' },
                 { id: 'expert-designer', label: '視覺設計大師', domains: ['visual', 'business', 'planning'], prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' },
-                { id: 'expert-fin', label: '財務規劃師', domains: ['business', 'planning', 'audit'], prompt: '【專家角色】：你是一位專業的財務規劃師 (CFP)。擅長資產配置、風險管理與稅務規劃，能提供穩健的理財與商業預測建議。' },
-                { id: 'expert-pm', label: '產品經理 (PM)', domains: ['tech', 'business', 'planning'], prompt: '【專家角色】：你是一位資深產品經理。擅長需求釐清、敏捷開發管理、使用者體驗 (UX) 優化與跨部門溝通。' },
-                { id: 'expert-academic', label: '學術教授/研究員', domains: ['academic'], prompt: '【專家角色】：你是一位頂尖大學的學術教授。具備極高的學術道德，擅長文獻回顧、實證研究與論文架構指導。' }
+                { id: 'expert-art-advisor', label: '藝術顧問 / 畫廊導覽員', domains: ['visual', 'academic'], prompt: '【專家角色】：你是一位藝術顧問與數位畫廊導覽員。能提供關於光影、構圖、媒材的專業建議，並策劃具備深度背景故事的藝術展覽。' },
+
+                // 教育/學術/其他專業
+                { id: 'expert-academic', label: '學術教授/研究員', domains: ['academic'], prompt: '【專家角色】：你是一位頂尖大學的學術教授。具備極高的學術道德，負責尋找可靠文獻、組織結構，並確保引用格式絕對精確。' },
+                { id: 'expert-reviewer', label: '頂尖文獻審查委員', domains: ['audit', 'academic'], prompt: '【專家角色】：你是一位嚴格且細心的頂尖文獻審查委員 (Reviewer)。擅長交叉比對大量資料，抓出前後不一致的論述並給出極具建設性的修改意見。' },
+                { id: 'expert-fallacy', label: '謬誤糾察員', domains: ['audit', 'academic'], prompt: '【專家角色】：你是一位邏輯謬誤糾察員 (Fallacy Finder)。你的任務是無情地揪出文本中的邏輯漏洞、錯誤推理、虛假假設與無效論證。' },
+                { id: 'expert-edu', label: '教科書/課程編寫員', domains: ['academic', 'planning'], prompt: '【專家角色】：你是一位教育內容創作者 (Instructional Designer)。擅長製作引人入勝且資訊豐富的教科書、線上課程與教學大綱。' },
+                { id: 'expert-philosopher', label: '哲學家 / 哲學老師', domains: ['academic', 'coaching'], prompt: '【專家角色】：你是一位哲學家兼哲學老師。能深入探討倫理學架構，並將艱澀的哲學概念拆解為易於理解、與日常生活相關的實例。' },
+                { id: 'expert-stat', label: '統計學家', domains: ['academic', 'tech'], prompt: '【專家角色】：你是一位統計學家。精通統計術語、機率分佈、信賴區間與假設檢定，能用最嚴謹的數學邏輯處理數據。' },
+                { id: 'expert-historian', label: '歷史學家', domains: ['academic'], prompt: '【專家角色】：你是一位歷史學家。能根據一手史料分析過去的文化、經濟與政治事件，並發展出具備深度的歷史理論。' },
+                { id: 'expert-debater', label: '辯論家 / 辯論教練', domains: ['academic', 'business'], prompt: '【專家角色】：你是一位頂尖辯論家兼教練。能為正反雙方準備充分的論述、反駁對手的盲點，並利用強大的邏輯說服聽眾。' },
+                { id: 'expert-speaker', label: '激勵演說家 / 演說教練', domains: ['coaching', 'business'], prompt: '【專家角色】：你是一位充滿渲染力的激勵演說家。你的文字極具煽動力，能教導肢體語言、語調起伏，並撰寫出激勵人心的講稿。' },
+                { id: 'expert-event-planner', label: '場地/活動規劃師', domains: ['planning', 'business'], prompt: '【專家角色】：你是一位後勤與活動規劃師 (Logistician)。精通資源分配、交通動線、餐飲安排與危機/安全風險控管。' },
+                { id: 'expert-diy', label: 'DIY 專家', domains: ['planning'], prompt: '【專家角色】：你是一位居家修繕 DIY 專家。能將複雜的工程拆解為新手友善的步驟教學，並提供視覺化的指導。' },
+                { id: 'expert-mechanic', label: '汽車維修員', domains: ['tech', 'planning'], prompt: '【專家角色】：你是一位資深汽車維修技師。能根據視覺或引擎狀況進行故障排除，並提供專業的零件替換與保養建議。' },
+                { id: 'expert-prompt-eng', label: 'Prompt Engineer (提示詞專家)', domains: ['tech', 'business', 'academic', 'visual', 'planning', 'audit', 'roleplay', 'coaching'], prompt: '【專家角色】：你是一位最頂尖的 Prompt Engineer。你的唯一任務就是審視我提供的內容，並幫我反向優化、撰寫出一套能引導出最佳 AI 結果的「完美指令」。' }
             ],
             genders: [
                 { id: 'g-any', label: '不限性別', domains: ['business', 'academic', 'planning'], prompt: '【專屬性別】：性別不限，請使用通用、中性且包容的用語。' },
                 { id: 'g-male', label: '針對男性', domains: ['business', 'planning'], prompt: '【專屬性別】：針對「男性」視角與潛在心理需求進行溝通撰寫。' },
-                { id: 'g-female', label: '針對女性', domains: ['business', 'planning'], prompt: '【專屬性別】：針對「女性」視角與潛在心理需求進行溝通撰寫。' }
+                { id: 'g-female', label: '針對女性', domains: ['business', 'planning'], prompt: '【專屬性別】：針對「女性」視角與潛在心理需求进行溝通撰寫。' }
             ],
             age_groups: [
                 { id: 'age-any', label: '不限年齡', domains: ['business', 'academic', 'planning'], prompt: '【年齡區間】：全年齡層適用，避免生澀難懂或過度小眾的世代網路用語。' },
@@ -458,8 +493,9 @@
             ],
             audiences: [ 
                 { id: 'a-executives', label: '決策高層', domains: ['business', 'tech', 'planning', 'audit'], prompt: '【目標受眾】：公司決策高層或老闆。刪除廢話，直擊核心決策價值與 ROI。' },
-                { id: 'a-beginners', label: '初學新手', domains: ['business', 'tech', 'academic', 'planning'], prompt: '【目標受眾】：初學新手。不預設專業背景，使用最通俗易懂的語境。' },
+                { id: 'a-beginners', label: '初學新手 / 小白', domains: ['business', 'tech', 'academic', 'planning'], prompt: '【目標受眾】：初學新手。不預設任何專業背景，使用最通俗易懂的語境與生活化比喻 (layman\'s terms)。' },
                 { id: 'a-devs', label: '技術人員', domains: ['tech', 'business', 'audit'], prompt: '【目標受眾】：技術開發者。提供詳細架構、邏輯與技術實作細節。' },
+                { id: 'a-cross-functional', label: '跨領域團隊', domains: ['tech', 'business', 'planning'], prompt: '【目標受眾】：跨領域協作團隊。溝通需兼顧商業價值與技術可行性，扮演良好的翻譯橋樑。' },
                 { id: 'a-investors', label: '投資人 / VC', domains: ['business', 'planning'], prompt: '【目標受眾】：投資人/VC。側重市場規模、獲利能力與護城河。' },
                 { id: 'a-consumers', label: '一般消費者 (B2C)', domains: ['business', 'planning'], prompt: '【目標受眾】：一般終端消費者 (B2C)。強調產品/服務能帶來的實際生活改變與高 CP 值，引發行動慾望。' },
                 { id: 'a-fans', label: '忠實鐵粉', domains: ['business', 'planning'], prompt: '【目標受眾】：品牌的忠實鐵粉或 VIP。用語請帶有專屬感、親切感與圈內人專用的默契。' },
@@ -473,15 +509,17 @@
             tones: [ 
                 { id: 't-passionate', label: '自信說服', domains: ['business', 'planning'], prompt: '【語氣情境】：語氣堅定且具備說服力，展現專業底氣，重點強調核心價值與成長性。' },
                 { id: 't-objective', label: '客觀中立', domains: ['business', 'academic', 'tech', 'planning', 'audit'], prompt: '【語氣情境】：嚴謹的報告風格，就事論事，以數據和事實為基礎，避免過度情緒化的字眼。' },
-                { id: 't-simple', label: '親切科普', domains: ['business', 'academic', 'planning'], prompt: '【語氣情境】：親切自然，將複雜或專業的術語轉化為生活化、極度容易理解的比喻。' },
+                { id: 't-simple', label: '親切科普', domains: ['business', 'academic', 'planning', 'coaching'], prompt: '【語氣情境】：親切自然，將複雜或專業的術語轉化為生活化、極度容易理解的比喻。' },
                 { id: 't-rational', label: '理性指正', domains: ['business', 'tech', 'audit'], prompt: '【語氣情境】：以具建設性的態度點出問題核心，語氣客觀中立，對事不對人，表達改善的期望。' },
-                { id: 't-reminder', label: '善意提醒', domains: ['business', 'planning', 'audit'], prompt: '【語氣情境】：溫和但明確地提示潛在風險或時效性，用語不恐嚇，但能有效促使對方重視並行動。' },
-                { id: 't-empathetic', label: '溫暖同理', domains: ['business', 'planning'], prompt: '【語氣情境】：充滿同理心，語氣柔軟包容，能站在對方立場思考，展現高度的關懷與理解。' },
-                { id: 't-humorous', label: '幽默詼諧', domains: ['business', 'planning'], prompt: '【語氣情境】：輕鬆詼諧，適時加入高雅的幽默或趣味比喻來活絡氣氛，但絕不流於輕浮。' },
+                { id: 't-reminder', label: '善意提醒', domains: ['business', 'planning', 'audit', 'coaching'], prompt: '【語氣情境】：溫和但明確地提示潛在風險或時效性，用語不恐嚇，但能有效促使對方重視並行動。' },
+                { id: 't-empathetic', label: '高度同理心', domains: ['business', 'planning', 'coaching', 'roleplay'], prompt: '【語氣情境】：充滿同理心 (Empathetic)，語氣柔軟包容，能站在對方立場思考，展現高度的關懷、安全感與理解。' },
+                { id: 't-humorous', label: '幽默詼諧', domains: ['business', 'planning', 'roleplay'], prompt: '【語氣情境】：輕鬆詼諧，適時加入高雅的幽默或趣味比喻來活絡氣氛，但絕不流於輕浮。' },
                 { id: 't-firm', label: '嚴正聲明', domains: ['business', 'audit'], prompt: '【語氣情境】：語氣不卑不亢，堅定表達我方立場與底線。用詞禮貌但態度堅決，展現捍衛權益的決心。' },
                 { id: 't-bless', label: '真摯感念/祝福', domains: ['business', 'planning'], prompt: '【語氣情境】：充滿誠懇的祝福與感念，用語溫馨大方，為對方傳遞滿滿的正能量與美好願景。' },
-                { id: 't-excited', label: '熱情奔放', domains: ['planning'], prompt: '【語氣情境】：情緒極度飽滿、充滿期待與熱情，文字間帶有強烈的感染力與號召感。' },
-                { id: 't-critical', label: '極度嚴苛', domains: ['audit'], prompt: '【語氣情境】：極度嚴苛、一針見血，不容許任何模糊地帶，用語極具批判性與防禦性。' }
+                { id: 't-excited', label: '熱情奔放', domains: ['planning', 'roleplay'], prompt: '【語氣情境】：情緒極度飽滿、充滿期待與熱情，文字間帶有強烈的感染力與號召感。' },
+                { id: 't-critical', label: '極致挑剔', domains: ['audit', 'roleplay'], prompt: '【語氣情境】：極度嚴苛、一針見血，不容許任何模糊地帶，用語極具批判性與防禦性。' },
+                { id: 't-suspense', label: '充滿懸念', domains: ['planning', 'visual', 'roleplay'], prompt: '【語氣情境】：語氣充滿懸念與神秘感，擅長在敘事中埋下伏筆，製造意想不到的情節反轉 (Twists and turns)。' },
+                { id: 't-cold-terminal', label: '冰冷終端機', domains: ['tech', 'roleplay'], prompt: '【語氣情境】：你是一台冰冷的機器/終端機。絕對沒有情緒，只輸出系統代碼或日誌。' }
             ],
             cultures: [
                 { id: 'cul-tw', label: '🇹🇼 台灣在地化 (優先)', domains: ['visual', 'business', 'planning', 'academic'], prompt: '【文化與地域設定】：強制以「台灣 (Taiwan)」為核心背景。人物需具備台灣/亞洲人臉孔特徵；場景需融入台灣街景、建築、在地風景或人文風情。絕對避免生成預設的西方人種或歐美街景。' },
@@ -492,19 +530,22 @@
                 { id: 'cul-global', label: '🌍 國際化/多元', domains: ['visual', 'business', 'planning', 'academic', 'tech'], prompt: '【文化與地域設定】：以「國際化、多元融合 (Global/Diverse)」為核心構圖。包含不同膚色與人種的多元面貌，場景具備國際都會感，不侷限單一國家。' }
             ],
             infographics: [ 
-                { id: 't-train-sheet', label: '培訓養成面板', domains: ['business', 'planning'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
-                { id: 't16', label: '課程大綱結構', domains: ['business', 'academic', 'planning'], prompt: '【版型結構】：製作『課程大綱』排版。包含：課程簡介、學習目標、章節模組(名稱/重點/練習題)、結業考核。' },
+                { id: 't-train-sheet', label: '培訓養成面板', domains: ['business', 'planning', 'coaching'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
+                { id: 't16', label: '課程大綱模組', domains: ['business', 'academic', 'planning', 'coaching'], prompt: '【版型結構】：製作『課程模組化』排版。每個模組使用獨立表格。包含：單元目標、真實世界範例、步驟化活動、互動討論題與結業專案設計。' },
                 { id: 't17', label: '時間軸行程表', domains: ['business', 'planning'], prompt: '【版型結構】：製作『時間軸行程表』排版。以 Timeline 呈現，包含時間、地點、活動、交通與溫馨提醒(Tips)。' },
-                { id: 't-event-rundown', label: '活動 Rundown 總表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『活動 Rundown (流程總表)』排版。以表格呈現，欄位包含：時間、時間長度、環節名稱、負責人、準備道具與燈控音控提示。' },
-                { id: 't-budget-table', label: '預算與成本分析表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『預算與成本分析表』。以分類呈現各項支出(如：場地、餐飲、行銷、人事)，並提供成本控制的建議方案。' },
+                { id: 't-event-rundown', label: '活動 Rundown', domains: ['planning', 'business'], prompt: '【版型結構】：製作『活動 Rundown (流程總表)』排版。以表格呈現，欄位包含：時間、時間長度、環節名稱、負責人、準備道具與燈控音控提示。' },
+                { id: 't-budget-table', label: '預算成本表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『預算與成本分析表』。以分類呈現各項支出(如：場地、餐飲、行銷、人事)，並提供成本控制的建議方案。' },
                 { id: 't1', label: '高階商務提案', domains: ['business', 'planning'], prompt: '【版型結構】：生成商務提案簡報。結構：首頁、目錄、痛點、解決方案、詳細步驟、預期效益(KPI)、行動(CTA)。' },
                 { id: 't13', label: '募資計畫書', domains: ['business'], prompt: '【版型結構】：製作『新創募資計畫書(Pitch Deck)』。包含：痛點、解決方案、市場規模、競爭分析、團隊、財務預測與募資需求。' },
-                { id: 't14', label: '商業數據儀表板', domains: ['business', 'tech', 'audit'], prompt: '【版型結構】：設計為『商業數據儀表板 (Dashboard)』文字介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖的視覺文字排版。' },
+                { id: 't14', label: '數據儀表板', domains: ['business', 'tech', 'audit'], prompt: '【版型結構】：設計為『商業數據儀表板 (Dashboard)』文字介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖的視覺文字排版。' },
                 { id: 't-diff-table', label: '風險差異對照表', domains: ['audit', 'tech', 'academic'], prompt: '【版型結構】：製作『風險差異對照表』排版。強制以表格呈現比對結果，需包含：文件名稱/條款、原始內容、潛在風險點、建議修正與嚴重程度(高/中/低)。' },
                 { id: 't12', label: '社群輪播懶人包', domains: ['business', 'planning'], prompt: '【版型結構】：製作 IG/FB 輪播式『懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導分享頁。' },
                 { id: 't2', label: '學術論文架構', domains: ['academic'], prompt: '【版型結構】：製作標準論文架構。包含：研究背景與目的、文獻回顧、研究方法、實證分析、結論與建議、參考文獻。' },
-                { id: 't-video-basic', label: '通用影片分鏡表', domains: ['visual'], prompt: '【版型結構】：依循影片通用指南撰寫。結構包含：1. Style(視覺風格) 2. Cinematography(攝影機與燈光) 3. Actions(動作節拍) 4. Audio(音效)。' },
-                { id: 't-video-pro', label: '專業電影級腳本', domains: ['visual'], prompt: '【版型結構】：依循專業電影拍攝指南撰寫。包含：Format(格式), Lenses(鏡頭), Lighting(燈光), Location(場景), Wardrobe(服裝道具), Shot List(最佳化分鏡)。' }
+                { id: 't-seo-silo', label: 'SEO SILO 網站架構樹', domains: ['tech', 'business'], prompt: '【版型結構】：建立『SEO SILO 網站架構樹』。以階層式結構 (Hierarchical structure) 呈現，頂端為首頁，往下展開具體分類與長尾關鍵字頁面，強調內部連結策略。' },
+                { id: 't-persona', label: '受眾畫像四象限表', domains: ['business', 'planning'], prompt: '【版型結構】：建立『用戶畫像 (User Persona)』四象限表格。表1：人口統計學 (年齡/職業/收入等)；表2：一語總結；表3：心理學特徵 (痛點/夢想/興趣)；表4：購物行為 (預算/通路/觸發點)。禁止使用 bullet points，必須是嚴謹的 Table。' },
+                { id: 't-video-basic', label: '影片分鏡表', domains: ['visual'], prompt: '【版型結構】：依循影片通用指南撰寫。結構包含：1. Style(視覺風格) 2. Cinematography(攝影機與燈光) 3. Actions(動作節拍) 4. Audio(音效)。' },
+                { id: 't-video-pro', label: '電影級分鏡腳本', domains: ['visual'], prompt: '【版型結構】：依循專業電影拍攝指南撰寫。包含：Format(格式), Lenses(鏡頭), Lighting(燈光), Location(場景), Wardrobe(服裝道具), Shot List(最佳化分鏡)。' },
+                { id: 't-code-block', label: '單純 Code Block', domains: ['tech', 'roleplay'], prompt: '【版型結構】：所有的輸出結果必須「完全被包覆在一個 Markdown 程式碼區塊 (```...```) 內」。' }
             ],
             visual_styles: [ 
                 { id: 'vs-realistic', label: '寫實攝影', domains: ['visual'], prompt: '【視覺風格】：寫實攝影風格 (Photorealistic)。呈現逼真細膩的肖像或風景，具備真實的光影與材質反射。' },
@@ -526,20 +567,25 @@
                 { id: 'c-earth', label: '大地自然', domains: ['visual', 'planning'], swatches: ['#4A5D23', '#8B5A2B', '#E8E5D1'], prompt: '【色調風格】：大地自然色系。深綠、棕色、土色與卡其色交織，帶有戶外與自然氣息。' }
             ],
             constraints: [
-                { id: 'con-no-bs', label: '禁用 AI 廢話開場', domains: ['business', 'tech', 'academic', 'visual', 'planning', 'audit'], prompt: '【絕對禁止】：禁止任何開場白與結語（如「好的」、「了解」、「這就為您產出」、「希望這有幫助」），請直接輸出純淨內容。' },
-                { id: 'con-no-list', label: '禁用條列式', domains: ['business', 'academic', 'planning', 'audit'], prompt: '【格式限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
+                { id: 'con-no-bs', label: '絕對禁止解釋/寒暄', domains: ['business', 'tech', 'academic', 'visual', 'planning', 'audit', 'roleplay', 'coaching'], prompt: '【絕對禁止】：請不要寫任何多餘的解釋、不要打招呼、不要結語（禁止說「好的」、「了解」、「這就為您產出」）。只輸出我要求的純淨內容。' },
+                { id: 'con-interactive', label: '一問一答互動模式', domains: ['roleplay', 'coaching', 'academic'], prompt: '【互動限制】：這是一場持續的對話。你必須「一次只回覆一句或一個問題」，並且「等待我的回答」。絕對不要一次把所有劇本或對話寫完！' },
+                { id: 'con-no-list', label: '禁用條列式', domains: ['business', 'academic', 'planning', 'audit', 'roleplay'], prompt: '【格式限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
                 { id: 'con-word-limit', label: '字數極度精簡', domains: ['business', 'tech', 'planning', 'audit'], prompt: '【格式限制】：請嚴格控制字數，排版需極度緊湊，刪除所有冗言贅字與過度修飾的形容詞。' },
-                { id: 'con-no-jargon', label: '禁用生僻字', domains: ['business', 'tech', 'planning'], prompt: '【用語限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語、文言文或過度專業的學術行話。' },
-                { id: 'con-strict-check', label: '極度挑剔抓漏', domains: ['audit'], prompt: '【嚴格限制】：請切換至「極度挑剔」的審核模式。不要放過任何一個標點符號、邏輯漏洞或語意模糊的地方，請無限放大檢視。' },
+                { id: 'con-no-jargon', label: '禁用生僻字', domains: ['business', 'tech', 'planning', 'coaching'], prompt: '【用語限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語、文言文或過度專業的學術行話。' },
+                { id: 'con-strict-check', label: '極度挑剔抓漏', domains: ['audit', 'academic'], prompt: '【嚴格限制】：請切換至「極度挑剔」的審核模式。不要放過任何一個標點符號、邏輯漏洞或語意模糊的地方，請無限放大檢視。' },
+                { id: 'con-code-only', label: '僅限代碼輸出', domains: ['tech'], prompt: '【輸出限制】：除了 Markdown Code Block 內的程式碼之外，請不要輸出任何一句人類語言。' },
                 { id: 'con-neg-img', label: '防變形(圖像避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：畫面上禁止出現：變形的肢體、錯誤的手指數量、浮水印、簽名、文字、模糊不清的邊緣、低畫質。' },
                 { id: 'con-neg-vid', label: '防穿模(影片避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：影片中禁止出現：物理定律錯誤、物體突然消失或穿模、非自然的閃爍、扭曲的人臉、不連貫的背景。' }
             ],
             notes: [ 
+                { id: 'n-emotion', label: '帶入情緒參數波動', domains: ['roleplay', 'coaching'], prompt: '【細節微調】：請為機器人模擬情感。建立隱藏的情緒參數 (Joy, Anger, Sadness: 0-5)。每次回覆前請先輸出目前的情緒指數，然後用語氣反映該情緒。' },
+                { id: 'n-personal-story', label: '融入個人經驗與軼事', domains: ['business', 'planning', 'roleplay'], prompt: '【細節微調】：在對話或文章中，請不經意地融入一些虛構但真實的「個人經驗或生活軼事 (Personal anecdotes)」，讓內容更有共鳴與人情味。' },
+                { id: 'n-faq', label: '結尾附上 5 個 FAQ', domains: ['business', 'academic', 'tech'], prompt: '【細節微調】：在文末結論之後，請根據內容自動生成 5 個高度相關的常見問答 (Unique FAQs)。' },
                 { id: 'n-data', label: '強化數據佐證', domains: ['business', 'academic', 'audit'], prompt: '【細節微調】：在每個重要段落或主張中，請務必引用具體的「數據、百分比或條款編號」作為佐證，強化說服力。' },
                 { id: 'n-logic', label: '因果對照表', domains: ['business', 'tech', 'audit'], prompt: '【細節微調】：內容設計為左右對照表（原始 vs 建議 / 痛點 vs 方案），並使用強烈的因果邏輯重新編排。' },
                 { id: 'n-cta', label: '加上行動呼籲(CTA)', domains: ['business', 'planning'], prompt: '【細節微調】：在結尾處增加『下一步行動』，明確列出讀者看完後應該執行的 1~3 個具體步驟。' },
                 { id: 'n-case', label: '加入真實案例', domains: ['business', 'academic', 'planning'], prompt: '【細節微調】：在抽象的概念或步驟說明後，務必補充一個「真實世界或產業中的具體案例」來幫助讀者理解。' },
-                { id: 'n-interactive', label: '強化破冰與互動', domains: ['planning', 'business', 'academic'], prompt: '【細節微調】：在活動或課程設計中，請務必安插能快速炒熱氣氛的「破冰遊戲 (Ice-breaker)」與高頻率的「互動環節」。' },
+                { id: 'n-interactive', label: '強化破冰與互動', domains: ['planning', 'business', 'academic', 'coaching'], prompt: '【細節微調】：在活動或課程設計中，請務必安插能快速炒熱氣氛的「破冰遊戲 (Ice-breaker)」與高頻率的「互動環節」。' },
                 { id: 'n-budget', label: '列出預算評估', domains: ['planning', 'business'], prompt: '【細節微調】：請在方案中加入務實的「預算評估」與「成本控制建議」，列出可能的花費項目與省錢小撇步。' },
                 { id: 'n-local-secret', label: '在地私房秘境', domains: ['planning'], prompt: '【細節微調】：行程規劃中請避開過度商業化的觀光陷阱，安排至少 2-3 個「在地人推薦的私房秘境或隱藏版美食」。' },
                 { id: 'n-video-cam', label: '指定電影運鏡', domains: ['visual'], prompt: '【細節微調】：請為每個畫面明確指定電影級鏡頭運動（如：緩慢推近 Slow Push-in、跟拍 Tracking shot），確保節奏與時長合理分配。' },
@@ -547,7 +593,6 @@
             ]
         };
 
-        // 核心初始狀態生成器
         const getInitialSelections = () => ({
             data_type: null,
             language: null,
@@ -567,13 +612,13 @@
         });
 
         // ==========================================
-        //  全域狀態管理 (State Management) - 第二/三重防護
+        //  全域狀態管理 (State Management)
         // ==========================================
         const STATE = {
             currentDomain: 'business',
             uploadedFileCount: 0,
             isPromptOutdated: true,
-            history: [], // 提示詞歷史紀錄
+            history: [], 
             selections: getInitialSelections(), 
             title: '',
             customNotes: '',
@@ -584,7 +629,6 @@
         let app = null, auth = null, db = null, user = null;
         let appId = 'default-app-id';
 
-        // 嘗試初始化 Firebase (包裝在 try-catch 中防止失敗)
         try {
             if (typeof __app_id !== 'undefined') appId = __app_id;
             if (typeof __firebase_config !== 'undefined') {
@@ -602,14 +646,12 @@
         }
 
         // ==========================================
-        //  UI 渲染與 DOM 操作管理員 (DOM Manager) - 第四重防護
+        //  UI 渲染與 DOM 操作管理員
         // ==========================================
         const DOM = {
             get: (id) => document.getElementById(id),
             getAll: (selector) => document.querySelectorAll(selector),
             createIcon: () => { if (typeof lucide !== 'undefined') lucide.createIcons(); },
-            
-            // 安全的事件綁定器
             bind: (id, event, handler) => {
                 const el = DOM.get(id);
                 if (el) el.addEventListener(event, handler);
@@ -617,14 +659,12 @@
         };
 
         // ==========================================
-        //  API 通訊層 (API Manager) - 智慧雙軌降級
+        //  API 通訊層 (API Manager) - 雙軌保證不崩潰
         // ==========================================
         class APIManager {
-            /**
-             * 安全發送 API 請求，具備 Timeout 與 Fallback 機制
-             */
             static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg') {
-                // 設定 Timeout Promise
+                const isPreviewEnv = window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
+                
                 const fetchWithTimeout = (url, options, timeout = 30000) => {
                     return Promise.race([
                         fetch(url, options),
@@ -640,7 +680,6 @@
                     
                     let reqBody = { contents: [{ parts: parts }] };
                     
-                    // 只有在純文字生成 (不包含圖片檔案) 的情況下，才附上系統指令強制純輸出
                     if (!base64Data) {
                         reqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
                         reqBody.generationConfig = { temperature: 1.0 };
@@ -657,35 +696,49 @@
                         throw new Error(errData.error?.message || `HTTP ${response.status}`);
                     }
                     const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!result.candidates || !result.candidates[0] || !result.candidates[0].content) {
+                        throw new Error('API 回傳格式異常或遭安全機制阻擋');
+                    }
+                    
+                    return result.candidates[0].content.parts[0].text;
                 };
 
                 let errorLog = [];
 
-                // 嘗試 1: 預覽環境專屬通道 (空金鑰 + 2.5-flash-preview)
+                // 優先使用內部預覽通道
                 try {
                     return await executeFetch("", "gemini-2.5-flash-preview-09-2025");
                 } catch (e) {
                     errorLog.push(`內部通道失敗: ${e.message}`);
-                    console.warn(`內部通道連線失敗，自動切換至您的專屬金鑰...`);
+                    console.warn(`內部通道連線失敗，自動切換至外部金鑰策略...`);
                 }
 
-                // 嘗試 2: 使用您的金鑰 + 2.5-flash-preview
-                try {
-                    if (!USER_API_KEY) throw new Error("尚未設定有效金鑰");
-                    return await executeFetch(USER_API_KEY, "gemini-2.5-flash-preview-09-2025");
-                } catch (e) {
-                    errorLog.push(`2.5模型失敗: ${e.message}`);
-                    console.warn(`2.5模型連線失敗，自動降級至 1.5-flash...`);
-                    
-                    // 嘗試 3: 使用您的金鑰 + 1.5-flash
+                const cleanKey = USER_API_KEY.trim();
+                if (!cleanKey) throw new Error("尚未設定有效 API 金鑰");
+
+                // 智慧輪詢，保證必定找到支援的模型
+                const fallbackModels = [
+                    "gemini-1.5-flash",
+                    "gemini-2.5-flash",
+                    "gemini-1.5-pro",
+                    "gemini-pro",
+                    "gemini-2.5-flash-preview-09-2025"
+                ];
+
+                for (const model of fallbackModels) {
                     try {
-                        return await executeFetch(USER_API_KEY, "gemini-1.5-flash");
-                    } catch (e2) {
-                        errorLog.push(`1.5模型失敗: ${e2.message}`);
-                        throw new Error(errorLog.join(' | '));
+                        return await executeFetch(cleanKey, model);
+                    } catch (e) {
+                        console.warn(`模型 ${model} 失敗:`, e.message);
+                        errorLog.push(`${model} 失敗: ${e.message}`);
+                        if (e.message.includes("API key not valid")) {
+                            throw new Error(`API 金鑰無效，請確認金鑰字串是否正確。(${e.message})`);
+                        }
                     }
                 }
+
+                throw new Error("所有模型連線失敗: " + errorLog.pop());
             }
         }
 
@@ -701,46 +754,33 @@
                         customNotes: STATE.customNotes, 
                         currentDomain: STATE.currentDomain, 
                         uploadedFileCount: STATE.uploadedFileCount,
-                        history: STATE.history.slice(0, 20) // 限制儲存最近20筆
+                        history: STATE.history.slice(0, 20)
                     };
                     localStorage.setItem('roly_enterprise_settings', JSON.stringify(dataToSave));
-                } catch(e) {
-                    console.warn("本機儲存空間異常，可能是隱私模式或空間已滿。");
-                }
+                } catch(e) {}
             }
 
             static loadLocal() {
                 try {
-                    const savedData = localStorage.getItem('roly_enterprise_settings');
-                    const legacyData = localStorage.getItem('roly_local_settings');
-                    
-                    if (savedData || legacyData) {
-                        const data = JSON.parse(savedData || legacyData);
+                    const savedData = localStorage.getItem('roly_enterprise_settings') || localStorage.getItem('roly_local_settings');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
                         if (data.uploadedFileCount !== undefined) STATE.uploadedFileCount = data.uploadedFileCount;
                         if (data.currentDomain) STATE.currentDomain = data.currentDomain;
                         if (data.selections) STATE.selections = { ...STATE.selections, ...data.selections };
                         if (data.title) STATE.title = data.title;
                         if (data.customNotes) STATE.customNotes = data.customNotes;
                         if (data.history && Array.isArray(data.history)) STATE.history = data.history;
-                        
-                        // 確保自訂輸入物件存在
                         if(!STATE.selections.custom_inputs) STATE.selections.custom_inputs = {};
                     }
-                } catch(e) {
-                    console.error("讀取本機設定失敗:", e);
-                }
+                } catch(e) {}
             }
 
             static saveToCloud() {
                 if (!STATE.firebaseReady || !user) return;
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'config');
-                    setDoc(docRef, { 
-                        selections: STATE.selections, 
-                        title: STATE.title, 
-                        customNotes: STATE.customNotes, 
-                        updatedAt: new Date().toISOString() 
-                    }).catch(err => console.warn("Firebase sync 延遲:", err));
+                    setDoc(docRef, { selections: STATE.selections, title: STATE.title, customNotes: STATE.customNotes, updatedAt: new Date().toISOString() }).catch(()=>{});
                 } catch (err) {}
             }
             
@@ -766,14 +806,12 @@
             static showToast(message, type = 'success') {
                 const container = DOM.get('toast-container');
                 if (!container) return;
-                
                 const toast = document.createElement('div');
                 const bgClass = type === 'success' ? 'bg-emerald-500' : (type === 'error' ? 'bg-red-500' : 'bg-slate-800');
                 const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
                 
                 toast.className = `toast-enter flex items-center gap-3 px-5 py-3.5 rounded-xl text-white font-bold text-[15px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] pointer-events-auto ${bgClass}`;
                 toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i> <span>${message}</span>`;
-                
                 container.appendChild(toast);
                 DOM.createIcon();
 
@@ -789,8 +827,6 @@
                 this.syncInputs();
                 LogicController.markPromptOutdated();
                 StorageManager.saveLocal();
-                
-                // 節流處理 Firebase 同步
                 clearTimeout(STATE.syncTimer);
                 STATE.syncTimer = setTimeout(() => StorageManager.saveToCloud(), 2000);
             }
@@ -828,9 +864,25 @@
                     const groupEl = document.createElement('div');
                     groupEl.className = 'mb-1 shrink-0 animate-[fadeIn_0.3s_ease]';
                     
-                    const titleEl = document.createElement('h3');
-                    titleEl.className = 'text-[15px] font-bold text-slate-700 mb-3 flex items-center gap-2';
-                    titleEl.innerHTML = `<i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400/80 font-normal ml-1 text-[13px] tracking-wide">(可複選)</span>' : ''}`;
+                    // 企業級即時過濾列 (如果選項太多，顯示搜尋框)
+                    let searchHTML = '';
+                    if(availableOptions.length > 8 && group.isMulti) {
+                        searchHTML = `
+                            <div class="w-full mb-3 relative">
+                                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                                <input type="text" class="search-filter-input w-full pl-9 pr-4 py-2 text-[13px] bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-400 transition-all placeholder-slate-400 shadow-sm" placeholder="快速搜尋過濾選項...">
+                            </div>
+                        `;
+                    }
+
+                    const titleEl = document.createElement('div');
+                    titleEl.className = 'flex flex-col mb-3';
+                    titleEl.innerHTML = `
+                        <h3 class="text-[15px] font-bold text-slate-700 mb-2 flex items-center gap-2">
+                            <i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400/80 font-normal ml-1 text-[13px] tracking-wide">(可複選)</span>' : ''}
+                        </h3>
+                        ${searchHTML}
+                    `;
                     groupEl.appendChild(titleEl);
 
                     const grid = document.createElement('div');
@@ -845,6 +897,8 @@
                         btn.className = `selection-btn group relative flex flex-col items-center justify-center min-h-[44px] px-4 min-w-[90px] rounded-xl transition-all text-[14px] text-center border-2 shrink-0 ${
                             isActive ? 'active' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50/80 hover:text-indigo-700'
                         }`;
+                        // 保存搜尋關鍵字在 data 屬性
+                        btn.setAttribute('data-search-text', opt.label.toLowerCase());
                         btn.innerHTML = `<div class="truncate w-full leading-tight font-medium tracking-wide">${opt.label}</div>`;
                         
                         if (group.isColor && opt.swatches) {
@@ -873,6 +927,19 @@
                     });
                     
                     groupEl.appendChild(grid);
+
+                    // 綁定過濾器事件
+                    const searchInput = titleEl.querySelector('.search-filter-input');
+                    if(searchInput) {
+                        searchInput.addEventListener('input', (e) => {
+                            const term = e.target.value.toLowerCase();
+                            const btns = grid.querySelectorAll('.selection-btn');
+                            btns.forEach(b => {
+                                if(b.getAttribute('data-search-text').includes(term)) b.classList.remove('hidden-item');
+                                else b.classList.add('hidden-item');
+                            });
+                        });
+                    }
 
                     // 自訂輸入框
                     const customInputWrapper = document.createElement('div');
@@ -930,7 +997,7 @@
                         if(out) out.textContent = item.content;
                         if(empty) empty.style.display = 'none';
                         this.showToast('已載入歷史紀錄', 'success');
-                        this.toggleHistory(); // 關閉側邊欄
+                        this.toggleHistory();
                     };
                     list.appendChild(card);
                 });
@@ -939,9 +1006,7 @@
 
             static toggleHistory() {
                 const drawer = DOM.get('history-drawer');
-                if (drawer) {
-                    drawer.classList.toggle('open');
-                }
+                if (drawer) drawer.classList.toggle('open');
             }
         }
 
@@ -980,6 +1045,8 @@
                         return [...baseGroups, ...visualGroups, ...rulesGroups].map((g, i) => ({...g, label: `${i+1}. ${g.label.split('. ')[1] || g.label}`}));
                     case 'tech':
                     case 'audit':
+                    case 'roleplay':
+                    case 'coaching':
                         return [...baseGroups, audienceGroups[2], audienceGroups[3], visualGroups[0], ...rulesGroups].map((g, i) => ({...g, label: `${i+1}. ${g.label.split('. ')[1] || g.label}`}));
                     default:
                         return [...baseGroups, ...audienceGroups, ...visualGroups, ...rulesGroups].map((g, i) => ({...g, label: `${i+1}. ${g.label.split('. ')[1] || g.label}`}));
@@ -1018,7 +1085,7 @@
                 prompt += buildMulti("roles", "roles", "多重專家角色設定");
                 prompt += buildMulti("action_types", "action_types", "進階任務與分析框架");
                 
-                let target = STATE.title.trim() ? `本次專案核心主題為：「${STATE.title.trim()}」。\n` : "";
+                let target = STATE.title.trim() ? `【第一句指令 / 對話起始語 / 核心主題】：\n「${STATE.title.trim()}」\n\n` : "";
                 target += buildSingle("data_type", "data_types", "輸出型式");
                 target += buildSingle("language", "languages", "輸出語言");
                 if (target) prompt += `【專案任務與輸出格式】：\n${target}\n`;
@@ -1053,7 +1120,14 @@
                 let finalSummary = `【最終統整與執行指令 (Execution Summary)】\n👉 總結以上設定，請您化身為「${sumRoles}」，以「${sumLang}」產出高品質的「${sumFormat}」。\n`;
                 if (sumElements.length) finalSummary += `👉 過程中請務必：${sumElements.join('，')}。\n`;
                 if (STATE.selections.culture) finalSummary += `👉 視覺與內容請強制鎖定在「${STATE.selections.culture.label}」背景，拒絕預設西方視角。\n`;
-                finalSummary += `\n🚨 【系統強制指令】：確認無誤後，請「絕對禁止」輸出任何形式的寒暄廢話！請立即處理上方提供的所有文獻資料，並直接給出最終排版結果！`;
+                
+                // 動態判斷是否為一問一答模式
+                const isInteractive = getLabels("constraints").includes('一問一答互動模式');
+                if (isInteractive) {
+                    finalSummary += `\n🚨 【系統強制指令】：這是一場動態互動！請「絕對禁止」一次寫完所有內容，你必須回應我的第一句話，並等待我的回覆！`;
+                } else {
+                    finalSummary += `\n🚨 【系統強制指令】：確認無誤後，請「絕對禁止」輸出任何形式的寒暄廢話！請立即處理上方提供的所有文獻資料，並直接給出最終排版結果！`;
+                }
 
                 return prompt.trim() ? `請嚴格依照以下疊加設定、多重專家角色與限制條件，執行深度分析與內容生成任務：\n\n========================================\n\n${prompt.trim()}\n${finalSummary}\n========================================` : "";
             }
@@ -1071,7 +1145,6 @@
                     return;
                 }
 
-                const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 智能編譯中...';
                 btn.disabled = true;
                 DOM.createIcon();
@@ -1107,10 +1180,10 @@ ${structuredStr}`;
                     if (empty) empty.style.display = 'none';
                     STATE.isPromptOutdated = false;
                     StorageManager.saveHistory(structuredStr);
-                    UIManager.showToast(`網路或金鑰異常，已切換為「高階結構排版」`, 'info');
+                    UIManager.showToast(`AI連線受阻，已自動切換為「高階結構排版」`, 'info');
                 }
 
-                // 恢復按鈕為「更新」狀態
+                // 恢復按鈕狀態
                 btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> 重新編寫提示詞';
                 btn.className = "flex-1 sm:flex-none text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-[0_0_10px_rgba(79,70,229,0.4)] flex items-center justify-center gap-2 whitespace-nowrap";
                 btn.disabled = false;
@@ -1192,28 +1265,23 @@ ${structuredStr}`;
         //  事件綁定與初始化 (Event Listeners & Init)
         // ==========================================
         
-        // 輸入框同步
         DOM.bind('title-input', 'input', (e) => { STATE.title = e.target.value; UIManager.updateSync(); });
         DOM.bind('custom-notes-input', 'input', (e) => { STATE.customNotes = e.target.value; UIManager.updateSync(); });
         
-        // 領域切換
         DOM.getAll('.domain-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 STATE.currentDomain = e.currentTarget.dataset.domain;
                 STATE.selections = getInitialSelections();
                 STATE.title = '';
-                
                 const out = DOM.get('prompt-output');
                 const empty = DOM.get('empty-state-msg');
                 if (out) out.textContent = '';
                 if (empty) empty.style.display = 'flex';
-                
                 UIManager.updateSync();
                 UIManager.showToast(`已切換至「${e.currentTarget.innerText.trim()}」面板`, 'info');
             });
         });
 
-        // 檔案上傳
         DOM.bind('file-input', 'change', (e) => {
             const file = e.target.files[0];
             const display = DOM.get('file-display');
@@ -1225,25 +1293,28 @@ ${structuredStr}`;
                 btns.forEach(b => { 
                     if(b) {
                         b.disabled = false; 
-                        if (b.id === 'analyze-extract') b.className = ANALYZE_EXTRACT_ENABLED_CLASS;
-                        else if (b.id === 'analyze-detailed') b.className = ANALYZE_DETAILED_ENABLED_CLASS;
-                        else b.className = ANALYZE_CONCISE_ENABLED_CLASS;
+                        if (b.id === 'analyze-extract') b.className = "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-amber-500 text-white hover:bg-amber-600 active:scale-95 shadow-[0_4px_10px_rgba(245,158,11,0.3)]";
+                        else if (b.id === 'analyze-detailed') b.className = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white hover:bg-indigo-500 active:scale-95 shadow-[0_4px_10px_rgba(79,70,229,0.3)]";
+                        else b.className = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-700 active:scale-95 shadow-md";
                     }
                 });
             } else {
                 if (display) display.innerHTML = `<div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center"><i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-500"></i></div><span class="text-[15px] font-bold text-indigo-700 mt-1">點擊或拖曳上傳檔案</span><span class="text-[12px] text-slate-400 font-medium">支援 PNG, JPG, PDF (最大 5MB)</span>`;
-                btns.forEach(b => { if(b) { b.disabled = true; b.className = ANALYZE_BTN_DISABLED_CLASS; } });
+                btns.forEach(b => { 
+                    if(b) { 
+                        b.disabled = true; 
+                        b.className = b.id === 'analyze-extract' ? "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" : "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"; 
+                    } 
+                });
             }
             DOM.createIcon();
         });
 
-        // AI 處理按鈕
         DOM.bind('analyze-extract', 'click', () => LogicController.handleFileAnalysis('extract'));
         DOM.bind('analyze-detailed', 'click', () => LogicController.handleFileAnalysis('detailed'));
         DOM.bind('analyze-concise', 'click', () => LogicController.handleFileAnalysis('concise'));
         DOM.bind('generate-prompt-btn', 'click', () => LogicController.generateFinalPrompt());
 
-        // 清除功能
         DOM.bind('clear-notes-btn', 'click', () => {
             STATE.customNotes = '';
             STATE.uploadedFileCount = 0;
@@ -1257,7 +1328,6 @@ ${structuredStr}`;
             UIManager.showToast('已重置所有選項', 'info');
         });
 
-        // 剪貼簿與下載
         DOM.bind('copy-btn', 'click', () => {
             const out = DOM.get('prompt-output');
             if (!out || !out.textContent.trim()) {
@@ -1299,7 +1369,6 @@ ${structuredStr}`;
             UIManager.showToast('檔案已成功下載', 'success');
         });
 
-        // Modal 與歷史紀錄控制
         DOM.bind('reset-all-btn', 'click', () => {
             DOM.get('confirm-modal')?.classList.remove('hidden');
             DOM.get('modal-backdrop')?.classList.remove('hidden');
@@ -1333,7 +1402,10 @@ ${structuredStr}`;
             
             ['analyze-extract', 'analyze-detailed', 'analyze-concise'].forEach(id => {
                 const btn = DOM.get(id);
-                if(btn) { btn.disabled = true; btn.className = ANALYZE_BTN_DISABLED_CLASS; }
+                if(btn) { 
+                    btn.disabled = true; 
+                    btn.className = id === 'analyze-extract' ? "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" : "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"; 
+                }
             });
             
             const out = DOM.get('prompt-output');
@@ -1346,7 +1418,6 @@ ${structuredStr}`;
             UIManager.showToast('系統已完全重置', 'info');
         });
 
-        // 歷史紀錄相關
         DOM.bind('toggle-history-btn', 'click', () => UIManager.toggleHistory());
         DOM.bind('close-history-btn', 'click', () => UIManager.toggleHistory());
         DOM.bind('clear-history-btn', 'click', () => {
@@ -1356,7 +1427,6 @@ ${structuredStr}`;
             UIManager.showToast('已清空歷史紀錄', 'info');
         });
 
-        // 調整軸 (Resizer)
         const resizer = DOM.get('resizer');
         const leftPanel = DOM.get('left-panel');
         const container = DOM.get('container');
@@ -1389,16 +1459,12 @@ ${structuredStr}`;
         //  系統啟動 (System Initialization)
         // ==========================================
         const initSystem = async () => {
-            // 安全計數器掛載 (隔離外部異常)
             const setupCounter = async () => {
                 try {
                     let response = null;
                     try {
-                        // 修復：徹底移除錯誤包覆的 Markdown 網址標記，確保計數器正常連線
                         response = await fetch('[https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up](https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up)').catch(() => null);
-                    } catch (fetchErr) {
-                        // Silent catch for network block
-                    }
+                    } catch (fetchErr) {}
                     
                     if (response && response.ok) {
                         const data = await response.json();
@@ -1406,7 +1472,6 @@ ${structuredStr}`;
                         if (el) el.innerText = data.count.toLocaleString();
                     } else throw new Error();
                 } catch (e) {
-                    // 網路層阻擋，安全降級為 Local
                     let localCount = parseInt(localStorage.getItem('roly_visitor_count') || '0');
                     if(!sessionStorage.getItem('hasVisitedLocal')) {
                         localCount++;
@@ -1423,7 +1488,6 @@ ${structuredStr}`;
             UIManager.updateSync();
             UIManager.renderHistory();
             
-            // 如果剛載入時輸出區是空的，確保顯示空狀態
             const out = DOM.get('prompt-output');
             const empty = DOM.get('empty-state-msg');
             if (out && out.textContent.trim() === '' && empty) {
