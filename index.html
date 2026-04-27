@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>啓仲哥的AI提示詞快速產生器 | V4.5 NotebookLM 極致視覺排版版</title>
+    <title>啓仲哥的AI提示詞快速產生器 | pro 1.0 商業版</title>
     <!-- 引入 Tailwind CSS 與 Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -108,7 +108,7 @@
             <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                 <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">啓仲</span>
                 AI 提示詞產生器
-                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">V4.5 視覺排版大師版</span>
+                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 1.0 商業版</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
@@ -345,8 +345,8 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ⚠️ 企業版核心：完美校對後的 API 金鑰
-        const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
+        // 預覽環境專屬：將 apiKey 設為空字串，系統將自動注入權限，確保 100% 絕對通過
+        const apiKey = ""; 
         
         // 按鈕樣式常數
         const ANALYZE_BTN_EXTRACT_DISABLED = "w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent";
@@ -356,11 +356,10 @@
         const ANALYZE_CONCISE_ENABLED_CLASS = "flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-800 text-white hover:bg-slate-700 active:scale-95 shadow-md";
 
         // ==========================================
-        //  終極詠唱資料庫 (V4.5 NotebookLM 極致視覺排版版)
+        //  終極詠唱資料庫 (pro 1.0 商業版)
         // ==========================================
         const INITIAL_CONFIG = {
             data_types: [
-                // NotebookLM 專屬圖表型式與需求
                 { id: 'dt-infographic-prompt', label: '🎨 資訊圖表 Prompt (MJ/DALL-E)', domains: ['charts', 'visual'], prompt: '【輸出型式】：請產出用於 AI 繪圖 (Midjourney / DALL-E) 的「資訊圖表 Prompt」。結合文本的核心知識與指定的視覺排版風格，產生極具設計感的英文繪圖指令。' },
                 { id: 'dt-notebooklm-ppt', label: '📑 NotebookLM 簡報大綱', domains: ['charts', 'business', 'academic', 'planning'], prompt: '【輸出型式】：請擔任簡報架構師與溝通策略專家，將資料轉化為結構化且可執行的簡報大綱。採用「問題與解決方案」敘事框架，將關鍵訊息流暢分配至 10 張投影片中。每頁需包含：標題、副標題、視覺化建議、講者備註。' },
                 { id: 'dt-mermaid-mindmap', label: '🧠 Mermaid 心智圖', domains: ['charts', 'academic', 'planning'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「心智圖 (Mindmap)」。從核心主題向外發散，至少包含 3 個層級的子節點。必須包覆在 ```mermaid 代碼區塊中。' },
@@ -370,7 +369,6 @@
                 { id: 'dt-swot', label: '⚔️ SWOT 分析矩陣', domains: ['charts', 'business'], prompt: '【輸出型式】：請產出「SWOT 分析矩陣」。以嚴謹的 Markdown 表格呈現優勢(S)、劣勢(W)、機會(O)、威脅(T)，並附上交叉分析策略 (SO, ST, WO, WT)。' },
                 { id: 'dt-podcast', label: '🎙️ Podcast 雙人對談腳本', domains: ['charts', 'business', 'academic'], prompt: '【輸出型式】：請將文獻轉換為「雙人對談 Podcast 腳本 (類似 NotebookLM Audio Overview)」。包含主持人(Host)與專家(Expert)的深度對談，語氣需自然、具備幽默感，並用生活化比喻解釋艱澀概念。' },
                 
-                // 原有資料型式
                 { id: 'dt-audit-report', label: '合約/文件檢核報告', domains: ['audit', 'business'], prompt: '【輸出型式】：請產出結構化的「文獻/條款檢核報告」。須列出：整體風險評估、不合理/缺失條款、具體修正與補充建議。' },
                 { id: 'dt-diff-table', label: '多文件差異對照表', domains: ['audit', 'academic', 'tech', 'charts'], prompt: '【輸出型式】：請產出「多文件差異對照表」。以表格清晰比對各文件之間的共同點、矛盾點與重要差異維度。' },
                 { id: 'dt-key-extract', label: '長文核心重點萃取', domains: ['audit', 'academic', 'tech', 'business', 'charts'], prompt: '【輸出型式】：請產出極度濃縮的「核心重點萃取 (Key Takeaways)」。排除所有廢話，以條列式精確條列出關鍵資訊、數據與結論。' },
@@ -541,7 +539,24 @@
                 { id: 'cul-us', label: '🇺🇸 歐美/西方', domains: ['visual', 'business', 'planning'], prompt: '【文化與地域設定】：以「歐美/西方 (Western)」為核心構圖。人物具備典型的歐美臉孔特徵；場景為典型的西方都市、街區或自然景觀。' },
                 { id: 'cul-global', label: '🌍 國際化/多元', domains: ['visual', 'business', 'planning', 'academic', 'tech'], prompt: '【文化與地域設定】：以「國際化、多元融合 (Global/Diverse)」為核心構圖。包含不同膚色與人種的多元面貌，場景具備國際都會感，不侷限單一國家。' }
             ],
-            // 視覺與排版增強：佈局結構 (新增 NotebookLM 重點版型)
+            infographics: [ 
+                { id: 't-train-sheet', label: '培訓養成面板', domains: ['business', 'planning', 'coaching'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
+                { id: 't16', label: '課程大綱模組', domains: ['business', 'academic', 'planning', 'coaching'], prompt: '【版型結構】：製作『課程模組化』排版。每個模組使用獨立表格。包含：單元目標、真實世界範例、步驟化活動、互動討論題與結業專案設計。' },
+                { id: 't17', label: '時間軸行程表', domains: ['business', 'planning'], prompt: '【版型結構】：製作『時間軸行程表』排版。以 Timeline 呈現，包含時間、地點、活動、交通與溫馨提醒(Tips)。' },
+                { id: 't-event-rundown', label: '活動 Rundown', domains: ['planning', 'business'], prompt: '【版型結構】：製作『活動 Rundown (流程總表)』排版。以表格呈現，欄位包含：時間、時間長度、環節名稱、負責人、準備道具與燈控音控提示。' },
+                { id: 't-budget-table', label: '預算成本表', domains: ['planning', 'business'], prompt: '【版型結構】：製作『預算與成本分析表』。以分類呈現各項支出(如：場地、餐飲、行銷、人事)，並提供成本控制的建議方案。' },
+                { id: 't1', label: '高階商務提案', domains: ['business', 'planning'], prompt: '【版型結構】：生成商務提案簡報。結構：首頁、目錄、痛點、解決方案、詳細步驟、預期效益(KPI)、行動(CTA)。' },
+                { id: 't13', label: '募資計畫書', domains: ['business'], prompt: '【版型結構】：製作『新創募資計畫書(Pitch Deck)』。包含：痛點、解決方案、市場規模、競爭分析、團隊、財務預測與募資需求。' },
+                { id: 't14', label: '數據儀表板', domains: ['business', 'tech', 'audit'], prompt: '【版型結構】：設計為『商業數據儀表板 (Dashboard)』文字介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖的視覺文字排版。' },
+                { id: 't-diff-table', label: '風險差異對照表', domains: ['audit', 'tech', 'academic'], prompt: '【版型結構】：製作『風險差異對照表』排版。強制以表格呈現比對結果，需包含：文件名稱/條款、原始內容、潛在風險點、建議修正與嚴重程度(高/中/低)。' },
+                { id: 't12', label: '社群輪播懶人包', domains: ['business', 'planning'], prompt: '【版型結構】：製作 IG/FB 輪播式『懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導分享頁。' },
+                { id: 't2', label: '學術論文架構', domains: ['academic'], prompt: '【版型結構】：製作標準論文架構。包含：研究背景與目的、文獻回顧、研究方法、實證分析、結論與建議、參考文獻。' },
+                { id: 't-seo-silo', label: 'SEO SILO 網站架構樹', domains: ['tech', 'business'], prompt: '【版型結構】：建立『SEO SILO 網站架構樹』。以階層式結構 (Hierarchical structure) 呈現，頂端為首頁，往下展開具體分類與長尾關鍵字頁面，強調內部連結策略。' },
+                { id: 't-persona', label: '受眾畫像四象限表', domains: ['business', 'planning'], prompt: '【版型結構】：建立『用戶畫像 (User Persona)』四象限表格。表1：人口統計學 (年齡/職業/收入等)；表2：一語總結；表3：心理學特徵 (痛點/夢想/興趣)；表4：購物行為 (預算/通路/觸發點)。禁止使用 bullet points，必須是嚴謹的 Table。' },
+                { id: 't-video-basic', label: '影片分鏡表', domains: ['visual'], prompt: '【版型結構】：依循影片通用指南撰寫。結構包含：1. Style(視覺風格) 2. Cinematography(攝影機與燈光) 3. Actions(動作節拍) 4. Audio(音效)。' },
+                { id: 't-video-pro', label: '電影級分鏡腳本', domains: ['visual'], prompt: '【版型結構】：依循專業電影拍攝指南撰寫。包含：Format(格式), Lenses(鏡頭), Lighting(燈光), Location(場景), Wardrobe(服裝道具), Shot List(最佳化分鏡)。' },
+                { id: 't-code-block', label: '單純 Code Block', domains: ['tech', 'roleplay'], prompt: '【版型結構】：所有的輸出結果必須「完全被包覆在一個 Markdown 程式碼區塊 (```...```) 內」。' }
+            ],
             layouts: [
                 { id: 'lay-center', label: '🎯 中心對焦', domains: ['charts', 'visual', 'planning'], prompt: '【排版與佈局結構】：中心對焦 (Central Focus)。核心概念放置在中央，其餘細節、分支或註解向外圍發散，營造視覺聚焦點。' },
                 { id: 'lay-snake', label: '🐍 蛇形流程', domains: ['charts', 'visual', 'tech'], prompt: '【排版與佈局結構】：蛇形流程 (Snake Flow)。適合用來呈現步驟說明與演進過程，動線呈現 S 型或 Z 型流暢引導，讓讀者視線自然跟隨。' },
@@ -578,7 +593,6 @@
                 { id: 'cam-macro', label: '🔍 微距攝影 (Macro)', domains: ['visual'], prompt: '【鏡頭與構圖】：微距攝影 (Macro Photography)。極度靠近極小的物體 (如昆蟲、水滴)，展現肉眼難以看見的驚人微觀細節。' }
             ],
             visual_styles: [ 
-                // 針對 NotebookLM 圖表擴充的視覺風格
                 { id: 'vs-pastel', label: '🌸 可愛粉嫩風格', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：可愛粉嫩風格 (Cute Pastel Style)。使用柔和親切的粉彩色調、馬卡龍色系與漸層，有效降低技術資訊的嚴肅感，並添加一些可愛的卡通圖案。' },
                 { id: 'vs-chalkboard', label: '🏫 黑板粉筆風格', domains: ['visual', 'charts', 'academic'], prompt: '【視覺風格】：黑板粉筆風格 (Chalkboard Style)。深綠或深灰色的黑板背景，搭配白色與彩色粉筆手繪質感的線條與文字，營造出上課教學的氛圍。' },
                 { id: 'vs-doodle', label: '✍️ 手繪塗鴉風格', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：手繪塗鴉風格 (Doodle Style)。看似隨意但具備強烈個人藝術感的手繪線條，充滿創意與隨性，適合創意發想筆記。' },
@@ -590,10 +604,8 @@
                 { id: 'vs-clay', label: '🧶 3D 黏土風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：3D 黏土風格 (3D Clay Style)。具有黏土捏塑的材質感、微小細節(如指紋或灰塵)與柔和的微距光影，可愛且具實體感。' },
                 { id: 'vs-isometric', label: '📐 等距視角微縮', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：等距視角微縮風格 (Isometric Miniature)。以上帝視角 45 度角俯視的立體小模型場景，精緻、結構嚴謹且細節豐富。' },
                 { id: 'vs-lego', label: '🧱 積木風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：積木風格 (Building Blocks Style)。所有元素由彩色塑膠積木拼裝而成，充滿童趣與建構邏輯感。' },
-                
-                // 原有視覺風格
                 { id: 'vs-realistic', label: '📸 寫實攝影', domains: ['visual', 'planning'], prompt: '【視覺風格】：寫實攝影風格 (Photorealistic)。呈現逼真細膩的肖像或風景，具備真實的光影細節、超高解析度與自然景深。' },
-                { id: 'vs-hdr', label: '🌟 高動態範圍(HDR)', domains: ['visual', 'business'], prompt: '【視覺風格】：高動態範圍 (HDR)。極致的色彩飽和度與對比度增強，展現生動且戲劇化的光影效果。' },
+                { id: 'vs-hdr', label: '🌟 高動態範圍(HDR)', domains: ['visual', 'business'], prompt: '【視覺風格】：高動態範圍 (HDR)。極致的色彩飽解度與對比度增強，展現生動且戲劇化的光影效果。' },
                 { id: 'vs-jp-photo', label: '🌸 日系清新風格', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：日系清新攝影風格 (Japanese Fresh Photo Style)。低對比、低飽和度，柔和且自然的採光，帶有微微的過曝與清新空氣感。' },
                 { id: 'vs-movie-doc', label: '🎞️ 電影紀錄片', domains: ['visual'], prompt: '【視覺風格】：電影紀錄片風格 (Cinematic Documentary)。自然採光、淺景深，帶來身歷其境的敘事真實感。' },
                 { id: 'vs-vintage', label: '📻 復古懷舊風格', domains: ['visual', 'business', 'planning'], prompt: '【視覺風格】：復古懷舊風格 (Vintage/Retro)。模仿過去某一時期的圖像效果，帶有褪色、底片顆粒、漏光等時代氛圍。' },
@@ -729,10 +741,7 @@
             static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg') {
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
                 
-                // 預覽環境強制使用空金鑰，本機端使用您設定的金鑰
                 const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
-                
-                // 統一強制使用預覽專屬穩定模型，徹底解決 "model is not found" 的問題
                 const modelToUse = "gemini-2.5-flash-preview-09-2025";
                 
                 const parts = [{ text: promptStr }];
@@ -747,7 +756,6 @@
                     reqBody.generationConfig = { temperature: 1.0 };
                 }
                 
-                // 指數退避重試機制：1s, 2s, 4s, 8s, 16s
                 const delays = [1000, 2000, 4000, 8000, 16000];
                 let lastError = null;
 
@@ -773,11 +781,9 @@
                         return result.candidates[0].content.parts[0].text;
                     } catch (error) {
                         lastError = error;
-                        // 若為金鑰本身無效，無需重試直接拋出錯誤
                         if (error.message.includes("API key not valid")) {
                             throw new Error(`API 金鑰無效，請確認金鑰字串是否正確。(${error.message})`);
                         }
-                        // 否則等待指定的秒數後進行重試
                         if (i < delays.length) {
                             await new Promise(resolve => setTimeout(resolve, delays[i]));
                         }
@@ -959,7 +965,7 @@
                         }
 
                         btn.onclick = () => {
-                            if (!STATE.selections[stateKey]) STATE.selections[stateKey] = []; // 確保陣列存在
+                            if (!STATE.selections[stateKey]) STATE.selections[stateKey] = [];
                             if (group.isMulti) {
                                 const index = STATE.selections[stateKey].findIndex(n => n.id === opt.id);
                                 if (index > -1) STATE.selections[stateKey].splice(index, 1);
@@ -1543,7 +1549,6 @@ ${structuredStr}`;
                 try {
                     let response = null;
                     try {
-                        // 修復：確保網址為純字串，避免 Markdown 自動解析報錯
                         response = await fetch('[https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up](https://api.counterapi.dev/v1/qizhong_roly_prompt/visits/up)').catch(() => null);
                     } catch (fetchErr) {}
                     
@@ -1567,7 +1572,6 @@ ${structuredStr}`;
             setupCounter();
             StorageManager.loadLocal();
             
-            // 系統初始化時，預設切換至新開發的「知識萃取與圖表」面板
             STATE.currentDomain = 'charts';
             
             UIManager.updateSync();
