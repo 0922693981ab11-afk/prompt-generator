@@ -741,8 +741,9 @@
             static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg') {
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
                 
+                // 智慧判斷：預覽環境使用空金鑰+2.5預覽模型；本機/外部環境使用用戶金鑰+1.5正式模型
                 const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
-                const modelToUse = "gemini-2.5-flash-preview-09-2025";
+                const modelToUse = isPreviewEnv ? "gemini-2.5-flash-preview-09-2025" : "gemini-1.5-flash";
                 
                 const parts = [{ text: promptStr }];
                 if (base64Data) {
@@ -751,12 +752,14 @@
                 
                 let reqBody = { contents: [{ role: "user", parts: parts }] };
                 
+                // 只有在純文字生成 (不包含圖片檔案) 的情況下，才附上系統指令強制純輸出
                 if (!base64Data) {
                     reqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
                     reqBody.generationConfig = { temperature: 1.0 };
                 }
                 
-                const delays = [1000, 2000, 4000, 8000, 16000];
+                // 移除容易引發崩潰的 Timeout 包裝，改用原生的指數退避重試機制：1s, 2s, 4s
+                const delays = [1000, 2000, 4000];
                 let lastError = null;
 
                 for (let i = 0; i <= delays.length; i++) {
@@ -781,16 +784,18 @@
                         return result.candidates[0].content.parts[0].text;
                     } catch (error) {
                         lastError = error;
+                        // 若為金鑰本身無效，無需重試直接拋出錯誤
                         if (error.message.includes("API key not valid")) {
                             throw new Error(`API 金鑰無效，請確認金鑰字串是否正確。(${error.message})`);
                         }
+                        // 否則等待指定的秒數後進行重試
                         if (i < delays.length) {
                             await new Promise(resolve => setTimeout(resolve, delays[i]));
                         }
                     }
                 }
                 
-                throw new Error(`連線失敗，請稍後再試。(${lastError.message})`);
+                throw new Error(`連線失敗 (${modelToUse}): ${lastError.message}`);
             }
         }
 
@@ -1248,7 +1253,7 @@ ${structuredStr}`;
                     if (empty) empty.style.display = 'none';
                     STATE.isPromptOutdated = false;
                     StorageManager.saveHistory(structuredStr);
-                    UIManager.showToast(`網路異常，已切換為「高階結構排版」`, 'info');
+                    UIManager.showToast(`連線受阻，已自動切換為「高階結構排版」`, 'info');
                 }
 
                 btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> 重新編寫提示詞';
