@@ -348,8 +348,8 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 預覽環境專屬：將 apiKey 設為空字串，系統將自動注入權限
-        const apiKey = ""; 
+        // ⚠️ 企業版核心：重新綁定您的個人 API 金鑰，解決外部署的連線錯誤
+        const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk"; 
 
         // ==========================================
         //  終極詠唱資料庫 (pro 1.0 商業版 - 領域絕對隔離版)
@@ -957,7 +957,7 @@
                     `;
                     groupEl.appendChild(titleEl);
 
-                    // 綁定單區塊骰子點擊事件 (修復 SVG 動畫崩潰)
+                    // 綁定單區塊骰子點擊事件 (修復動畫崩潰的順序問題)
                     const diceBtn = titleEl.querySelector('.section-dice-btn');
                     if(diceBtn) {
                         diceBtn.onclick = () => {
@@ -965,7 +965,7 @@
                             if (icon) {
                                 icon.classList.add('animate-spin');
                             }
-                            // 延遲 300ms 讓動畫跑完，再更新資料與畫面，避免 DOM 消失引發崩潰
+                            // 延遲 300 毫秒，等動畫播完後再刷新 DOM
                             setTimeout(() => {
                                 LogicController.randomizeGroup(group.key);
                                 UIManager.updateSync();
