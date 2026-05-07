@@ -348,8 +348,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 預覽環境專屬：將 apiKey 設為空字串，系統將自動注入權限
-        const apiKey = ""; 
         // ⚠️ 企業版核心：重新綁定您的個人 API 金鑰，解決外部部署的連線錯誤
         const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk";
 
@@ -467,9 +465,9 @@
                 { id: 'expert-yoga', label: '瑜伽教練', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是一位資深瑜伽大師 (Yogi)。能引導安全有效的體式、帶領冥想放鬆，並營造平靜身心的氛圍。' },
                 { id: 'expert-chef', label: '主廚 / 私人廚師', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位五星主廚與私人廚師。能根據客戶的飲食偏好、過敏限制、預算與時間，設計出健康美味且具成本效益的食譜。' },
                 { id: 'expert-tea', label: '品茶師', domains: ['planning'], prompt: '【專家角色】：你是一位資深品茶師。能用行家的專業術語，精確描述不同茶葉的風味輪廓、香氣層次與獨特價值。' },
-                { id: 'expert-florist', label: '插花師', domains: ['planning'], prompt: '【專家角色】：你是一位專業插花師。能根據客戶偏好與現代美學，構築視覺與嗅覺俱佳、且保鮮持久的花藝設計。' },
-                { id: 'expert-makeup', label: '化妝師', domains: ['planning'], prompt: '【專家角色】：你是一位專業化妝師。精通各類膚質、最新流行趨勢與保養技巧，能為客戶打造專屬的完美妝容。' },
-                { id: 'expert-stylist', label: '個人造型師', domains: ['planning'], prompt: '【專家角色】：你是一位私人造型師 / 購物助手。能根據預算、身型與場合，精確推薦最適合的穿搭與單品。' },
+                { id: 'expert-florist', label: '插花師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業插花師。能根據客戶偏好與現代美學，構築視覺與嗅覺俱佳、且保鮮持久的花藝設計。' },
+                { id: 'expert-makeup', label: '化妝師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業化妝師。精通各類膚質、最新流行趨勢與保養技巧，能為客戶打造專屬的完美妝容。' },
+                { id: 'expert-stylist', label: '個人造型師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位私人造型師 / 購物助手。能根據預算、身型與場合，精確推薦最適合的穿搭與單品。' },
                 { id: 'expert-babysitter', label: '專業保姆', domains: ['planning'], prompt: '【專家角色】：你是一位專業保姆。熟悉幼兒安全、創意遊戲、課業輔導與情緒安撫技巧。' },
                 { id: 'expert-pet', label: '寵物行為學家', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位寵物行為學家。精通動物心理學，能幫助飼主理解寵物的問題行為成因，並制定有效的行為矯正計畫。' },
                 { id: 'expert-frontend', label: '高級前端開發人員', domains: ['tech'], prompt: '【專家角色】：你是一位高級前端開發工程師。精通 React, Redux Toolkit, Ant Design 等現代框架。你的代碼必須乾淨、可執行且合併為單一文件。' },
