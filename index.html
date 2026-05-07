@@ -324,32 +324,30 @@
          系統核心邏輯 (System Core Logic) pro 1.0
          ========================================= -->
     <script type="module">
+        // 攔截並優化全域錯誤
         window.addEventListener('error', (e) => {
+            // 阻擋非致命錯誤的彈窗，避免干擾使用者
+            if (e.message && (e.message.includes('Script error') || e.message.includes('ResizeObserver'))) return;
             console.error('🔥 [Global Error Captured]:', e.error);
-            showCrashUI(e.error?.stack || e.message || '未知錯誤');
         });
         window.addEventListener('unhandledrejection', (e) => {
             console.error('🔥 [Unhandled Promise Rejection]:', e.reason);
-            showCrashUI(e.reason?.stack || e.reason || '非同步操作崩潰');
         });
 
+        // 移除容易誤觸的當機紅畫面，改以 Console 記錄為主
         function showCrashUI(errorDetail) {
-            try {
-                const crashUI = document.getElementById('crash-boundary');
-                const crashLog = document.getElementById('crash-log');
-                if (crashUI && crashLog) {
-                    crashUI.classList.remove('hidden');
-                    crashLog.textContent = errorDetail.toString();
-                }
-            } catch(err) {}
+            console.warn("系統捕捉到異常：", errorDetail);
         }
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ⚠️ 企業版核心：重新綁定您的個人 API 金鑰，解決外部部署的連線錯誤
-        const USER_API_KEY = "AIzaSyCNHgPF0fRlC-1Y0QyGVSBQ3LDMUANCqbk";
+        // 預覽環境專屬：將 apiKey 設為空字串，系統將自動注入權限
+        const apiKey = ""; 
+
+        // ⚠️ 企業版核心：已更新為您的專屬 API 金鑰
+        const USER_API_KEY = "AIzaSyAAY4qBzfWU7UX6lHqqbaTNiw7s4ihY5C0";
 
         // ==========================================
         //  終極詠唱資料庫 (pro 1.0 商業版 - 領域絕對隔離版)
@@ -586,32 +584,32 @@
                 { id: 'vs-clay', label: '🧶 3D 黏土風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：3D 黏土風格 (3D Clay Style)。具有黏土捏塑的材質感、微小細節(如指紋或灰塵)與柔和的微距光影，可愛且具實體感。' },
                 { id: 'vs-isometric', label: '📐 等距視角微縮', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：等距視角微縮風格 (Isometric Miniature)。以上帝視角 45 度角俯視的立體小模型場景，精緻、結構嚴謹且細節豐富。' },
                 { id: 'vs-lego', label: '🧱 積木風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：積木風格 (Building Blocks Style)。所有元素由彩色塑膠積木拼裝而成，充滿童趣與建構邏輯感。' },
-                { id: 'vs-realistic', label: '📸 寫實攝影', domains: ['charts', 'planning'], prompt: '【視覺風格】：寫實攝影風格 (Photorealistic)。呈現逼真細膩的肖像或風景，具備真實的光影細節、超高解析度與自然景深。' },
-                { id: 'vs-hdr', label: '🌟 高動態範圍(HDR)', domains: ['charts', 'business'], prompt: '【視覺風格】：高動態範圍 (HDR)。極致的色彩飽和度與對比度增強，展現生動且戲劇化的光影效果。' },
-                { id: 'vs-jp-photo', label: '🌸 日系清新風格', domains: ['charts', 'planning'], prompt: '【視覺風格】：日系清新攝影風格 (Japanese Fresh Photo Style)。低對比、低飽和度，柔和且自然的採光，帶有微微的過曝與清新空氣感。' },
-                { id: 'vs-movie-doc', label: '🎞️ 電影紀錄片', domains: ['charts'], prompt: '【視覺風格】：電影紀錄片風格 (Cinematic Documentary)。自然採光、淺景深，帶來身歷其境的敘事真實感。' },
-                { id: 'vs-vintage', label: '📻 復古懷舊風格', domains: ['charts', 'business', 'planning'], prompt: '【視覺風格】：復古懷舊風格 (Vintage/Retro)。模仿過去某一時期的圖像效果，帶有褪色、底片顆粒、漏光等時代氛圍。' },
-                { id: 'vs-bw', label: '⚫ 黑白/單色攝影', domains: ['charts', 'academic'], prompt: '【視覺風格】：黑白攝影風格 (Black & White)。僅使用黑白色調，強調光影對比、幾何線條與深刻的情感張力。' },
-                { id: 'vs-pixar', label: '🎈 皮克斯 3D 風', domains: ['charts', 'planning'], prompt: '【視覺風格】：皮克斯 3D 動畫風格 (Pixar 3D Style)。擁有精緻的材質渲染、溫暖鮮豔的色彩以及可愛、生動的角色特徵。' },
-                { id: 'vs-3d-render', label: '🧊 三維圖像 (3D)', domains: ['charts', 'tech'], prompt: '【視覺風格】：高端 3D 渲染 (3D Render/CGI)。具有強烈的深度、透視感，精確的物理光線追蹤 (Ray Tracing) 與材質反射。' },
-                { id: 'vs-cartoon', label: '🎨 美式卡通風格', domains: ['charts', 'planning'], prompt: '【視覺風格】：卡通風格 (Cartoon Style)。具有鮮明的卡通元素、平塗上色與誇張的角色特徵。' },
-                { id: 'vs-comic', label: '💬 漫畫書風格', domains: ['charts'], prompt: '【視覺風格】：漫畫書風格 (Comic Book)。具備強烈動感場景、粗黑墨線輪廓，模仿經典美漫或日漫的網點效果。' },
-                { id: 'vs-anime', label: '⛩️ 日式動漫風格', domains: ['charts', 'planning'], prompt: '【視覺風格】：日式動漫風格 (Anime Style)。精美的賽璐璐上色、大眼睛特徵、豐富的背景細節與獨特的光影氛圍。' },
-                { id: 'vs-digital', label: '💻 數碼藝術', domains: ['charts', 'tech'], prompt: '【視覺風格】：數碼藝術 (Digital Art)。以精湛的電繪技巧創作，結合特效、發光元素與高科技數位質感。' },
-                { id: 'vs-fantasy', label: '🐉 幻想藝術', domains: ['charts', 'planning'], prompt: '【視覺風格】：幻想藝術 (Fantasy Art)。夢幻、史詩或超現實的場景，包含魔法、神話生物與宏大的世界觀構圖。' },
-                { id: 'vs-future', label: '🚀 科幻未來主義', domains: ['charts', 'tech'], prompt: '【視覺風格】：未來主義風格 (Futuristic)。具備強烈的科幻感，包含太空、機甲、全息投影和超現代科技感。' },
-                { id: 'vs-cyberpunk', label: '🌃 賽博龐克', domains: ['charts'], prompt: '【視覺風格】：賽博龐克 (Cyberpunk)。高反差的陰暗底色，搭配破敗的高科技城市景觀與鮮豔的霓虹螢光元素。' },
-                { id: 'vs-neon', label: '💡 霓虹發光效果', domains: ['charts', 'business'], prompt: '【視覺風格】：霓虹效果 (Neon Arts)。明亮、鮮豔且高飽和度的霓虹燈管發光色調，充滿夜生活與潮流感。' },
-                { id: 'vs-abstract', label: '🌀 抽象藝術', domains: ['charts', 'business'], prompt: '【視覺風格】：抽象藝術 (Abstract Art)。色彩鮮豔、不拘泥於寫實形體，透過幾何形狀與筆觸傳達概念。' },
-                { id: 'vs-modern', label: '🏛️ 現代藝術/極簡', domains: ['charts', 'business', 'academic'], prompt: '【視覺風格】：極簡現代藝術 (Minimalist Modern Art)。設計精緻俐落，使用淺灰或純白背景，搭配深色文字與純黑粗線強調。嚴謹的網格對齊，並留有大量負空間 (Negative space) 以營造優雅與專業感。' },
-                { id: 'vs-line-art', label: '✒️ 線條藝術', domains: ['charts', 'tech', 'academic'], prompt: '【視覺風格】：線條藝術 (Line Art)。主要以單色線條為主的簡約設計，乾淨俐落，無過度陰影塗抹。' },
-                { id: 'vs-low-poly', label: '💎 低聚風格', domains: ['charts', 'tech'], prompt: '【視覺風格】：低聚風格 (Low Poly)。使用簡單、帶有稜角的多邊形色塊拼接而成的 3D 幾何圖像效果。' },
-                { id: 'vs-oil', label: '🖼️ 經典油畫', domains: ['charts', 'academic'], prompt: '【視覺風格】：油畫風格 (Oil Painting)。模仿古典大師的厚重筆觸、豐富的色彩堆疊與畫布紋理質感。' },
-                { id: 'vs-watercolor', label: '💧 水彩畫風格', domains: ['charts', 'planning'], prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩畫的清透、邊緣自然暈染與水漬流動的柔和效果。' },
-                { id: 'vs-pointillism', label: '✨ 點描風格', domains: ['charts'], prompt: '【視覺風格】：點描風格 (Pointillism)。使用無數細小且色彩鮮明的點，在視覺上混合成完整的圖像。' }
+                { id: 'vs-realistic', label: '📸 寫實攝影', domains: ['visual', 'planning'], prompt: '【視覺風格】：寫實攝影風格 (Photorealistic)。呈現逼真細膩的肖像或風景，具備真實的光影細節、超高解析度與自然景深。' },
+                { id: 'vs-hdr', label: '🌟 高動態範圍(HDR)', domains: ['visual', 'business'], prompt: '【視覺風格】：高動態範圍 (HDR)。極致的色彩飽和度與對比度增強，展現生動且戲劇化的光影效果。' },
+                { id: 'vs-jp-photo', label: '🌸 日系清新風格', domains: ['visual', 'planning'], prompt: '【視覺風格】：日系清新攝影風格 (Japanese Fresh Photo Style)。低對比、低飽和度，柔和且自然的採光，帶有微微的過曝與清新空氣感。' },
+                { id: 'vs-movie-doc', label: '🎞️ 電影紀錄片', domains: ['visual'], prompt: '【視覺風格】：電影紀錄片風格 (Cinematic Documentary)。自然採光、淺景深，帶來身歷其境的敘事真實感。' },
+                { id: 'vs-vintage', label: '📻 復古懷舊風格', domains: ['visual', 'business', 'planning'], prompt: '【視覺風格】：復古懷舊風格 (Vintage/Retro)。模仿過去某一時期的圖像效果，帶有褪色、底片顆粒、漏光等時代氛圍。' },
+                { id: 'vs-bw', label: '⚫ 黑白/單色攝影', domains: ['visual', 'academic'], prompt: '【視覺風格】：黑白攝影風格 (Black & White)。僅使用黑白色調，強調光影對比、幾何線條與深刻的情感張力。' },
+                { id: 'vs-pixar', label: '🎈 皮克斯 3D 風', domains: ['visual', 'planning'], prompt: '【視覺風格】：皮克斯 3D 動畫風格 (Pixar 3D Style)。擁有精緻的材質渲染、溫暖鮮豔的色彩以及可愛、生動的角色特徵。' },
+                { id: 'vs-3d-render', label: '🧊 三維圖像 (3D)', domains: ['visual', 'tech'], prompt: '【視覺風格】：高端 3D 渲染 (3D Render/CGI)。具有強烈的深度、透視感，精確的物理光線追蹤 (Ray Tracing) 與材質反射。' },
+                { id: 'vs-cartoon', label: '🎨 美式卡通風格', domains: ['visual', 'planning', 'charts'], prompt: '【視覺風格】：卡通風格 (Cartoon Style)。具有鮮明的卡通元素、平塗上色與誇張的角色特徵。' },
+                { id: 'vs-comic', label: '💬 漫畫書風格', domains: ['visual'], prompt: '【視覺風格】：漫畫書風格 (Comic Book)。具備強烈動感場景、粗黑墨線輪廓，模仿經典美漫或日漫的網點效果。' },
+                { id: 'vs-anime', label: '⛩️ 日式動漫風格', domains: ['visual', 'planning', 'charts'], prompt: '【視覺風格】：日式動漫風格 (Anime Style)。精美的賽璐璐上色、大眼睛特徵、豐富的背景細節與獨特的光影氛圍。' },
+                { id: 'vs-digital', label: '💻 數碼藝術', domains: ['visual', 'tech'], prompt: '【視覺風格】：數碼藝術 (Digital Art)。以精湛的電繪技巧創作，結合特效、發光元素與高科技數位質感。' },
+                { id: 'vs-fantasy', label: '🐉 幻想藝術', domains: ['visual', 'planning'], prompt: '【視覺風格】：幻想藝術 (Fantasy Art)。夢幻、史詩或超現實的場景，包含魔法、神話生物與宏大的世界觀構圖。' },
+                { id: 'vs-future', label: '🚀 科幻未來主義', domains: ['visual', 'tech'], prompt: '【視覺風格】：未來主義風格 (Futuristic)。具備強烈的科幻感，包含太空、機甲、全息投影和超現代科技感。' },
+                { id: 'vs-cyberpunk', label: '🌃 賽博龐克', domains: ['visual'], prompt: '【視覺風格】：賽博龐克 (Cyberpunk)。高反差的陰暗底色，搭配破敗的高科技城市景觀與鮮豔的霓虹螢光元素。' },
+                { id: 'vs-neon', label: '💡 霓虹發光效果', domains: ['visual', 'business'], prompt: '【視覺風格】：霓虹效果 (Neon Arts)。明亮、鮮豔且高飽和度的霓虹燈管發光色調，充滿夜生活與潮流感。' },
+                { id: 'vs-abstract', label: '🌀 抽象藝術', domains: ['visual', 'business'], prompt: '【視覺風格】：抽象藝術 (Abstract Art)。色彩鮮豔、不拘泥於寫實形體，透過幾何形狀與筆觸傳達概念。' },
+                { id: 'vs-modern', label: '🏛️ 現代藝術/極簡', domains: ['visual', 'business', 'academic', 'charts'], prompt: '【視覺風格】：極簡現代藝術 (Minimalist Modern Art)。設計精緻俐落，使用淺灰或純白背景，搭配深色文字與純黑粗線強調。嚴謹的網格對齊，並留有大量負空間 (Negative space) 以營造優雅與專業感。' },
+                { id: 'vs-line-art', label: '✒️ 線條藝術', domains: ['visual', 'tech', 'academic'], prompt: '【視覺風格】：線條藝術 (Line Art)。主要以單色線條為主的簡約設計，乾淨俐落，無過度陰影塗抹。' },
+                { id: 'vs-low-poly', label: '💎 低聚風格', domains: ['visual', 'tech'], prompt: '【視覺風格】：低聚風格 (Low Poly)。使用簡單、帶有稜角的多邊形色塊拼接而成的 3D 幾何圖像效果。' },
+                { id: 'vs-oil', label: '🖼️ 經典油畫', domains: ['visual', 'academic'], prompt: '【視覺風格】：油畫風格 (Oil Painting)。模仿古典大師的厚重筆觸、豐富的色彩堆疊與畫布紋理質感。' },
+                { id: 'vs-watercolor', label: '💧 水彩畫風格', domains: ['visual', 'planning'], prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩畫的清透、邊緣自然暈染與水漬流動的柔和效果。' },
+                { id: 'vs-pointillism', label: '✨ 點描風格', domains: ['visual'], prompt: '【視覺風格】：點描風格 (Pointillism)。使用無數細小且色彩鮮明的點，在視覺上混合成完整的圖像。' }
             ],
             colors: [ 
-                { id: 'c-navy', label: '商務深藍', domains: ['business', 'planning', 'charts'], swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍、深灰色等沉穩的商務配色，搭配清晰的資料圖表，展現權威感與可信度。' },
+                { id: 'c-navy', label: '商務深藍', domains: ['visual', 'business', 'planning', 'charts'], swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍、深灰色等沉穩的商務配色，搭配清晰的資料圖表，展現權威感與可信度。' },
                 { id: 'c-white', label: '極簡純白', domains: ['visual', 'business', 'planning', 'charts'], swatches: ['#FFFFFF', '#F2F2F7', '#8E8E93'], prompt: '【色調風格】：極簡全白或淺灰背景搭配主體，追求極致乾淨與優雅。' },
                 { id: 'c-gold', label: '奢華黑金', domains: ['visual', 'planning', 'charts'], swatches: ['#000000', '#D4AF37', '#1A1A1A'], prompt: '【色調風格】：純黑背景搭配磨砂金或香檳金，營造高端質感。' },
                 { id: 'c-cyber', label: '賽博霓虹', domains: ['visual', 'planning', 'charts'], swatches: ['#000000', '#FF00FF', '#00FFFF'], prompt: '【色調風格】：純黑背景搭配強烈對比的螢光紫、霓虹青色。' },
@@ -632,7 +630,7 @@
                 { id: 'con-neg-vid', label: '防穿模(影片避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：影片中禁止出現：物理定律錯誤、物體突然消失或穿模、非自然的閃爍、扭曲的人臉、不連貫的背景。' }
             ],
             notes: [ 
-                { id: 'n-citations', label: '附上文獻出處與頁碼', domains: ['charts', 'academic', 'audit'], prompt: '【細節微調】：在輸出的每一個事實、數據或圖表節點旁，請務必精準標註對應的「文獻來源、段落位置或頁碼」 (例如：[文獻A, p.3])，以確保知識的絕對可追溯性。' },
+                { id: 'n-citations', label: '附上文獻出處與頁碼', domains: ['charts', 'academic', 'audit'], prompt: '【細節微調】：在輸定的每一個事實、數據或圖表節點旁，請務必精準標註對應的「文獻來源、段落位置或頁碼」 (例如：[文獻A, p.3])，以確保知識的絕對可追溯性。' },
                 { id: 'n-emotion', label: '帶入情緒參數波動', domains: ['roleplay', 'coaching'], prompt: '【細節微調】：請為機器人模擬情感。建立隱藏的情緒參數 (Joy, Anger, Sadness: 0-5)。每次回覆前請先輸出目前的情緒指數，然後用語氣反映該情緒。' },
                 { id: 'n-personal-story', label: '融入個人經驗與軼事', domains: ['business', 'planning', 'roleplay', 'charts'], prompt: '【細節微調】：在對話或文章中，請不經意地融入一些虛構但真實的「個人經驗或生活軼事 (Personal anecdotes)」，讓內容更有共鳴與人情味。' },
                 { id: 'n-faq', label: '結尾附上 5 個 FAQ', domains: ['business', 'academic', 'tech', 'charts'], prompt: '【細節微調】：在文末結論之後，請根據內容自動生成 5 個高度相關的常見問答 (Unique FAQs)。' },
@@ -728,55 +726,86 @@
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
                 
                 const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
-                const modelToUse = isPreviewEnv ? "gemini-2.5-flash-preview-09-2025" : "gemini-1.5-flash";
+                
+                // 【資深架構升級】：多模型智能降級路由 (Multi-Model Fallback Router)
+                const modelsToTry = isPreviewEnv 
+                    ? ["gemini-2.5-flash-preview-09-2025"] 
+                    : [
+                        "gemini-2.5-flash", 
+                        "gemini-1.5-flash-latest", 
+                        "gemini-1.5-flash", 
+                        "gemini-1.5-pro-latest", 
+                        "gemini-pro"
+                      ];
                 
                 const parts = [{ text: promptStr }];
                 if (base64Data) {
                     parts.push({ inlineData: { mimeType: mimeType, data: base64Data } });
                 }
                 
-                let reqBody = { contents: [{ role: "user", parts: parts }] };
+                let baseReqBody = { contents: [{ role: "user", parts: parts }] };
                 
                 if (!base64Data) {
-                    reqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
-                    reqBody.generationConfig = { temperature: 1.0 };
+                    baseReqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
+                    baseReqBody.generationConfig = { temperature: 1.0 };
                 }
                 
-                const delays = [1000, 2000, 4000];
-                let lastError = null;
+                let lastErrorMsg = "";
 
-                for (let i = 0; i <= delays.length; i++) {
-                    try {
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${keyToUse}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(reqBody)
-                        });
+                // 遍歷所有可能的模型端點
+                for (const currentModel of modelsToTry) {
+                    const delays = [1000, 2000, 4000]; 
+                    
+                    let reqBody = JSON.parse(JSON.stringify(baseReqBody));
+                    if (currentModel === "gemini-pro" && reqBody.systemInstruction) {
+                        delete reqBody.systemInstruction;
+                        reqBody.contents[0].parts.unshift({ text: "【系統指令：你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出解釋或 Markdown 標記。】\n\n" });
+                    }
 
-                        if (!response.ok) {
-                            const errData = await response.json().catch(() => ({}));
-                            throw new Error(errData.error?.message || `HTTP ${response.status}`);
-                        }
-                        
-                        const result = await response.json();
-                        
-                        if (!result.candidates || !result.candidates[0] || !result.candidates[0].content) {
-                            throw new Error('API 回傳格式異常或遭安全機制阻擋');
-                        }
-                        
-                        return result.candidates[0].content.parts[0].text;
-                    } catch (error) {
-                        lastError = error;
-                        if (error.message.includes("API key not valid")) {
-                            throw new Error(`API 金鑰無效，請確認金鑰字串是否正確。(${error.message})`);
-                        }
-                        if (i < delays.length) {
-                            await new Promise(resolve => setTimeout(resolve, delays[i]));
+                    for (let i = 0; i <= delays.length; i++) {
+                        try {
+                            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${keyToUse}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(reqBody)
+                            });
+
+                            if (!response.ok) {
+                                const errData = await response.json().catch(() => ({}));
+                                throw new Error(errData.error?.message || `HTTP ${response.status}`);
+                            }
+                            
+                            const result = await response.json();
+                            
+                            if (!result.candidates || !result.candidates[0] || !result.candidates[0].content) {
+                                throw new Error('API 回傳格式異常或遭安全機制阻擋');
+                            }
+                            
+                            return result.candidates[0].content.parts[0].text;
+                        } catch (error) {
+                            const errMsg = error.message.toLowerCase();
+                            
+                            // 1. 致命錯誤：金鑰無效或配額耗盡，無須重試，直接拋出
+                            if (errMsg.includes("api key not valid") || errMsg.includes("quota") || errMsg.includes("api_key_invalid")) {
+                                throw new Error(`API 金鑰無效或配額已滿，請確認金鑰設定。`);
+                            }
+                            
+                            // 2. 路由錯誤：該模型不存在/不支援，記錄錯誤，跳出內層迴圈，換下一個模型
+                            if (errMsg.includes("not found") || errMsg.includes("not supported")) {
+                                lastErrorMsg = `模型 ${currentModel} 無法使用或沒有權限`;
+                                break; 
+                            }
+                            
+                            lastErrorMsg = error.message;
+                            // 3. 網路波動或暫時錯誤，等待後重試
+                            if (i < delays.length) {
+                                await new Promise(resolve => setTimeout(resolve, delays[i]));
+                            }
                         }
                     }
                 }
                 
-                throw new Error(`連線失敗 (${modelToUse}): ${lastError.message}`);
+                throw new Error(`連線受阻 (${lastErrorMsg})。如果您在本地執行，請確認原始碼中的 USER_API_KEY 是否正確填寫且具備權限。`);
             }
         }
 
@@ -943,7 +972,7 @@
 
                     const titleEl = document.createElement('div');
                     titleEl.className = 'flex flex-col mb-3';
-                    // 加入骰子按鈕
+                    
                     titleEl.innerHTML = `
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-[15px] font-bold text-slate-700 flex items-center gap-2">
@@ -957,7 +986,7 @@
                     `;
                     groupEl.appendChild(titleEl);
 
-                    // 綁定單區塊骰子點擊事件 (修復動畫崩潰的順序問題)
+                    // 綁定單區塊骰子點擊事件 (防禦 DOM 重繪崩潰)
                     const diceBtn = titleEl.querySelector('.section-dice-btn');
                     if(diceBtn) {
                         diceBtn.onclick = () => {
@@ -965,7 +994,6 @@
                             if (icon) {
                                 icon.classList.add('animate-spin');
                             }
-                            // 延遲 300 毫秒，等動畫播完後再刷新 DOM
                             setTimeout(() => {
                                 LogicController.randomizeGroup(group.key);
                                 UIManager.updateSync();
@@ -980,7 +1008,6 @@
 
                     availableOptions.forEach(opt => {
                         const btn = document.createElement('button');
-                        // 確保 STATE.selections[stateKey] 存在防禦 undefined 錯誤
                         const currentSelections = STATE.selections[stateKey] || (group.isMulti ? [] : null);
                         let isActive = group.isMulti ? (currentSelections).some(n => n.id === opt.id) : (currentSelections?.id === opt.id);
 
@@ -1181,7 +1208,7 @@
                     { label: "特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
                 ];
 
-                // 根據領域回傳絕對純淨的陣列組合，強制隔離不同領域的參數，永不引發 undefined 錯誤
+                // 根據領域回傳絕對純淨的陣列組合，強制隔離不同領域的參數
                 switch(domain) {
                     case 'visual':
                         // 純繪圖：拔除所有寫文章的選項
@@ -1253,6 +1280,7 @@
                     prompt += buildMulti("visual_styles", "visual_styles", "藝術與視覺風格");
                     prompt += buildSingle("color", "colors", "色彩美學");
                     prompt += buildMulti("constraints", "constraints", "負面提示與避雷");
+                    prompt += buildMulti("notes", "notes", "特定細節微調");
                     
                     let finalSummary = `\n🚨 【系統強制指令-視覺影像專用】：
 1. 嚴格鎖定領域：這是一項「圖像/影片生成」任務。
@@ -1343,8 +1371,7 @@ ${structuredStr}`;
                     if (empty) empty.style.display = 'none';
                     STATE.isPromptOutdated = false;
                     StorageManager.saveHistory(structuredStr);
-                    // 優化了錯誤提示，讓使用者知道是金鑰/網路問題
-                    UIManager.showToast(`連線失敗 (可能 API 金鑰無效或配額已滿)，已啟動離線高階排版`, 'info');
+                    UIManager.showToast(`連線受阻 (可能 API 金鑰無效或配額已滿)，已啟動離線高階排版`, 'info');
                 }
 
                 btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> 重新編寫提示詞';
@@ -1404,7 +1431,11 @@ ${structuredStr}`;
                                 throw new Error("回傳無資料");
                             }
                         } catch (err) {
-                            UIManager.showToast(`分析失敗: ${err.message}`, 'error');
+                            let errorDisplay = err.message;
+                            if (errorDisplay.includes("連線受阻") || errorDisplay.includes("API 金鑰無效")) {
+                                errorDisplay = "請確認您的專屬 API 金鑰是否有效且具備權限。";
+                            }
+                            UIManager.showToast(`分析受阻：${errorDisplay}`, 'error');
                         } finally {
                             restoreButtons();
                         }
@@ -1669,6 +1700,7 @@ ${structuredStr}`;
             setupCounter();
             StorageManager.loadLocal();
             
+            // 系統初始化時，預設切換至最新開發的「AI 繪圖」面板
             STATE.currentDomain = 'visual';
             
             UIManager.updateSync();
