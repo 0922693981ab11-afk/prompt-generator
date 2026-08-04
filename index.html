@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>啓仲哥的AI提示詞快速產生器 | pro 2.0 NotebookLM 煉金版</title>
-    <!-- 引入 Tailwind CSS 與 Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -817,10 +816,10 @@
         };
 
         // ==========================================
-        //  API 通訊層 (API Manager)
+        //  API 通訊層 (API Manager) - 升級 Context 隔離架構
         // ==========================================
         class APIManager {
-            static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg') {
+            static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg', sysInstructText = null) {
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
                 const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
                 
@@ -841,9 +840,15 @@
                 
                 let baseReqBody = { contents: [{ role: "user", parts: parts }] };
                 
-                if (!base64Data) {
+                if (sysInstructText) {
+                    baseReqBody.systemInstruction = { parts: [{ text: sysInstructText }] };
+                } else if (!base64Data) {
                     baseReqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
-                    baseReqBody.generationConfig = { temperature: 1.0 };
+                }
+                
+                if (!base64Data) {
+                    // 為了確保提示詞結構嚴謹，稍微降低溫度
+                    baseReqBody.generationConfig = { temperature: 0.8 }; 
                 }
                 
                 let lastErrorMsg = "";
@@ -853,8 +858,9 @@
                     
                     let reqBody = JSON.parse(JSON.stringify(baseReqBody));
                     if (currentModel === "gemini-pro" && reqBody.systemInstruction) {
+                        const sysText = reqBody.systemInstruction.parts[0].text;
                         delete reqBody.systemInstruction;
-                        reqBody.contents[0].parts.unshift({ text: "【系統指令：你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出解釋或 Markdown 標記。】\n\n" });
+                        reqBody.contents[0].parts.unshift({ text: `【系統指令：${sysText}】\n\n` });
                     }
 
                     for (let i = 0; i <= delays.length; i++) {
@@ -1548,7 +1554,6 @@
                 };
 
                 let prompt = "";
-                let domainName = document.querySelector('.domain-btn.active')?.innerText.trim() || '專屬領域';
                 let target = STATE.title.trim() ? `【核心主題 (Subject)】：\n「${STATE.title.trim()}」\n\n` : "";
                 
                 if (STATE.currentDomain === 'visual') {
@@ -1614,6 +1619,7 @@
                     let systemInstructionText = "";
                     let domainName = document.querySelector('.domain-btn.active')?.innerText.trim() || '專屬領域';
                     
+                    // 【最佳實踐】：嚴格定義系統指引 (System Instruction) 分離行為框架
                     if (STATE.currentDomain === 'visual') {
                         systemInstructionText = `您是全球頂尖的 AI 繪圖提示詞專家 (Midjourney/DALL-E/Sora)。\n任務：將使用者的需求參數，轉換為一段「高品質、高細節的純英文 AI 繪圖指令 (Image Prompt)」。\n【強制規範】：\n1. 先在心裡分析畫面的主體、背景、光影與風格層次。\n2. 只能輸出純英文。\n3. 使用逗號分隔關鍵字，依序為：[Main Subject], [Environment], [Composition], [Lighting], [Style], [Parameters]。\n4. 絕對禁止輸出任何中文、開場白、結語、對話或 Markdown 標記！直接給出那段純英文的 Prompt 咒語！`;
                     } else if (STATE.currentDomain === 'charts') {
@@ -1624,14 +1630,16 @@
 
                     let userPrompt = "";
                     
+                    // 【最佳實踐】：Context First (龐大的參考文獻放最前面)
                     if (STATE.customNotes.trim()) {
                         userPrompt += `【參考資料 / Context Data】：\n---\n${STATE.customNotes.trim()}\n---\n\n`;
-                        userPrompt += `請基於上述提供的參考資料，遵循以下指令與限制來生成最終提示詞。\n\n`;
+                        userPrompt += `請務必基於上方提供的參考資料，遵循以下指令與限制來生成最終提示詞。\n\n`;
                     }
                     
                     userPrompt += `【當前領域】：${domainName}\n\n`;
                     userPrompt += `【使用者需求參數】：\n${structuredConstraints}`;
 
+                    // 將 System Instruction 與 User Prompt 分開呼叫 API
                     let finalPrompt = await APIManager.callGemini(userPrompt, null, null, systemInstructionText);
                     
                     if (finalPrompt) {
@@ -1649,6 +1657,7 @@
                 } catch(e) {
                     console.error("AI 潤飾失敗，啟用降級保護:", e.message);
                     
+                    // 降級保護：若 API 斷線，直接組合參數提供給使用者
                     let fallbackPrompt = "";
                     if (STATE.customNotes.trim()) {
                         fallbackPrompt += `【請先詳細閱讀並記憶以下專案/文獻參考資料】：\n---\n${STATE.customNotes.trim()}\n---\n\n`;
@@ -1941,7 +1950,7 @@
             
             UIManager.updateSync();
             closeModal();
-            UIManager.showToast('好的！系統已經幫你全部清空囉', 'info');
+            UIManager.showToast('系統已完全重置', 'info');
         });
 
         DOM.bind('toggle-history-btn', 'click', () => UIManager.toggleHistory());
