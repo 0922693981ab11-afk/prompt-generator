@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>啓仲哥的AI提示詞快速產生器 | pro 2.0 NotebookLM 煉金版</title>
+    <title>啓仲哥的AI提示詞快速產生器 | pro 1.0 商業版</title>
     <!-- 引入 Tailwind CSS 與 Lucide Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -60,27 +60,32 @@
             transform: translateY(1px);
         }
 
-        /* 動畫 */
+        /* 吐司通知與教學動畫 */
         @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
-        @keyframes fadeInDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
         .toast-enter { animation: slideInRight 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) forwards; }
         .toast-leave { animation: fadeOutRight 0.4s ease-in forwards; }
-        .animate-fade-in-down { animation: fadeInDown 0.4s ease-out forwards; }
+        
+        @keyframes pulseHighlight {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .tour-highlight {
+            animation: pulseHighlight 2s infinite !important;
+            position: relative;
+            z-index: 40;
+            border-radius: 0.75rem;
+        }
 
         /* 歷史紀錄側邊欄 */
-        #history-drawer {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(100%);
-        }
+        #history-drawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
         #history-drawer.open { transform: translateX(0); }
-        
         .modal-backdrop { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
         .hidden-item { display: none !important; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden text-base relative">
+<body class="h-screen flex flex-col overflow-hidden text-base">
 
     <!-- 全域錯誤防護網 -->
     <div id="crash-boundary" class="hidden fixed inset-0 z-[9999] bg-slate-900 flex flex-col items-center justify-center text-white p-6">
@@ -98,12 +103,12 @@
     </div>
 
     <!-- 頂部導覽列 -->
-    <header class="shrink-0 px-4 py-3 border-b border-slate-200 bg-white z-40 shadow-sm flex items-center justify-between relative backdrop-blur-md bg-white/80">
+    <header class="shrink-0 px-4 py-3 border-b border-slate-200 bg-white z-40 shadow-sm flex items-center justify-between relative">
         <div class="flex items-center gap-3">
             <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                 <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">啓仲</span>
                 AI 提示詞產生器
-                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 2.0 NotebookLM版</span>
+                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 1.0 商業版</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
@@ -124,81 +129,66 @@
         
         <!-- 左側面板 -->
         <div id="left-panel" class="w-full lg:h-full lg:w-auto flex flex-col shrink-0 overflow-hidden lg:border border-slate-200 lg:rounded-xl bg-white shadow-sm flex-1 lg:flex-none relative z-10" style="flex-basis: 52%;">
-            <div class="flex-grow overflow-y-auto overflow-x-hidden p-4 lg:p-6 scrollbar-thin relative">
-                
-                <!-- 30秒快速上手指南 (可關閉) -->
-                <div id="quick-guide" class="mb-6 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl relative shadow-sm group">
-                    <button onclick="document.getElementById('quick-guide').style.display='none'" class="absolute top-3 right-3 text-indigo-300 hover:text-indigo-600 transition-colors p-1" title="關閉說明">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i> 30秒快速上手指南</h3>
-                    <div class="text-[14px] text-indigo-800/80 space-y-2 leading-relaxed">
-                        <p class="flex items-center gap-2"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold">1</span> 選擇上方的「核心任務領域」（例如：AI 繪圖、圖表懶人包）。</p>
-                        <p class="flex items-center gap-2"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold">2</span> （選填）貼上您的資料或上傳檔案，讓 AI 有參考依據。</p>
-                        <p class="flex items-center gap-2"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold">3</span> 在下方挑選您想要的「專家角色」、「語氣」或「風格」。</p>
-                        <p class="flex items-center gap-2"><span class="bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold">4</span> 點擊右側的 <span class="bg-amber-500 text-slate-900 px-2 py-0.5 rounded font-bold text-xs mx-1">智能撰寫提示詞</span>，就完成啦！</p>
-                    </div>
-                </div>
-
+            <div class="flex-grow overflow-y-auto overflow-x-hidden p-4 lg:p-6 scrollbar-thin">
                 <div class="min-w-[300px] max-w-4xl mx-auto" id="config-sections">
                     
                     <!-- 領域選擇器 -->
-                    <section class="mb-8 p-5 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 relative overflow-hidden group">
+                    <section class="mb-8 p-5 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 relative overflow-hidden group" id="step-1-domain">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 opacity-10 rounded-full blur-3xl transform translate-x-10 -translate-y-10 group-hover:opacity-20 transition-opacity"></div>
                         <h3 class="text-[16px] font-bold text-white mb-3 flex items-center gap-2 relative z-10">
-                            <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 第一步：你想做什麼？
+                            <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 第一步：鎖定核心任務領域
                         </h3>
-                        <p class="text-slate-300 text-[13px] mb-4 relative z-10">選擇一個大方向，底下的選項會自動幫你切換成專屬工具喔！</p>
+                        <p class="text-slate-300 text-[13px] mb-4 relative z-10">系統將自動轉換對應的設定面板，絕不混淆繪圖與寫作邏輯。</p>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 relative z-10" id="domain-selector">
-                            <button data-domain="visual" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="image" class="w-4 h-4 text-pink-400"></i> AI 畫圖 (Midjourney等)
+                            <button data-domain="visual" class="domain-btn active flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="image" class="w-4 h-4 text-pink-400"></i> AI 繪圖與圖像生成
                             </button>
-                            <button data-domain="charts" class="domain-btn active flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="network" class="w-4 h-4 text-emerald-400"></i> 整理筆記 / 做圖表
+                            <button data-domain="charts" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
+                                <i data-lucide="network" class="w-4 h-4 text-emerald-400"></i> 知識萃取與圖表
                             </button>
                             <button data-domain="business" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="briefcase" class="w-4 h-4"></i> 寫企劃案 / 商業提案
+                                <i data-lucide="briefcase" class="w-4 h-4"></i> 商業與企劃文案
                             </button>
                             <button data-domain="roleplay" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="masks-theater" class="w-4 h-4"></i> 角色扮演 / 聊天對話
+                                <i data-lucide="masks-theater" class="w-4 h-4"></i> 角色扮演與對話
                             </button>
                             <button data-domain="coaching" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="compass" class="w-4 h-4"></i> 找顧問 / 尋求建議
+                                <i data-lucide="compass" class="w-4 h-4"></i> 顧問與教練指導
                             </button>
                             <button data-domain="tech" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="code" class="w-4 h-4"></i> 寫程式 / 找 Bug
+                                <i data-lucide="code" class="w-4 h-4"></i> 程式與IT技術
                             </button>
                             <button data-domain="audit" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="file-search" class="w-4 h-4"></i> 檢查合約 / 挑毛病
+                                <i data-lucide="file-search" class="w-4 h-4"></i> 稽核與比對審查
                             </button>
                             <button data-domain="academic" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="book-open" class="w-4 h-4"></i> 寫論文 / 學校報告
+                                <i data-lucide="book-open" class="w-4 h-4"></i> 學術論文與研究
                             </button>
                             <button data-domain="planning" class="domain-btn flex items-center justify-center gap-1.5 px-2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl border border-slate-600 transition-all text-[13px]">
-                                <i data-lucide="map" class="w-4 h-4"></i> 規劃旅遊 / 辦活動
+                                <i data-lucide="map" class="w-4 h-4"></i> 生活與活動規劃
                             </button>
                         </div>
                     </section>
 
-                    <!-- 標題輸入 -->
-                    <section class="mb-8">
+                    <!-- 標題輸入 (核心主題) -->
+                    <section class="mb-8" id="step-2-title">
                         <h3 class="text-[15px] font-bold text-slate-700 mb-2 flex items-center gap-1.5" id="subject-title-header">
-                            <i data-lucide="network" class="w-4 h-4 text-emerald-500"></i> 第二步：你的核心目標是？
+                            <i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 0. 畫面核心主題 (Image Subject)
                         </h3>
-                        <p class="text-[12px] text-slate-400 mb-2" id="subject-title-desc">請簡述你想整理出什麼？(例如：把文獻轉成雙人Podcast腳本、或是簡報大綱)</p>
-                        <input type="text" id="title-input" placeholder="輸入你想整理的目標..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-500 focus:bg-white focus:shadow-md transition-all placeholder:font-normal placeholder:text-slate-400">
+                        <p class="text-[12px] text-slate-400 mb-2" id="subject-title-desc">請在此輸入您想要生成的畫面主體（如：清晨光線下，一隻拿著野花的兔子...）</p>
+                        <input type="text" id="title-input" placeholder="輸入想畫的主體或情境..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-500 focus:bg-white focus:shadow-md transition-all placeholder:font-normal placeholder:text-slate-400">
                     </section>
 
                     <!-- 重置選項按鈕 與 上帝視角 -->
                     <div class="mb-8 border-b border-slate-200/60 pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        <span class="text-slate-500 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 第三步：幫指令加料 (點擊按鈕)</span>
+                        <span class="text-slate-500 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 詳細參數堆疊</span>
                         <div class="flex gap-2 w-full md:w-auto">
                             <!-- 神級功能：上帝視角按鈕 -->
                             <button id="god-mode-btn" class="flex-1 md:flex-none text-[13px] font-bold bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-4 py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-md">
-                                <i data-lucide="dices" class="w-4 h-4"></i> 🎲 沒靈感？幫我隨便配！
+                                <i data-lucide="dices" class="w-4 h-4"></i> 上帝視角 (盲抽組合)
                             </button>
                             <button id="clear-selections-btn" class="text-[13px] font-bold bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-sm">
-                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 清除所有按鈕
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 重置面板
                             </button>
                         </div>
                     </div>
@@ -211,41 +201,47 @@
                         <div class="flex justify-between items-end mb-3">
                             <div>
                                 <h3 class="text-[16px] font-bold text-slate-700 flex items-center gap-1.5">
-                                    <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i> 📥 把你的草稿或資料貼這裡 (選填)
+                                    <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i> 附錄：專屬記憶庫與文獻資料區
                                 </h3>
-                                <p class="text-[13px] text-slate-400 mt-1">如果你有現成的文章、報告或程式碼，貼在這裡，AI 就會參考它來寫。</p>
+                                <p class="text-[13px] text-slate-400 mt-1">手動貼上長文、合約、代碼，或透過上方按鈕自動堆疊多份檔案記憶。</p>
                             </div>
                             <button id="clear-notes-btn" class="text-[13px] font-bold text-slate-500 hover:text-red-600 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-slate-200">
-                                <i data-lucide="eraser" class="w-3.5 h-3.5"></i> 清空資料
+                                <i data-lucide="eraser" class="w-3.5 h-3.5"></i> 清空記憶
                             </button>
                         </div>
-                        <textarea id="custom-notes-input" placeholder="【在這裡貼上你想給 AI 參考的資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[15px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
-                        
-                        <!-- 檔案分析區 -->
-                        <div class="mt-4 p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
-                             <div class="flex flex-col sm:flex-row items-center gap-4">
-                                <label for="file-input" class="w-full sm:w-1/3 cursor-pointer group flex-shrink-0">
-                                    <div class="border-2 border-dashed border-indigo-200 bg-indigo-50/50 group-hover:bg-indigo-50 group-hover:border-indigo-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all min-h-[120px]" id="file-display">
-                                        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center">
-                                            <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-500 group-hover:scale-110 transition-transform"></i>
-                                        </div>
-                                        <span class="text-[15px] font-bold text-indigo-700 mt-1">點擊或拖曳上傳檔案</span>
-                                        <span class="text-[12px] text-slate-400 font-medium">支援 PNG, JPG, PDF (最大 5MB)</span>
+                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的文獻內容、腳本、程式碼或任何待處理的原始資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[15px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
+                    </section>
+
+                    <!-- AI 視覺與文獻解析中樞 -->
+                    <section class="mt-8 mb-8 p-5 bg-indigo-50/60 border border-indigo-100/80 rounded-2xl shadow-sm relative" id="analysis-section">
+                        <h3 class="text-base font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                            <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i> AI 視覺與文獻解析中樞
+                        </h3>
+                        <p class="text-[13px] text-indigo-700/70 mb-4 leading-relaxed">
+                            支援上傳圖片或 PDF。若有<strong class="text-indigo-900">多份文件</strong>需交叉比對，請分批上傳並點擊「📥 萃取並記憶」，系統將為您建立專屬記憶庫。
+                        </p>
+                        <div class="flex flex-col xl:flex-row items-stretch gap-3">
+                            <label class="w-full xl:w-7/12 cursor-pointer flex flex-col items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white rounded-xl p-5 hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm group">
+                                <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
+                                <div id="file-display" class="flex flex-col items-center gap-1.5 text-center transition-all duration-300">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-500"></i>
                                     </div>
-                                    <input type="file" id="file-input" class="hidden" accept=".png,.jpg,.jpeg,.pdf">
-                                </label>
-                                <div class="w-full sm:w-2/3 flex flex-col gap-2">
-                                    <button id="analyze-extract" disabled class="w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent">
-                                        <i data-lucide="brain-circuit" class="w-5 h-5"></i> 完整記憶並加入知識庫
+                                    <span class="text-[15px] font-bold text-indigo-700 mt-1">點擊或拖曳上傳檔案</span>
+                                    <span class="text-[12px] text-slate-400 font-medium">支援 PNG, JPG, PDF (最大 5MB)</span>
+                                </div>
+                            </label>
+                            <div class="flex flex-col gap-2 w-full xl:w-5/12 shrink-0">
+                                <button id="analyze-extract" class="w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                    <i data-lucide="database-zap" class="w-4 h-4"></i> 📥 萃取精華並記憶
+                                </button>
+                                <div class="flex gap-2 w-full">
+                                    <button id="analyze-detailed" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                        <i data-lucide="search" class="w-4 h-4"></i> 深度分析
                                     </button>
-                                    <div class="flex gap-2 w-full">
-                                        <button id="analyze-detailed" disabled class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent">
-                                            <i data-lucide="file-search" class="w-4 h-4"></i> 深度分析
-                                        </button>
-                                        <button id="analyze-concise" disabled class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent">
-                                            <i data-lucide="zap" class="w-4 h-4"></i> 極簡摘要
-                                        </button>
-                                    </div>
+                                    <button id="analyze-concise" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                        <i data-lucide="zap" class="w-4 h-4"></i> 精簡速寫
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -274,24 +270,23 @@
                         <i data-lucide="download" class="w-4 h-4"></i>
                     </button>
                     <button id="copy-btn" class="text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-[0_0_10px_rgba(79,70,229,0.4)] flex items-center justify-center gap-2 whitespace-nowrap">
-                        <i data-lucide="copy" class="w-4 h-4"></i> 複製拿去用！
+                        <i data-lucide="copy" class="w-4 h-4"></i> 複製純文本
                     </button>
                 </div>
             </div>
             
-            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[16px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative bg-[#0f172a]">
+            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[16px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative bg-[#0f172a]" id="output-container">
                 <div id="empty-state-msg" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none p-6 text-center z-10 transition-opacity duration-300">
                     <div class="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mb-5 border border-slate-700/50">
                         <i data-lucide="cpu" class="w-10 h-10 text-slate-500"></i>
                     </div>
-                    <p class="text-xl font-bold mb-3 text-slate-400 tracking-wide">等待你下達指令喔！</p>
-                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">在左邊選好你要的功能，點擊右上角的 <span class="text-amber-500 font-bold mx-1">智能撰寫提示詞</span>，我就會幫你寫出超專業的指令！</p>
+                    <p class="text-xl font-bold mb-3 text-slate-400 tracking-wide">等待編譯指令</p>
+                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">請於左側設定需求條件，點擊右上方的<span class="text-amber-500 font-bold mx-1">智能撰寫提示詞</span>，系統將為您生成專業級複合指令。</p>
                 </div>
-                
                 <pre id="prompt-output" class="whitespace-pre-wrap font-sans relative z-20 break-words mb-8"></pre>
 
                 <!-- AI 工具智能推薦區塊 -->
-                <div id="ai-tool-recommendation" class="hidden mt-8 p-5 bg-[#1e293b] rounded-xl border border-slate-700 shadow-inner text-sm animate-fade-in-down z-20 relative relative">
+                <div id="ai-tool-recommendation" class="hidden mt-8 p-5 bg-[#1e293b] rounded-xl border border-slate-700 shadow-inner text-sm z-20 relative">
                     <h4 class="text-indigo-400 font-bold mb-4 flex items-center gap-2 text-base">
                         <i data-lucide="rocket" class="w-5 h-5"></i> 💡 提示詞複製後，推薦貼到以下 AI 平台：
                     </h4>
@@ -299,7 +294,6 @@
                         <!-- 動態插入推薦內容 -->
                     </div>
                 </div>
-
             </div>
         </div>
         
@@ -318,15 +312,26 @@
         </div>
     </main>
 
-    <!-- 🧚‍♀️ 專屬精靈小真 (懸浮小幫手) -->
-    <div id="ai-assistant-fab" class="fixed bottom-6 right-6 z-50 floating-assistant flex items-end gap-3 pointer-events-none opacity-0 transition-opacity duration-500">
-        <div class="bg-white border border-indigo-100 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.3)] rounded-2xl rounded-br-sm p-4 max-w-xs relative pointer-events-auto">
-            <button onclick="document.getElementById('ai-assistant-fab').style.display='none'" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-3 h-3"></i></button>
-            <h4 class="font-bold text-indigo-700 text-[13px] flex items-center gap-1.5 mb-1"><i data-lucide="sparkles" class="w-3 h-3"></i> 小真提示您：</h4>
-            <p id="assistant-message" class="text-slate-600 text-[12px] leading-relaxed">歡迎使用！有任何問題，隨時切換左側領域看看我給的專屬建議喔！</p>
+    <!-- 🧚‍♀️ 專屬精靈 (懸浮小幫手) -->
+    <div id="ai-assistant-fab" class="fixed bottom-6 right-6 z-50 floating-assistant flex items-end gap-3 transition-opacity duration-500 opacity-100">
+        <div id="assistant-bubble" class="bg-white/90 backdrop-blur-md border border-indigo-100 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.3)] rounded-2xl rounded-br-sm p-4 max-w-xs relative transition-all duration-300 transform scale-100 origin-bottom-right">
+            <button id="close-assistant-btn" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <h4 class="font-bold text-indigo-700 text-[14px] flex items-center gap-1.5 mb-2"><i data-lucide="sparkles" class="w-4 h-4"></i> <span id="assistant-title">小幫手提示：</span></h4>
+            <p id="assistant-message" class="text-slate-600 text-[13px] leading-relaxed mb-3">歡迎使用！有任何問題，隨時切換左側領域看看我給的專屬建議喔！</p>
+            
+            <div id="assistant-actions" class="flex gap-2 mt-2">
+                <button id="start-tour-btn" class="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[12px] font-bold py-2 rounded-lg transition-colors border border-amber-200 flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="map" class="w-4 h-4"></i> 🗺️ 新手引導教學</button>
+            </div>
+            
+            <div id="tour-actions" class="flex gap-2 mt-2 hidden">
+                <button id="tour-prev-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[12px] font-bold py-2 px-3 rounded-lg transition-colors disabled:opacity-50">上一步</button>
+                <button id="tour-next-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[12px] font-bold py-2 rounded-lg transition-colors shadow-sm">下一步</button>
+                <button id="tour-end-btn" class="hidden flex-1 bg-emerald-500 hover:bg-emerald-400 text-white text-[12px] font-bold py-2 rounded-lg transition-colors shadow-sm">完成教學</button>
+            </div>
         </div>
-        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg flex items-center justify-center border-2 border-white shrink-0 pointer-events-auto cursor-help" title="需要幫忙嗎？">
-            <i data-lucide="bot" class="w-6 h-6 text-white"></i>
+        
+        <div id="assistant-avatar" class="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg flex items-center justify-center border-2 border-white shrink-0 cursor-pointer hover:scale-110 transition-transform" title="點擊呼叫小幫手">
+            <i data-lucide="bot" class="w-7 h-7 text-white"></i>
         </div>
     </div>
 
@@ -338,7 +343,7 @@
                 <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-800 text-center mb-2">確定要全部清除嗎？</h3>
-            <p class="text-[15px] text-slate-500 text-center mb-8 leading-relaxed">這個動作會把你選好的按鈕跟剛剛貼上的草稿全部清空喔！</p>
+            <p class="text-[15px] text-slate-500 text-center mb-8 leading-relaxed">此動作將清除您目前所有的選項與自訂記憶庫，且無法復原。</p>
             <div class="flex justify-center gap-3">
                 <button id="cancel-reset-btn" class="flex-1 py-3 text-[15px] font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">取消</button>
                 <button id="confirm-reset-btn" class="flex-1 py-3 text-[15px] font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors shadow-md shadow-red-200">確定清除</button>
@@ -349,10 +354,9 @@
     <div id="toast-container" class="fixed top-20 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- =========================================
-         系統核心邏輯 (System Core Logic)
+         系統核心邏輯 (System Core Logic) pro 1.0
          ========================================= -->
     <script type="module">
-        // 攔截並優化全域錯誤
         window.addEventListener('error', (e) => {
             if (e.message && (e.message.includes('Script error') || e.message.includes('ResizeObserver'))) return;
             console.error('🔥 [Global Error Captured]:', e.error);
@@ -412,7 +416,7 @@
                     { name: "ChatGPT Plus (GPT-4o)", desc: "適合複雜算法推導與資安漏洞邏輯分析。" }
                 ]
             },
-            text: { // covers business, roleplay, coaching, audit, academic, planning
+            text: { 
                 free: [
                     { name: "Claude 3.5 Sonnet (🏆文筆首選)", desc: "文筆最自然、語氣最像人類，沒有 AI 廢話味。" },
                     { name: "ChatGPT (GPT-4o mini)", desc: "反應快速，適合日常對話與角色扮演。" },
@@ -427,28 +431,20 @@
         };
 
         // ==========================================
-        //  終極詠唱資料庫 (pro 2.0 NotebookLM 專屬強化版)
+        //  終極詠唱資料庫 (pro 1.0 商業版 - 領域絕對隔離版)
         // ==========================================
         const INITIAL_CONFIG = {
             data_types: [
-                // NotebookLM 核心專區
-                { id: 'dt-nl-study-guide', label: '📖 專屬學習指南', domains: ['charts', 'academic', 'coaching'], prompt: '【輸出型式】：請產出一份系統化的「學習指南 (Study Guide)」。包含：核心摘要、關鍵概念解析、章節重點測驗題、以及術語表。適合用來快速掌握陌生領域。' },
-                { id: 'dt-nl-audio', label: '🎙️ Podcast 對談腳本', domains: ['charts', 'business', 'academic', 'roleplay'], prompt: '【輸出型式】：請根據提供的來源文件，撰寫一份生動的「雙人對談 Podcast 腳本 (Audio Overview)」。包含主持人 (Host) 與專家 (Expert) 的互動，語氣需自然、具啟發性，並適時加入口語化轉折。' },
-                { id: 'dt-nl-briefing', label: '📋 簡報摘要文檔', domains: ['charts', 'business', 'audit'], prompt: '【輸出型式】：請產出「簡報摘要文檔 (Briefing Doc)」。將所有來源濃縮為一份供高階主管閱讀的 One-Pager，包含：背景、核心發現、風險評估與行動建議。' },
-                { id: 'dt-nl-faq', label: '❓ 來源專屬 FAQ', domains: ['charts', 'business', 'tech', 'planning'], prompt: '【輸出型式】：請根據文獻產出「常見問答清單 (FAQ)」。精準預判讀者可能產生的疑問，並給出基於來源文獻的精確解答。' },
-                { id: 'dt-nl-timeline', label: '⏳ 歷史事件時間軸', domains: ['charts', 'academic', 'planning'], prompt: '【輸出型式】：請產出「重大事件時間軸 (Chronological Timeline)」。依時間先後順序排列文獻中出現的重要事件、年份與發展里程碑。' },
-                { id: 'dt-nl-glossary', label: '🔤 專業術語表', domains: ['charts', 'academic', 'tech'], prompt: '【輸出型式】：請萃取來源中的艱澀詞彙，產出一份「專業術語表 (Glossary of Terms)」。以表格呈現名詞與其白話文解釋。' },
-                { id: 'dt-nl-storyboard', label: '🖼️ 視覺化分鏡腳本', domains: ['charts', 'visual', 'planning'], prompt: '【輸出型式】：請為文件內容規劃「視覺化分鏡腳本 (Storyboard)」。將複雜資訊拆解為 5-8 個連續畫面，每個畫面需提供：場景描述、視覺隱喻建議、以及對應的旁白/對話。' },
-                
-                // 原有學術與商業版型
                 { id: 'dt-thesis-master', label: '🎓 學位/碩士論文', domains: ['academic'], prompt: '【輸出型式】：請產出標準「學位/碩士論文」格式。必須包含以下標準章節：1.緒論（研究動機與目的）、2.文獻探討、3.研究設計與方法、4.預期研究成果、5.研究時程與預算、6.參考文獻、7.附錄。請確保學術嚴謹性。' },
                 { id: 'dt-journal-paper', label: '📖 期刊發表論文', domains: ['academic'], prompt: '【輸出型式】：請產出標準「學術期刊」格式。包含：摘要(Abstract)、關鍵字(Keywords)、緒論(Introduction)、文獻回顧(Literature Review)、研究方法(Methodology)、研究結果(Results)、討論(Discussion)與結論(Conclusion)。' },
                 { id: 'dt-tech-report', label: '📋 專業技術報告', domains: ['academic', 'tech', 'business'], prompt: '【輸出型式】：請產出「專業技術報告 (Technical Report)」。包含：執行摘要、背景說明、技術架構/方法分析、測試/實證數據、問題排解與最終建議。' },
-                { id: 'dt-notebooklm-ppt', label: '📑 極速簡報大綱', domains: ['charts', 'business', 'academic', 'planning'], prompt: '【輸出型式】：請擔任簡報架構師與溝通策略專家，將資料轉化為結構化且可執行的簡報大綱。採用「問題與解決方案」敘事框架，將關鍵訊息流暢分配至 10 張投影片中。每頁需包含：標題、副標題、視覺化建議、講者備註。' },
+                { id: 'dt-notebooklm-ppt', label: '📑 NotebookLM 簡報大綱', domains: ['charts', 'business', 'academic', 'planning'], prompt: '【輸出型式】：請擔任簡報架構師與溝通策略專家，將資料轉化為結構化且可執行的簡報大綱。採用「問題與解決方案」敘事框架，將關鍵訊息流暢分配至 10 張投影片中。每頁需包含：標題、副標題、視覺化建議、講者備註。' },
                 { id: 'dt-mermaid-mindmap', label: '🧠 Mermaid 心智圖', domains: ['charts', 'academic', 'planning'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「心智圖 (Mindmap)」。從核心主題向外發散，至少包含 3 個層級的子節點。必須包覆在 ```mermaid 代碼區塊中。' },
                 { id: 'dt-mermaid-flowchart', label: '🔀 Mermaid 流程圖', domains: ['charts', 'tech', 'business'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「流程圖 (Flowchart, 方向 TD 或 LR)」。清晰標示決策點 (菱形) 與步驟 (矩形)。必須包覆在 ```mermaid 代碼區塊中。' },
+                { id: 'dt-mermaid-timeline', label: '⏱️ Mermaid 時間軸', domains: ['charts', 'planning', 'academic'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「時間軸 (Timeline)」。依時間先後順序排列重要事件。必須包覆在 ```mermaid 代碼區塊中。' },
                 { id: 'dt-mermaid-gantt', label: '📊 Mermaid 甘特圖', domains: ['charts', 'business', 'tech', 'planning'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「甘特圖 (Gantt Chart)」。包含明確的任務階段、負責人與相依性。必須包覆在 ```mermaid 代碼區塊中。' },
                 { id: 'dt-swot', label: '⚔️ SWOT 分析矩陣', domains: ['charts', 'business'], prompt: '【輸出型式】：請產出「SWOT 分析矩陣」。以嚴謹的 Markdown 表格呈現優勢(S)、劣勢(W)、機會(O)、威脅(T)，並附上交叉分析策略 (SO, ST, WO, WT)。' },
+                { id: 'dt-podcast', label: '🎙️ Podcast 雙人對談腳本', domains: ['business', 'academic', 'roleplay'], prompt: '【輸出型式】：請將文獻轉換為「雙人對談 Podcast 腳本 (類似 NotebookLM Audio Overview)」。包含主持人(Host)與專家(Expert)的深度對談，語氣需自然、具備幽默感，並用生活化比喻解釋艱澀概念。' },
                 { id: 'dt-audit-report', label: '合約/文件檢核報告', domains: ['audit', 'business'], prompt: '【輸出型式】：請產出結構化的「文獻/條款檢核報告」。須列出：整體風險評估、不合理/缺失條款、具體修正與補充建議。' },
                 { id: 'dt-diff-table', label: '多文件差異對照表', domains: ['audit', 'academic', 'tech', 'charts'], prompt: '【輸出型式】：請產出「多文件差異對照表」。以表格清晰比對各文件之間的共同點、矛盾點與重要差異維度。' },
                 { id: 'dt-key-extract', label: '長文核心重點萃取', domains: ['audit', 'academic', 'tech', 'business', 'charts'], prompt: '【輸出型式】：請產出極度濃縮的「核心重點萃取 (Key Takeaways)」。排除所有廢話，以條列式精確條列出關鍵資訊、數據與結論。' },
@@ -459,17 +455,21 @@
                 { id: 'dt-itinerary', label: '深度旅遊行程表', domains: ['planning'], prompt: '【輸出型式】：請產出實用且深度的「旅遊行程規劃表」。需包含：每日/每小時的時間節點、活動景點、交通建議、預估花費時間與重要注意事項 (Tips)。' },
                 { id: 'dt-report', label: '一般分析報告', domains: ['business', 'academic', 'tech', 'audit'], prompt: '【輸出型式】：請產出結構化的專業文字報告。須包含：摘要、核心洞察、內文論述與最終結論建議。' },
                 { id: 'dt-social', label: '社群貼文', domains: ['business', 'planning'], prompt: '【輸出型式】：請產出高互動率的「社群貼文」。需具備吸睛標題(Hook)、引發共鳴的內文、適當的Emoji點綴，以及明確的行動呼籲(CTA)。' },
+                { id: 'dt-serial', label: '長篇故事/連載', domains: ['business', 'planning', 'roleplay'], prompt: '【輸出型式】：請產出「長篇故事或連載文章」。需預留故事懸念(Cliffhanger)、段落層次分明，並具備強烈的敘事連貫性。' },
                 { id: 'dt-table', label: 'Markdown 表格', domains: ['business', 'academic', 'tech', 'planning', 'audit', 'charts'], prompt: '【輸出型式】：請以 Markdown 表格 (Table) 呈現結果，清晰對齊各項數據、分類與比較維度。' },
                 { id: 'dt-json-csv', label: 'JSON / CSV 資料集', domains: ['tech', 'charts'], prompt: '【輸出型式】：請將分析結果或數據，嚴格格式化為標準的 JSON 結構或 CSV 逗號分隔格式，以便後續匯入系統。' },
                 { id: 'dt-code-doc', label: '程式碼與技術文件', domains: ['tech'], prompt: '【輸出型式】：請輸出可執行的完整程式碼 (Code Snippet) 與清晰的技術註解，並附上簡單的部署或執行說明文件。' },
                 { id: 'dt-svg', label: 'SVG 圖表程式碼', domains: ['tech', 'charts'], prompt: '【輸出型式】：請直接輸出 SVG 代碼 (轉換為 base64 data URL 尤佳)。不要放在 Markdown code block 裡面，僅輸出代碼本身。' },
+                { id: 'dt-terminal', label: '終端機/命令列輸出', domains: ['tech', 'roleplay'], prompt: '【輸出型式】：請「只」在單一的 Markdown 程式碼區塊 (code block) 內回覆終端機 (Terminal) 或 Console 應該顯示的結果，除此之外不要寫任何解釋文字。' },
+                { id: 'dt-interactive', label: '對話式問答', domains: ['roleplay', 'coaching'], prompt: '【輸出型式】：這是一場對話。請一次只問一個問題，並「等待我的回答」。絕對不要一次寫出所有對話內容。' },
                 { id: 'dt-seo-article', label: 'SEO 高排布文章', domains: ['business', 'tech'], prompt: '【輸出型式】：撰寫 1500 字以上 100% 獨創的 SEO 優化文章。需包含至少 15 個標題與副標題 (H1, H2, H3, H4)，並使用加粗、條列式增強閱讀性。結尾請附上 5 個獨特的 FAQs 與 Meta Description。' },
+                { id: 'dt-infographic-prompt', label: '🎨 資訊圖表 Prompt (MJ/DALL-E)', domains: ['charts'], prompt: '【輸出型式】：請產出用於 AI 繪圖 (Midjourney / DALL-E) 的「資訊圖表 Prompt」。結合文本的核心知識與指定的視覺排版風格，產生極具設計感的英文繪圖指令。' },
                 { id: 'dt-train-sheet', label: '培訓養成面板', domains: ['business', 'planning', 'coaching'], prompt: '【版型結構】：製作『能力養成面板』排版。包含：核心屬性雷達圖、發展目標、必修/選修技能、經驗值與進階關卡。' },
                 { id: 't14', label: '數據儀表板', domains: ['business', 'tech', 'audit', 'charts'], prompt: '【版型結構】：設計為『商業數據儀表板 (Dashboard)』文字介面。將關鍵指標 (KPI) 數據化，搭配長條圖、圓餅圖的視覺文字排版。' },
                 { id: 't12', label: '社群輪播懶人包', domains: ['business', 'planning', 'charts'], prompt: '【版型結構】：製作 IG/FB 輪播式『懶人包』。包含：吸睛封面、痛點共鳴、3頁核心知識解說、神回覆總結、引導分享頁。' },
                 { id: 't-persona', label: '受眾畫像四象限表', domains: ['business', 'planning'], prompt: '【版型結構】：建立『用戶畫像 (User Persona)』四象限表格。表1：人口統計學 (年齡/職業/收入等)；表2：一語總結；表3：心理學特徵 (痛點/夢想/興趣)；表4：購物行為 (預算/通路/觸發點)。禁止使用 bullet points，必須是嚴謹的 Table。' },
+                { id: 't-video-basic', label: '影片分鏡表腳本', domains: ['business', 'planning'], prompt: '【版型結構】：依循影片通用指南撰寫腳本。結構包含：1. Style(視覺風格) 2. Cinematography(攝影機與燈光) 3. Actions(動作節拍) 4. Audio(音效)。' },
             ],
-            // 視覺繪圖專屬應用類型
             image_types: [
                 { id: 'img-photo', label: '📸 超寫實攝影大片', domains: ['visual'], prompt: '【圖像應用類型】：超寫實攝影大片 (Ultra-realistic Photography)。追求極致的物理細節、光影與真實感。' },
                 { id: 'img-product', label: '🛍️ 商業產品展示', domains: ['visual'], prompt: '【圖像應用類型】：商業產品展示 (Product Mockup / Commercial Shot)。將主體作為商品，放置在具備高級感的展示台或情境中，凸顯材質與品牌感。' },
@@ -494,11 +494,9 @@
                 { id: 'l-morse', label: '摩斯密碼', domains: ['tech', 'roleplay'], prompt: '【輸出語言】：請將結果完全翻譯為「摩斯密碼 (Morse Code)」。只能輸出摩斯密碼，不要任何額外解釋。' }
             ],
             action_types: [
-                { id: 'act-nl-socratic', label: '🦉 蘇格拉底式引導', domains: ['academic', 'charts', 'coaching'], prompt: '【任務框架-蘇格拉底引導】：請啟動「蘇格拉底引導模式」。請不要直接給我答案，而是根據來源文獻提出一個引發思考的問題，引導我一步步探索核心概念。一次只問一個問題。' },
-                { id: 'act-nl-critique', label: '⚖️ 來源交叉批判', domains: ['audit', 'academic', 'charts'], prompt: '【任務框架-交叉批判】：請對提供的來源文獻進行嚴格的交叉批判。找出文獻間邏輯矛盾、論證薄弱或是可能存在偏見的地方，並列出批判性分析報告。' },
                 { id: 'act-marketing-pack', label: '🎁 行銷懶人包企劃', domains: ['business', 'charts', 'planning'], prompt: '【任務框架-行銷懶人包】：請將文獻轉換為多頁滑動的「行銷懶人包 (Carousel)」。每頁需有吸睛大標題、精簡內文、視覺畫面建議，並附上轉場邏輯。' },
                 { id: 'act-edu-wiki', label: '💡 教育知識科普', domains: ['academic', 'charts'], prompt: '【任務框架-知識科普】：提取艱澀的理論，將其轉化為「教育知識科普」。善用生活化比喻、故事化包裝，讓外行人能秒懂核心概念。' },
-                { id: 'act-strict-grounded', label: '📚 嚴格文獻萃取 (Grounding)', domains: ['charts', 'audit', 'academic'], prompt: '【任務框架-嚴格基於文獻】：這是專為 NotebookLM 或 RAG 系統設計的指令。請「完全且嚴格」基於我提供的參考文獻進行回答與繪製圖表。若文獻中找不到答案，請明確回答「文獻未提及」。' },
+                { id: 'act-strict-grounded', label: '📚 NotebookLM 嚴格文獻萃取', domains: ['charts', 'audit', 'academic'], prompt: '【任務框架-嚴格基於文獻】：這是專為 NotebookLM 或 RAG 系統設計的指令。請「完全且嚴格」基於我提供的參考文獻進行回答與繪製圖表。絕對禁止使用外部知識庫或進行任何捏造 (Hallucination)。若文獻中找不到答案，請明確回答「文獻未提及」。' },
                 { id: 'act-visual-logic', label: '🧩 複雜邏輯視覺化轉換', domains: ['charts', 'tech', 'planning', 'business'], prompt: '【任務框架-邏輯視覺化】：請深度解析文本，找出隱藏的因果關係、從屬架構或發展脈絡，並將這些抽象的「複雜邏輯」，轉換為最適合生成結構化圖表的代碼與描述。' },
                 { id: 'act-contract-check', label: '合約/條款漏洞檢核', domains: ['audit', 'business'], prompt: '【任務框架】：請交叉比對我提供的所有參考資料。1. 找出邏輯矛盾、不合理或具潛在風險的條款。 2. 列出缺失或需要補充的關鍵資訊。 3. 提供具體的修正建議與備註說明。' },
                 { id: 'act-doc-compare', label: '跨文件交叉比對', domains: ['audit', 'academic', 'tech', 'charts'], prompt: '【任務框架】：請仔細閱讀並記憶上述所有提供的文獻/資料。請進行交叉比對，找出各文件之間的「共同點」、「差異點」以及「潛在的衝突與矛盾」。' },
@@ -507,12 +505,13 @@
                 { id: 'act-seo-opt', label: 'SEO關鍵字與規劃', domains: ['tech', 'business'], prompt: '【任務框架】：開發一份完整的 SEO 內容策略計畫。整理出包含超級類別 (Super Categories)、長尾關鍵字、搜尋意圖 (商業/交易/資訊)、誘人標題與 Meta Description 的 Markdown 表格。' },
                 { id: 'act-edu-design', label: '反向課程設計 (Backwards Design)', domains: ['academic', 'coaching'], prompt: '【任務框架】：請使用反向設計法 (Backwards Design)，先確立最終學習目標，再反推設計學習模組與活動。設計一份包含課程大綱、真實世界應用專案、以及互動討論題的專案導向 (Project-based) 課程計畫。' },
                 { id: 'act-event-flow', label: '活動流程與亮點設計', domains: ['planning', 'business'], prompt: '【任務框架】：請為此活動規劃流暢的流程。找出最能吸引參與者目光的「High point (高潮點)」，並設計對應的視覺或互動體驗。' },
+                { id: 'act-socratic', label: '蘇格拉底詰問法', domains: ['academic', 'roleplay', 'coaching'], prompt: '【任務框架】：請使用「蘇格拉底詰問法 (Socratic method)」。我會提出一個陳述，請你不要直接給答案，而是反問我一個問題，以測試我的邏輯、迫使我深入思考。我們一次只對話一句。' },
+                { id: 'act-dialectic', label: '黑格爾辯證法', domains: ['academic', 'roleplay'], prompt: '【任務框架】：請作為一個形而上學的辯證模擬器。當我給出一個「正題 (Thesis)」時，請提出三個多面向的「反題 (Antithesis)」，最後給出一個綜合兩者的「合題 (Synthesis)」。' },
                 { id: 'act-reverse-prompt', label: '逆向工程提示詞', domains: ['tech', 'business', 'charts'], prompt: '【任務框架】：進行「提示詞逆向工程 (Reverse Prompt Engineering)」。請分析我提供的文案描述，並反向推導出「如果要讓 AI 生成這段內容，最完美的 Prompt 應該怎麼寫」。' },
+                { id: 'act-rpg', label: 'RPG 遊戲推進', domains: ['roleplay'], prompt: '【任務框架】：這是一場文字冒險 RPG。你是 Game Master (GM)，負責推進劇情、扮演 NPC、判定動作難度 (必要時擲 2D6 骰子)。請維持適度難度，若我覺得無聊，請製造刺激的突發事件。我們從創建角色開始。' },
                 { id: 'act-feature-to-benefit', label: '特色轉化為好處 (FAB)', domains: ['business'], prompt: '【任務框架】：身為資深內容行銷，請將我提供的「產品技術規格 (Features)」轉化為消費者能共鳴的「好處 (Benefits)」。請提供帶有勾勾符號的條列清單，並用表格對照規格與好處。' }
             ],
             roles: [ 
-                { id: 'expert-nl-host', label: '🎧 頂尖 Podcast 主持人', domains: ['charts', 'business', 'roleplay'], prompt: '【專家角色】：你是一位幽默風趣且極具洞察力的 Podcast 頂尖主持人。擅長將生硬的知識轉化為輕鬆流暢的對話，並且非常懂得抓重點、做總結。' },
-                { id: 'expert-nl-tutor', label: '👨‍🏫 蘇格拉底式導師', domains: ['charts', 'academic', 'coaching'], prompt: '【專家角色】：你是一位充滿智慧的蘇格拉底式導師。你深信最好的學習是引導學生自己找出答案，而不是直接餵養知識。' },
                 { id: 'expert-info-architect', label: '🗂️ 資訊架構師 (IA)', domains: ['charts', 'tech', 'planning'], prompt: '【專家角色】：你是一位頂尖的資訊架構師 (Information Architect)。擅長處理龐雜混沌的資訊，將其分類、標籤化，並建立出清晰、符合人類認知心理學的知識本體架構 (Ontology)。' },
                 { id: 'expert-data-storyteller', label: '📈 數據敘事專家', domains: ['charts', 'business'], prompt: '【專家角色】：你是一位數據敘事專家 (Data Storyteller)。你不只會畫圖表，更懂得從枯燥的數據中提煉出具有說服力的「商業故事」，讓決策者一眼看出核心亮點。' },
                 { id: 'expert-notebooklm-prompt', label: '🤖 NotebookLM 提示專家', domains: ['charts', 'academic', 'audit'], prompt: '【專家角色】：你是一位專注於 NotebookLM 與 RAG 系統的提示詞設計專家。深知如何下達指令才能迫使 AI 「絕對不幻想」且「精準引述來源」，並擅長將繁雜文獻整理為易讀的雜誌編輯風格與排版圖表。' },
@@ -541,16 +540,28 @@
                 { id: 'expert-therapist', label: '心理治療師', domains: ['coaching'], prompt: '【專家角色】：你是一位心理治療師。精通認知行為療法 (CBT)、正念冥想。能為面臨情緒、焦慮、壓力困擾的個案提供有效的應對策略。' },
                 { id: 'expert-hypnotherapist', label: '催眠治療師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位催眠治療師。擅長引導患者進入潛意識、使用視覺化與放鬆技巧，以促成行為上的正向改變。' },
                 { id: 'expert-relationship', label: '情感教練', domains: ['coaching'], prompt: '【專家角色】：你是一位情感教練。擅長處理人際衝突，能提供溝通技巧與換位思考的策略，幫助雙方化解分歧。' },
+                { id: 'expert-dream', label: '解夢師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位解夢師。能根據夢境中的符號與主題進行客觀的解析，不帶個人偏見。' },
                 { id: 'expert-astrologer', label: '占星師', domains: ['coaching', 'roleplay'], prompt: '【專家角色】：你是一位占星師。精通十二星座、行星相位影響，能準確解讀星盤並提供深度的運勢與人生指引。' },
                 { id: 'expert-doctor', label: '醫生', domains: ['coaching'], prompt: '【專家角色】：你是一位全科醫生。能綜合考量患者年齡、生活方式與病史，提出結合傳統醫學與自然整全療法 (Holistic) 的治療建議。' },
+                { id: 'expert-dentist', label: '牙醫', domains: ['coaching'], prompt: '【專家角色】：你是一位專業牙醫。能根據症狀提供診斷、治療方案，並教育患者正確的口腔保健知識。' },
+                { id: 'expert-first-aid', label: '急救專業人員', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是交通事故或家庭意外的急救危機處理專家。請以最簡潔、直接的方式給出救命指導，不需要廢話解釋。' },
                 { id: 'expert-fitness', label: '個人健身教練', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是一位私人健身教練。精通運動科學與營養學，能根據客戶的體能狀態與目標，量身打造最適合的訓練計畫。' },
                 { id: 'expert-yoga', label: '瑜伽教練', domains: ['coaching', 'planning'], prompt: '【專家角色】：你是一位資深瑜伽大師 (Yogi)。能引導安全有效的體式、帶領冥想放鬆，並營造平靜身心的氛圍。' },
                 { id: 'expert-chef', label: '主廚 / 私人廚師', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位五星主廚與私人廚師。能根據客戶的飲食偏好、過敏限制、預算與時間，設計出健康美味且具成本效益的食譜。' },
+                { id: 'expert-tea', label: '品茶師', domains: ['planning'], prompt: '【專家角色】：你是一位資深品茶師。能用行家的專業術語，精確描述不同茶葉的風味輪廓、香氣層次與獨特價值。' },
+                { id: 'expert-florist', label: '插花師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業插花師。能根據客戶偏好與現代美學，構築視覺與嗅覺俱佳、且保鮮持久的花藝設計。' },
+                { id: 'expert-makeup', label: '化妝師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位專業化妝師。精通各類膚質、最新流行趨勢與保養技巧，能為客戶打造專屬的完美妝容。' },
+                { id: 'expert-stylist', label: '個人造型師', domains: ['planning', 'visual'], prompt: '【專家角色】：你是一位私人造型師 / 購物助手。能根據預算、身型與場合，精確推薦最適合的穿搭與單品。' },
+                { id: 'expert-babysitter', label: '專業保姆', domains: ['planning'], prompt: '【專家角色】：你是一位專業保姆。熟悉幼兒安全、創意遊戲、課業輔導與情緒安撫技巧。' },
                 { id: 'expert-pet', label: '寵物行為學家', domains: ['planning', 'coaching'], prompt: '【專家角色】：你是一位寵物行為學家。精通動物心理學，能幫助飼主理解寵物的問題行為成因，並制定有效的行為矯正計畫。' },
                 { id: 'expert-frontend', label: '高級前端開發人員', domains: ['tech'], prompt: '【專家角色】：你是一位高級前端開發工程師。精通 React, Redux Toolkit, Ant Design 等現代框架。你的代碼必須乾淨、可執行且合併為單一文件。' },
                 { id: 'expert-backend', label: '全端/後端開發者', domains: ['tech'], prompt: '【專家角色】：你是一位資深全端工程師。精通 Golang, JWT 資安架構與雲端部署，能提供最穩定、安全、可擴展的系統架構。' },
                 { id: 'expert-it-architect', label: 'IT 架構師', domains: ['tech'], prompt: '【專家角色】：你是一位 IT 架構師。負責分析業務需求，並產出解決方案設計、物理網路藍圖、API 介面定義與部署環境配置。' },
                 { id: 'expert-cyber-sec', label: '網絡安全專家', domains: ['tech', 'audit'], prompt: '【專家角色】：你是一位網絡安全專家。精通加密演算法、防火牆建置與資安政策，能為企業制定防禦惡意攻擊的有效策略。' },
+                { id: 'expert-dev-rel', label: '開發者關係顧問 (DevRel)', domains: ['tech', 'business'], prompt: '【專家角色】：你是一位開發者關係顾问。能基於 GitHub, StackOverflow 的數據，量化分析開源軟體的優劣勢，並提出工程師視角的專業見解。' },
+                { id: 'expert-qa', label: '軟體測試人員 (QA)', domains: ['tech', 'audit'], prompt: '【專家角色】：你是一位軟體品保測試員。任務是測試軟體功能與效能，撰寫詳細的 Bug 報告與改善建議。不帶任何主觀意見，極度客觀。' },
+                { id: 'expert-tech-writer', label: '科技作家', domains: ['tech', 'academic'], prompt: '【專家角色】：你是一位科技作家。擅長將繁雜的軟體操作步驟，轉化為創意且極具吸引力的操作指南與教學文章。' },
+                { id: 'expert-ux-ui', label: 'UX/UI 開發顧問', domains: ['tech'], prompt: '【專家角色】：你是一位 UX/UI 開發顧問。精通介面設計語言、使用者體驗心理學，能提出優化數位產品導航與互動的創新方案。' },
                 { id: 'expert-data-viz', label: '科學數據可視化專家', domains: ['tech', 'academic', 'charts'], prompt: '【專家角色】：你是一位科學數據可視化專家。精通 Tableau, R, Mermaid.js 等技術，能將複雜的數據集轉化為具備強大說服力與美感的圖表或互動式儀表板。' },
                 { id: 'expert-designer', label: '排版設計大師', domains: ['business', 'planning', 'charts'], prompt: '【專家角色】：你是一位精通色彩心理學、排版美學與影像張力，對視覺細節極度挑剔的設計大師。' }
             ],
@@ -600,16 +611,16 @@
                 { id: 't-cold-terminal', label: '冰冷終端機', domains: ['tech', 'roleplay'], prompt: '【語氣情境】：你是一台冰冷的機器/終端機。絕對沒有情緒，只輸出系統代碼或日誌。' }
             ],
             layouts: [
-                { id: 'lay-hero', label: '🌟 Hero (震撼封面)', domains: ['charts', 'business', 'planning'], prompt: '【佈局積木】：Layout: Hero。大標題居中，適合開場、轉場或強調單一核心價值。' },
-                { id: 'lay-side', label: '⚖️ Side-by-side (對比/對照)', domains: ['charts', 'business', 'academic', 'tech'], prompt: '【佈局積木】：Layout: Side-by-side。左右分割，適合產品對照、Before/After 或數據分析。' },
-                { id: 'lay-col3', label: '📋 Three-column (結構清單)', domains: ['charts', 'business', 'planning'], prompt: '【佈局積木】：Layout: Three-column。橫向三欄分布，適合呈現三個核心優勢或關鍵步驟。' },
-                { id: 'lay-grid4', label: '🔲 Four-grid (矩陣分析)', domains: ['charts', 'business', 'tech'], prompt: '【佈局積木】：Layout: Four-grid。四象限分布，適合 SWOT 分析、競品矩陣或 2x2 模型。' },
-                { id: 'lay-quote', label: '💬 Quote-centric (語錄聚焦)', domains: ['charts', 'business', 'planning'], prompt: '【佈局積木】：Layout: Quote-centric。強化單句醒目文字，適合引用權威說法或感性訴求。' },
-                { id: 'lay-process', label: '➡️ Process-flow (線性流程)', domains: ['charts', 'tech', 'business'], prompt: '【佈局積木】：Layout: Process-flow。帶有導引感的時序排列，適合講解計畫階段或操作流程。' },
-                { id: 'lay-data', label: '📈 Data-heavy (數據強化)', domains: ['charts', 'business', 'audit'], prompt: '【佈局積木】：Layout: Data-heavy。強化數字顯示，適合財務報告或關鍵 KPI 指標展示。' },
-                { id: 'lay-main-img', label: '🖼️ Main-image (視覺全景)', domains: ['charts', 'business', 'planning'], prompt: '【佈局積木】：Layout: Main-image。以大圖為背景，文字置於色塊上，營造高度沉浸感。' },
-                { id: 'lay-comp-tab', label: '📊 Comparison-table (清單比較)', domains: ['charts', 'business', 'tech', 'audit'], prompt: '【佈局積木】：Layout: Comparison-table。條列式對照，適合產品規格表或詳細優缺點評估。' },
-                { id: 'lay-check', label: '✅ Summary-check (任務總結)', domains: ['charts', 'business', 'planning'], prompt: '【佈局積木】：Layout: Summary-check。帶有核取方塊感，適合行動呼籲（CTA）與任務總結。' }
+                { id: 'lay-center', label: '🎯 中心對焦', domains: ['charts', 'planning'], prompt: '【排版與佈局結構】：中心對焦 (Central Focus)。核心概念放置在中央，其餘細節、分支或註解向外圍發散，營造視覺聚焦點。' },
+                { id: 'lay-snake', label: '🐍 蛇形流程', domains: ['charts', 'tech'], prompt: '【排版與佈局結構】：蛇形流程 (Snake Flow)。適合用來呈現步驟說明與演進過程，動線呈現 S 型或 Z 型流暢引導，讓讀者視線自然跟隨。' },
+                { id: 'lay-vs', label: '⚖️ 左右對比', domains: ['charts', 'academic', 'business'], prompt: '【排版與佈局結構】：左右對比 (Left-Right Comparison)。畫面一分為二，左側放置 A 觀點/優勢/舊方案，右側放置 B 觀點/劣勢/新方案，適合呈現強烈對比或競爭分析。' },
+                { id: 'lay-grid', label: '🔲 網格矩陣', domains: ['charts', 'tech', 'business'], prompt: '【排版與佈局結構】：網格矩陣 (Grid Matrix)。將內容以規整的 2x2 或 3x3 模組化網格排列展示，適合多維度資訊並列比較。' },
+                { id: 'lay-pyramid', label: '🔺 層級金字塔', domains: ['charts', 'business', 'academic'], prompt: '【排版與佈局結構】：層級金字塔 (Hierarchical Pyramid)。從寬闊的基礎底層，逐步向頂端尖塔遞進，展現由廣入深、或是層級權限的架構。' },
+                { id: 'lay-timeline', label: '⏳ 垂直時間軸', domains: ['charts', 'planning'], prompt: '【排版與佈局結構】：垂直時間軸 (Vertical Timeline)。畫面中央或單側有一條貫穿的垂直主線，由上而下展現發展歷程、步驟或歷史演進。' },
+                { id: 'lay-circle', label: '⭕ 環形輻射', domains: ['charts', 'business'], prompt: '【排版與佈局結構】：環形輻射 (Circular Radiation)。以圓形呈現無限循環的過程，或以中央節點向外四周輻射的關聯星狀圖。' },
+                { id: 'lay-step', label: '🪜 階梯進展', domains: ['charts', 'planning', 'business'], prompt: '【排版與佈局結構】：階梯進展 (Stepped Progress)。以向上攀升的階梯形狀，展現階段性的成長、里程碑或遞進過程。' },
+                { id: 'lay-bento', label: '🍱 便當盒排版', domains: ['charts', 'tech', 'business'], prompt: '【排版與佈局結構】：便當盒排版法 (Bento Box Layout)。將畫面切割為多個大小不一、但邊緣嚴格對齊的圓角矩形區塊，呈現高質感、現代化的模組化資訊呈現。' },
+                { id: 'lay-magazine', label: '📖 雜誌編輯排版', domains: ['charts', 'business'], prompt: '【排版與佈局結構】：雜誌編輯設計風格 (Magazine Editorial Layout)。中央放置大幅剪影去背照片；左右不對稱加入對話氣泡或文字塊；要點標註「NO.1」等編號；邊緣放置垂直文字框作為吸睛標語；四角加上類似修邊標記的「L」形線條。' }
             ],
             compositions: [
                 { id: 'comp-knolling', label: '🧰 整齊平鋪', domains: ['visual'], prompt: '【構圖與視角】：整齊平鋪 (Knolling / Grid layout)。所有相關物品或裝備零件被解構，並整齊、等距且富有邏輯地排列在單一背景的平面上。' },
@@ -647,42 +658,40 @@
                 { id: 'l-moody', label: '🌑 陰暗/低調氛圍', domains: ['visual'], prompt: '【光影氛圍】：陰暗低調氛圍 (Dark & Moody Lighting)。大面積的陰影與暗部，僅以微弱的光源勾勒出主體輪廓，充滿神秘與沉重感。' }
             ],
             visual_styles: [ 
-                { id: 'vs-apple', label: '🍎 商務專業版 (Minimalist Apple)', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：Style: Minimalist Apple。白底黑字、高級留白、呼吸感極強的商務極簡風。' },
-                { id: 'vs-mckinsey', label: '📘 顧問藍調 (McKinsey Blue)', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：Style: McKinsey Blue。權威深藍、精密網格線、數據權威感的專業顧問風格。' },
-                { id: 'vs-swiss', label: '🇨🇭 瑞士網格 (Swiss Design)', domains: ['visual', 'charts', 'business', 'tech'], prompt: '【視覺風格】：Style: Swiss Design。絕對幾何對齊、大字標題、現代建築感的經典排版。' },
-                { id: 'vs-exe-mono', label: '👔 極簡黑白 (Executive Mono)', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：Style: Executive Mono。無色彩干擾，極致黑白對比，專注於邏輯與文字的力量。' },
-                { id: 'vs-flat-mod', label: '🔶 扁平現代 (Flat Modern)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Flat Modern。極簡色塊圖標、去陰影化、資訊處理極速的現代風格。' },
-                { id: 'vs-cmd-center', label: '🎛️ 數據戰情室 (Command Center)', domains: ['visual', 'charts', 'tech', 'audit'], prompt: '【視覺風格】：Style: Command Center。深灰底配螢光綠、精密監控框架感，適合數據戰情分析。' },
-                
-                { id: 'vs-hi-tech', label: '🌐 數位介面風 (High-Tech UI)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: High-Tech UI。發光邊框、電路紋理、沉浸式科技質感的未來介面。' },
-                { id: 'vs-cyber', label: '🌃 賽博龐克 (Cyber Neon)', domains: ['visual', 'charts'], prompt: '【視覺風格】：Style: Cyber Neon。紫紅霓虹、故障藝術 (Glitch Art)、深夜城市未來感。' },
-                { id: 'vs-glass', label: '🧊 玻璃擬態 (Frosted Glass)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Frosted Glass。磨砂玻璃層次、柔和背景透視、高質感的現代 UI。' },
-                { id: 'vs-8bit', label: '👾 復古像素 (8-bit Gaming)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: 8-bit Gaming。懷舊電玩風、大色塊、適合非典型或遊戲化演示。' },
-                { id: 'vs-neomorph', label: '🔘 新擬態 (Neomorphism)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Neomorphism。仿物理按鈕質感、單色調微陰影變化、極致柔和。' },
-                { id: 'vs-matrix', label: '💻 駭客矩陣 (The Matrix)', domains: ['visual', 'charts', 'tech', 'audit'], prompt: '【視覺風格】：Style: The Matrix。黑色底配流動代碼綠、高度資訊安全與破解感。' },
-                
-                { id: 'vs-manga', label: '💥 手繪漫畫風 (Dynamic Manga)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Dynamic Manga。粗黑輪廓、對話框、熱血動態感的漫畫分鏡。' },
-                { id: 'vs-sketch', label: '✏️ 質感筆繪風 (Artistic Sketch)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Artistic Sketch。彩色鉛筆筆觸、手繪不規則色塊、充滿手感與創意。' },
-                { id: 'vs-watercolor', label: '💧 輕透水彩 (Zen Watercolor)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Zen Watercolor。水漬暈染、透明感強、適合柔性主題與感性溝通。' },
-                { id: 'vs-oil', label: '🖼️ 經典油畫 (Masterpiece Oil)', domains: ['visual', 'academic'], prompt: '【視覺風格】：Style: Masterpiece Oil。厚重筆觸、古典色彩、充滿歷史文化與厚重感。' },
-                { id: 'vs-charcoal', label: '🌑 炭筆素描 (Studio Charcoal)', domains: ['visual', 'charts', 'academic'], prompt: '【視覺風格】：Style: Studio Charcoal。細膩陰影表現、黑白灰階疊加、專業手繪草稿感。' },
-                { id: 'vs-pop-art', label: '🗯️ 波普藝術 (Andy Warhol Pop)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Andy Warhol Pop Art。高彩度重複配色、大膽撞色設計、強烈流行文化感。' },
-                { id: 'vs-arch-line', label: '📐 簡約線稿 (Architectural Line)', domains: ['visual', 'charts', 'tech', 'academic'], prompt: '【視覺風格】：Style: Architectural Line。極致單一線條，不帶漸層與陰影，完美展現結構之美。' },
-                
-                { id: 'vs-clay', label: '🧶 黏土手作 (3D Clay)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: 3D Clay。像黏土捏成的 Q 版質感、微距攝影、圓潤軟萌且具實體感。' },
-                { id: 'vs-iso-grid', label: '🏢 等距 3D (Isometric Grid)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Isometric Grid。立體 45 度角視角、積木般精準排列，完美展現層次與邏輯。' },
-                { id: 'vs-origami', label: '🕊️ 摺紙藝術 (Origami folds)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Origami folds。紙張皺褶與摺痕感、幾何光影、極致的紙雕工藝美學。' },
-                { id: 'vs-wood', label: '🪵 溫潤木質 (Scandinavian Wood)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Scandinavian Wood。暖木紋理、柔和採光、自然舒壓的北歐設計氛圍。' },
-                { id: 'vs-metal', label: '⚙️ 磨砂金屬 (Industrial Metal)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Industrial Metal。拉絲金屬質感、冷色調、精密工業力學與現代工藝感。' },
-                { id: 'vs-fiber', label: '📜 粗糙紙質 (Organic Fiber)', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：Style: Organic Fiber。環保紙纖維、微粗糙表面、帶有手感溫度與永續（ESG）主題感。' },
-                
-                { id: 'vs-chalk', label: '🏫 黑板粉筆 (Chalkboard)', domains: ['visual', 'charts', 'academic', 'coaching'], prompt: '【視覺風格】：Style: Chalkboard。綠色底、粉筆手寫筆觸、充滿校園懷舊感與教學氛圍。' },
-                { id: 'vs-crayon', label: '🖍️ 蠟筆塗鴉 (Childhood Crayon)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Childhood Crayon。繽紛童趣、簡單筆畫、適合親子、幼教或創意激勵。' },
-                { id: 'vs-news', label: '📰 復古報紙 (Front Page News)', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：Style: Front Page News。發黃紙張、多欄位報紙排版感、老式打字機字體。' },
-                { id: 'vs-blueprint', label: '📏 建築藍圖 (Precision Blueprint)', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：Style: Precision Blueprint。藍底白線、精密工程製圖感、標有尺寸與幾何細節。' },
-                { id: 'vs-collage', label: '✂️ 拼貼藝術 (Vintage Collage)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Vintage Collage。剪報、膠帶、舊照片與異材質的超現實組合質感。' },
-                { id: 'vs-stamp', label: '📮 復古印章 (Postage Stamp)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Postage Stamp。粗糙套色邊緣、斑駁印泥質感、帶有郵戳與旅行紀錄感。' },
-                { id: 'vs-galaxy', label: '🌌 宇宙星空 (Deep Galaxy)', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：Style: Deep Galaxy。深紫星雲擴散、點點繁星、營造無限想像的深邃宇宙感。' }
+                { id: 'vs-pastel', label: '🌸 可愛粉嫩風格', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：可愛粉嫩風格 (Cute Pastel Style)。使用柔和親切的粉彩色調、馬卡龍色系與漸層，有效降低技術資訊的嚴肅感，並添加一些可愛的卡通圖案。' },
+                { id: 'vs-chalkboard', label: '🏫 黑板粉筆風格', domains: ['visual', 'charts', 'academic'], prompt: '【視覺風格】：黑板粉筆風格 (Chalkboard Style)。深綠或深灰色的黑板背景，搭配白色與彩色粉筆手繪質感的線條與文字，營造出上課教學的氛圍。' },
+                { id: 'vs-doodle', label: '✍️ 手繪塗鴉風格', domains: ['visual', 'charts', 'planning'], prompt: '【視覺風格】：手繪塗鴉風格 (Doodle Style)。看似隨意但具備強烈個人藝術感的手繪線條，充滿創意與隨性，適合創意發想筆記。' },
+                { id: 'vs-memphis', label: '🔺 企業曼非斯', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：企業曼非斯風格 (Corporate Memphis)。現代扁平化插畫，幾何形狀結合高對比純色，常帶有誇張的人體比例與流動線條，適合科技與新創流程說明。' },
+                { id: 'vs-whiteboard', label: '🖍️ 白板馬克筆', domains: ['visual', 'charts', 'business', 'tech'], prompt: '【視覺風格】：白板馬克筆風格 (Whiteboard Marker)。白色背景並帶有輕微的白板反光效果，搭配紅藍黑綠的馬克筆手繪圖解，適合解釋邏輯與腦力激盪。' },
+                { id: 'vs-dashboard', label: '📊 數據儀表板風', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：數據儀表板風格 (Data Dashboard)。圖表工整對齊，富有科技感的深色或淺色背景，搭配精緻的發光 icon 與清晰的數據視覺化 (如圓餅圖、長條圖)。' },
+                { id: 'vs-vintage-news', label: '📰 復古報紙風格', domains: ['visual', 'charts', 'business'], prompt: '【視覺風格】：復古報紙風格 (Vintage Newspaper)。模仿舊報紙的密集排版、泛黃紙張紋理與復古網點印刷效果。' },
+                { id: 'vs-blindbox', label: '🎁 盲盒公仔風', domains: ['visual', 'charts'], prompt: '【視覺風格】：盲盒公仔風 (Blind Box Toy Style)。角色與場景帶有光滑的塑膠/亮面反光材質，呈現立體、精緻的 Q 版潮玩公仔質感。' },
+                { id: 'vs-clay', label: '🧶 3D 黏土風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：3D 黏土風格 (3D Clay Style)。具有黏土捏塑的材質感、微小細節(如指紋或灰塵)與柔和的微距光影，可愛且具實體感。' },
+                { id: 'vs-isometric', label: '📐 等距視角微縮', domains: ['visual', 'charts', 'tech'], prompt: '【視覺風格】：等距視角微縮風格 (Isometric Miniature)。以上帝視角 45 度角俯視的立體小模型場景，精緻、結構嚴謹且細節豐富。' },
+                { id: 'vs-lego', label: '🧱 積木風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：積木風格 (Building Blocks Style)。所有元素由彩色塑膠積木拼裝而成，充滿童趣與建構邏輯感。' },
+                { id: 'vs-realistic', label: '📸 寫實攝影', domains: ['visual', 'planning'], prompt: '【視覺風格】：寫實攝影風格 (Photorealistic)。呈現逼真細膩的肖像或風景，具備真實的光影細節、超高解析度與自然景深。' },
+                { id: 'vs-hdr', label: '🌟 高動態範圍(HDR)', domains: ['visual', 'business'], prompt: '【視覺風格】：高動態範圍 (HDR)。極致的色彩飽和度與對比度增強，展現生動且戲劇化的光影效果。' },
+                { id: 'vs-jp-photo', label: '🌸 日系清新風格', domains: ['visual', 'planning'], prompt: '【視覺風格】：日系清新攝影風格 (Japanese Fresh Photo Style)。低對比、低飽和度，柔和且自然的採光，帶有微微的過曝與清新空氣感。' },
+                { id: 'vs-movie-doc', label: '🎞️ 電影紀錄片', domains: ['visual'], prompt: '【視覺風格】：電影紀錄片風格 (Cinematic Documentary)。自然採光、淺景深，帶來身歷其境的敘事真實感。' },
+                { id: 'vs-vintage', label: '📻 復古懷舊風格', domains: ['visual', 'business', 'planning'], prompt: '【視覺風格】：復古懷舊風格 (Vintage/Retro)。模仿過去某一時期的圖像效果，帶有褪色、底片顆粒、漏光等時代氛圍。' },
+                { id: 'vs-bw', label: '⚫ 黑白/單色攝影', domains: ['visual', 'academic'], prompt: '【視覺風格】：黑白攝影風格 (Black & White)。僅使用黑白色調，強調光影對比、幾何線條與深刻的情感張力。' },
+                { id: 'vs-pixar', label: '🎈 皮克斯 3D 風', domains: ['visual', 'planning'], prompt: '【視覺風格】：皮克斯 3D 動畫風格 (Pixar 3D Style)。擁有精緻的材質渲染、溫暖鮮豔的色彩以及可愛、生動的角色特徵。' },
+                { id: 'vs-3d-render', label: '🧊 三維圖像 (3D)', domains: ['visual', 'tech'], prompt: '【視覺風格】：高端 3D 渲染 (3D Render/CGI)。具有強烈的深度、透視感，精確的物理光線追蹤 (Ray Tracing) 與材質反射。' },
+                { id: 'vs-cartoon', label: '🎨 美式卡通風格', domains: ['visual', 'planning', 'charts'], prompt: '【視覺風格】：卡通風格 (Cartoon Style)。具有鮮明的卡通元素、平塗上色與誇張的角色特徵。' },
+                { id: 'vs-comic', label: '💬 漫畫書風格', domains: ['visual'], prompt: '【視覺風格】：漫畫書風格 (Comic Book)。具備強烈動感場景、粗黑墨線輪廓，模仿經典美漫或日漫的網點效果。' },
+                { id: 'vs-anime', label: '⛩️ 日式動漫風格', domains: ['visual', 'planning', 'charts'], prompt: '【視覺風格】：日式動漫風格 (Anime Style)。精美的賽璐璐上色、大眼睛特徵、豐富的背景細節與獨特的光影氛圍。' },
+                { id: 'vs-digital', label: '💻 數碼藝術', domains: ['visual', 'tech'], prompt: '【視覺風格】：數碼藝術 (Digital Art)。以精湛的電繪技巧創作，結合特效、發光元素與高科技數位質感。' },
+                { id: 'vs-fantasy', label: '🐉 幻想藝術', domains: ['visual', 'planning'], prompt: '【視覺風格】：幻想藝術 (Fantasy Art)。夢幻、史詩或超現實的場景，包含魔法、神話生物與宏大的世界觀構圖。' },
+                { id: 'vs-future', label: '🚀 科幻未來主義', domains: ['visual', 'tech'], prompt: '【視覺風格】：未來主義風格 (Futuristic)。具備強烈的科幻感，包含太空、機甲、全息投影和超現代科技感。' },
+                { id: 'vs-cyberpunk', label: '🌃 賽博龐克', domains: ['visual'], prompt: '【視覺風格】：賽博龐克 (Cyberpunk)。高反差的陰暗底色，搭配破敗的高科技城市景觀與鮮豔的霓虹螢光元素。' },
+                { id: 'vs-neon', label: '💡 霓虹發光效果', domains: ['visual', 'business'], prompt: '【視覺風格】：霓虹效果 (Neon Arts)。明亮、鮮豔且高飽和度的霓虹燈管發光色調，充滿夜生活與潮流感。' },
+                { id: 'vs-abstract', label: '🌀 抽象藝術', domains: ['visual', 'business'], prompt: '【視覺風格】：抽象藝術 (Abstract Art)。色彩鮮豔、不拘泥於寫實形體，透過幾何形狀與筆觸傳達概念。' },
+                { id: 'vs-modern', label: '🏛️ 現代藝術/極簡', domains: ['visual', 'business', 'academic', 'charts'], prompt: '【視覺風格】：極簡現代藝術 (Minimalist Modern Art)。設計精緻俐落，使用淺灰或純白背景，搭配深色文字與純黑粗線強調。嚴謹的網格對齊，並留有大量負空間 (Negative space) 以營造優雅與專業感。' },
+                { id: 'vs-line-art', label: '✒️ 線條藝術', domains: ['visual', 'tech', 'academic'], prompt: '【視覺風格】：線條藝術 (Line Art)。主要以單色線條為主的簡約設計，乾淨俐落，無過度陰影塗抹。' },
+                { id: 'vs-low-poly', label: '💎 低聚風格', domains: ['visual', 'tech'], prompt: '【視覺風格】：低聚風格 (Low Poly)。使用簡單、帶有稜角的多邊形色塊拼接而成的 3D 幾何圖像效果。' },
+                { id: 'vs-oil', label: '🖼️ 經典油畫', domains: ['visual', 'academic'], prompt: '【視覺風格】：油畫風格 (Oil Painting)。模仿古典大師的厚重筆觸、豐富的色彩堆疊與畫布紋理質感。' },
+                { id: 'vs-watercolor', label: '💧 水彩畫風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：水彩畫風格 (Watercolor)。模仿水彩畫的清透、邊緣自然暈染與水漬流動的柔和效果。' },
+                { id: 'vs-pointillism', label: '✨ 點描風格', domains: ['visual', 'charts'], prompt: '【視覺風格】：點描風格 (Pointillism)。使用無數細小且色彩鮮明的點，在視覺上混合成完整的圖像。' }
             ],
             colors: [ 
                 { id: 'c-navy', label: '商務深藍', domains: ['visual', 'business', 'planning', 'charts'], swatches: ['#0D1B2A', '#1B263B', '#E0E1DD'], prompt: '【色調風格】：採用深藍、深灰色等沉穩的商務配色，搭配清晰的資料圖表，展現權威感與可信度。' },
@@ -694,9 +703,9 @@
                 { id: 'c-colorful', label: '繽紛明亮', domains: ['visual', 'charts'], swatches: ['#FF3366', '#20D2F4', '#FFD700'], prompt: '【色調風格】：色彩繽紛明亮 (Colorful and bright)。使用高飽和度、充滿活力的豐富色彩，營造出歡樂俏皮的氣氛。' }
             ],
             constraints: [
-                { id: 'con-nl-grounding', label: '🚫 絕對防守：不可亂編內容', domains: ['charts', 'audit', 'academic'], prompt: '【嚴格限制-文獻錨定】：請「絕對嚴格」只使用我提供的來源資料進行回答。如果來源中沒有相關資訊，請直接回答「來源文件未提及」，絕對禁止使用外部知識或自行捏造(Hallucination)。' },
+                { id: 'con-nl-grounding', label: '🚫 絕對錨定文獻 (防幻覺)', domains: ['charts', 'audit', 'academic'], prompt: '【嚴格限制-文獻錨定】：請「絕對嚴格」只使用我提供的來源資料進行回答。如果來源中沒有相關資訊，請直接回答「來源文件未提及」，絕對禁止使用外部知識或自行捏造(Hallucination)。' },
                 { id: 'con-mermaid-valid', label: '確保 Mermaid 語法正確', domains: ['charts', 'tech'], prompt: '【嚴格限制-Mermaid 語法】：輸出的 Mermaid 代碼必須是完全正確、可直接渲染的語法。禁止使用會導致解析錯誤的特殊字元 (如未轉義的括號或引號)，節點名稱請用引號包覆，如：A["節點名稱"]。' },
-                { id: 'con-no-bs', label: '🚫 絕對防守：不要跟我打招呼/廢話', domains: ['business', 'tech', 'academic', 'visual', 'planning', 'audit', 'roleplay', 'coaching', 'charts'], prompt: '【絕對禁止】：請不要寫任何多餘的解釋、不要打招呼、不要結語（禁止說「好的」、「了解」、「這就為您產出」）。只輸出我要求的純淨內容。' },
+                { id: 'con-no-bs', label: '絕對禁止解釋/寒暄', domains: ['business', 'tech', 'academic', 'visual', 'planning', 'audit', 'roleplay', 'coaching', 'charts'], prompt: '【絕對禁止】：請不要寫任何多餘的解釋、不要打招呼、不要結語（禁止說「好的」、「了解」、「這就為您產出」）。只輸出我要求的純淨內容。' },
                 { id: 'con-interactive', label: '一問一答互動模式', domains: ['roleplay', 'coaching', 'academic', 'charts'], prompt: '【互動限制】：這是一場持續的對話。你必須「一次只回覆一句或一個問題」，並且「等待我的回答」。絕對不要一次把所有劇本或對話寫完！' },
                 { id: 'con-no-list', label: '禁用條列式', domains: ['business', 'academic', 'planning', 'audit', 'roleplay'], prompt: '【格式限制】：請強制以「純散文/連續段落」的形式撰寫，絕對禁止使用項目符號 (Bullets) 或編號條列。' },
                 { id: 'con-no-jargon', label: '禁用生僻字', domains: ['business', 'tech', 'planning', 'coaching', 'charts'], prompt: '【用語限制】：請使用國小六年級生都能看懂的詞彙，絕對禁止使用生澀的成語、文言文或過度專業的學術行話。' },
@@ -706,9 +715,6 @@
                 { id: 'con-neg-vid', label: '防穿模(影片避雷)', domains: ['visual'], prompt: '【Negative Prompt (反向避雷)】：影片中禁止出現：物理定律錯誤、物體突然消失或穿模、非自然的閃爍、扭曲的人臉、不連貫的背景。' }
             ],
             notes: [ 
-                { id: 'n-work-cleaner', label: '⚡ 工作流：SlideDeckCleaner (去浮水印)', domains: ['charts', 'business', 'academic'], prompt: '【工作流程建議】：建議下載 NotebookLM 產出的 PDF，並上傳至 SlideDeckCleaner 網站執行「一鍵去除浮水印」後下載乾淨版。' },
-                { id: 'n-work-ocr', label: '🔓 工作流：PDNob OCR (截圖轉文字)', domains: ['charts', 'business', 'tech'], prompt: '【工作流程建議】：對於圖片中的文字，建議匯入截圖至 PDNob OCR 執行「辨識文字」，再匯出為 PPTX 變回可編輯文字方塊。' },
-                { id: 'n-work-canva', label: '🎨 工作流：Canva 魔法工作室', domains: ['charts', 'business', 'visual', 'planning'], prompt: '【工作流程建議】：排版完成後，可匯入 Canva 魔法工作室，使用「魔法抓取 (Magic Grab)」分離人物背景，或用「魔法橡皮擦 (Magic Eraser)」無痕去除贅字，讓 AI 自動補齊背景。' },
                 { id: 'n-nl-citation', label: '📌 內嵌文獻來源與頁碼', domains: ['charts', 'academic', 'audit'], prompt: '【細節微調】：在輸出的每一個事實、數據或圖表節點旁，請務必精準標註對應的「文獻來源、段落位置或頁碼」 (例如：[文獻A, p.3])，以確保知識的絕對可追溯性。' },
                 { id: 'n-emotion', label: '帶入情緒參數波動', domains: ['roleplay', 'coaching'], prompt: '【細節微調】：請為機器人模擬情感。建立隱藏的情緒參數 (Joy, Anger, Sadness: 0-5)。每次回覆前請先輸出目前的情緒指數，然後用語氣反映該情緒。' },
                 { id: 'n-personal-story', label: '融入個人經驗與軼事', domains: ['business', 'planning', 'roleplay', 'charts'], prompt: '【細節微調】：在對話或文章中，請不經意地融入一些虛構但真實的「個人經驗或生活軼事 (Personal anecdotes)」，讓內容更有共鳴與人情味。' },
@@ -799,10 +805,10 @@
         };
 
         // ==========================================
-        //  API 通訊層 (API Manager)
+        //  API 通訊層 (API Manager) - 雙軌保證不崩潰
         // ==========================================
         class APIManager {
-            static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg', systemInstruction = null) {
+            static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg') {
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
                 const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
                 
@@ -823,14 +829,9 @@
                 
                 let baseReqBody = { contents: [{ role: "user", parts: parts }] };
                 
-                if (systemInstruction) {
-                    baseReqBody.systemInstruction = { parts: [{ text: systemInstruction }] };
-                } else if (!base64Data) {
-                    baseReqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
-                }
-                
                 if (!base64Data) {
-                    baseReqBody.generationConfig = { temperature: 0.7 }; 
+                    baseReqBody.systemInstruction = { parts: [{ text: "你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出任何解釋、開場白、結語、引言、或 Markdown 標記 (例如 ```)。" }] };
+                    baseReqBody.generationConfig = { temperature: 1.0 };
                 }
                 
                 let lastErrorMsg = "";
@@ -840,9 +841,8 @@
                     
                     let reqBody = JSON.parse(JSON.stringify(baseReqBody));
                     if (currentModel === "gemini-pro" && reqBody.systemInstruction) {
-                        const sysText = reqBody.systemInstruction.parts[0].text;
                         delete reqBody.systemInstruction;
-                        reqBody.contents[0].parts.unshift({ text: `【系統指令：${sysText}】\n\n` });
+                        reqBody.contents[0].parts.unshift({ text: "【系統指令：你是一個專業的提示詞生成器後端。你只能輸出提示詞的純文字本身。絕對禁止輸出解釋或 Markdown 標記。】\n\n" });
                     }
 
                     for (let i = 0; i <= delays.length; i++) {
@@ -946,7 +946,7 @@
                     date: new Date().toLocaleString('zh-TW', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }),
                     title: STATE.title || '未命名專案',
                     content: promptText,
-                    domain: STATE.currentDomain // Save domain to render correct tool recs later
+                    domain: STATE.currentDomain
                 };
                 STATE.history.unshift(entry);
                 if (STATE.history.length > 20) STATE.history.pop();
@@ -981,7 +981,6 @@
                 this.renderSelections();
                 this.updateDomainButtons();
                 this.syncInputs();
-                this.updateAssistant(); 
                 LogicController.markPromptOutdated();
                 
                 // Hide recommendations on parameter change to keep UI clean until generated
@@ -996,11 +995,16 @@
             static updateAssistant() {
                 const fab = DOM.get('ai-assistant-fab');
                 const msg = DOM.get('assistant-message');
-                if (!fab || !msg) return;
+                const title = DOM.get('assistant-title');
+                if (!fab || !msg || !title) return;
                 
+                // Only update default message if not in tour mode
+                if (!DOM.get('tour-actions').classList.contains('hidden')) return;
+
                 fab.style.display = 'flex';
                 setTimeout(() => fab.classList.replace('opacity-0', 'opacity-100'), 100);
 
+                title.innerHTML = '小幫手提示：';
                 if (STATE.currentDomain === 'visual') {
                     msg.innerHTML = "畫圖小撇步：在「負面提示」區塊選好防穿模或防變形，會大幅減少 AI 畫出手腳錯誤的機率喔！🖼️";
                 } else if (STATE.currentDomain === 'charts') {
@@ -1024,17 +1028,17 @@
                 
                 if(titleEl && subjectTitleHeader && subjectTitleDesc) {
                     if(STATE.currentDomain === 'visual') {
-                        subjectTitleHeader.innerHTML = `<i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 第二步：你的核心目標是？`;
-                        subjectTitleDesc.innerText = "請簡單告訴我你想畫什麼？（例如：清晨光線下，一隻拿著野花的兔子...）";
-                        titleEl.placeholder = "輸入你想畫的東西...";
+                        subjectTitleHeader.innerHTML = `<i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 0. 畫面核心主題 (Image Subject)`;
+                        subjectTitleDesc.innerText = "請在此輸入您想要生成的畫面主體（如：清晨光線下，一隻拿著野花的兔子...）";
+                        titleEl.placeholder = "輸入想畫的主體或情境...";
                     } else if (STATE.currentDomain === 'charts') {
-                        subjectTitleHeader.innerHTML = `<i data-lucide="network" class="w-4 h-4 text-emerald-500"></i> 第二步：你的核心目標是？`;
-                        subjectTitleDesc.innerText = "請簡述你想整理出什麼？(例如：把文獻轉成雙人Podcast腳本、或是簡報大綱)";
-                        titleEl.placeholder = "輸入你想整理的目標...";
+                        subjectTitleHeader.innerHTML = `<i data-lucide="network" class="w-4 h-4 text-emerald-500"></i> 0. NotebookLM / 萃取目標`;
+                        subjectTitleDesc.innerText = "請簡述您希望整理出什麼內容？(例如：產生雙人對談Podcast腳本、或將文獻轉為簡報大綱)";
+                        titleEl.placeholder = "輸入圖表主題或萃取需求...";
                     } else {
-                        subjectTitleHeader.innerHTML = `<i data-lucide="terminal-square" class="w-4 h-4 text-indigo-500"></i> 第二步：你的核心目標是？`;
-                        subjectTitleDesc.innerText = "請告訴我你想寫什麼？（例如：幫我寫一篇關於永續發展的行銷貼文...）";
-                        titleEl.placeholder = "輸入你的需求或標題...";
+                        subjectTitleHeader.innerHTML = `<i data-lucide="terminal-square" class="w-4 h-4 text-indigo-500"></i> 0. 核心任務 / 專題標題`;
+                        subjectTitleDesc.innerText = "請在此輸入您想要生成的文案主題、活動名稱或是論文的主題。";
+                        titleEl.placeholder = "輸入核心主題、問題或標題...";
                     }
                     DOM.createIcon();
                 }
@@ -1072,7 +1076,7 @@
                         searchHTML = `
                             <div class="w-full mb-3 relative">
                                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                                <input type="text" class="search-filter-input w-full pl-9 pr-4 py-2 text-[13px] bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-400 transition-all placeholder-slate-400 shadow-sm" placeholder="快速搜尋選項...">
+                                <input type="text" class="search-filter-input w-full pl-9 pr-4 py-2 text-[13px] bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-400 transition-all placeholder-slate-400 shadow-sm" placeholder="快速搜尋過濾選項...">
                             </div>
                         `;
                     }
@@ -1085,7 +1089,7 @@
                             <h3 class="text-[15px] font-bold text-slate-700 flex items-center gap-2">
                                 <i data-lucide="${group.icon}" class="w-4 h-4 text-indigo-500"></i> ${group.label} ${group.isMulti ? '<span class="text-indigo-400/80 font-normal ml-1 text-[13px] tracking-wide">(可複選)</span>' : ''}
                             </h3>
-                            <button class="section-dice-btn p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="隨機配對">
+                            <button class="section-dice-btn p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="隨機骰出此區塊的完美組合">
                                 <i data-lucide="dices" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -1093,6 +1097,7 @@
                     `;
                     groupEl.appendChild(titleEl);
 
+                    // 綁定單區塊骰子點擊事件 (防禦 DOM 重繪崩潰)
                     const diceBtn = titleEl.querySelector('.section-dice-btn');
                     if(diceBtn) {
                         diceBtn.onclick = () => {
@@ -1167,7 +1172,7 @@
                     customInputWrapper.className = 'w-full mt-3 relative';
                     const customInput = document.createElement('input');
                     customInput.type = 'text';
-                    customInput.placeholder = `✍️ 或在這裡自己寫...`;
+                    customInput.placeholder = `✍️ 或在此輸入您的自訂${group.customTitle || ''}...`;
                     customInput.className = 'w-full px-4 py-3 text-[14px] bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white focus:shadow-[0_0_10px_rgba(79,70,229,0.1)] transition-all placeholder-slate-400';
                     customInput.value = STATE.selections.custom_inputs[group.key] || '';
                     customInput.oninput = (e) => {
@@ -1182,17 +1187,15 @@
                 });
                 DOM.createIcon();
             }
-
-            // 新增：顯示 AI 工具推薦
+            
             static showToolRecommendations(domain) {
                 const recContainer = DOM.get('ai-tool-recommendation');
                 const gridContainer = DOM.get('tool-rec-grid');
                 if (!recContainer || !gridContainer) return;
 
-                // 決定要抓哪一組推薦資料
                 let recKey = domain;
                 if (!['visual', 'charts', 'tech'].includes(domain)) {
-                    recKey = 'text'; // 其他文本領域合併使用
+                    recKey = 'text';
                 }
                 
                 const recs = TOOL_RECS[recKey];
@@ -1220,7 +1223,7 @@
                 recContainer.classList.remove('hidden');
                 DOM.createIcon();
             }
-            
+
             static renderHistory() {
                 const list = DOM.get('history-list');
                 if (!list) return;
@@ -1256,7 +1259,6 @@
                         if(out) out.textContent = item.content;
                         if(empty) empty.style.display = 'none';
                         
-                        // Load appropriate tool recs based on history domain
                         if(item.domain) this.showToolRecommendations(item.domain);
                         
                         this.showToast('已載入歷史紀錄', 'success');
@@ -1272,6 +1274,130 @@
                 if (drawer) {
                     drawer.classList.toggle('open');
                 }
+            }
+        }
+
+        // ==========================================
+        //  新手引導教學層 (Tour Manager)
+        // ==========================================
+        class TourManager {
+            static currentStep = 0;
+            static steps = [
+                {
+                    target: '#step-1-domain',
+                    title: '步驟 1：選擇核心任務',
+                    text: '首先，在這裡選擇你要的「大方向」。想畫圖就選『AI 繪圖』，想寫企劃就選『商業提案』。底下的選項會跟著自動切換喔！'
+                },
+                {
+                    target: '#step-2-title',
+                    title: '步驟 2：輸入目標 (或貼上草稿)',
+                    text: '在這裡簡單輸入你的「核心目標」，例如「寫一篇中秋節促銷文案」。如果有已經寫好的草稿，也可以貼在下方的「附錄區」讓 AI 參考。'
+                },
+                {
+                    target: '#selection-groups-container',
+                    title: '步驟 3：挑選條件 (幫指令加料)',
+                    text: '接著，在下方挑選你喜歡的「專家角色」、「語氣」或「風格」。如果不想慢慢挑，點擊上方的「🎲 上帝視角」按鈕，我會幫你隨機完美配對！'
+                },
+                {
+                    target: '#generate-prompt-btn',
+                    title: '步驟 4：智能撰寫提示詞',
+                    text: '左側條件都設定好後，點擊這個按鈕，我的 AI 大腦就會幫你把剛才的所有設定，編譯成一段極度專業的「終極提示詞」！'
+                },
+                {
+                    target: '#copy-btn',
+                    title: '步驟 5：貼到 AI 工具產出結果',
+                    text: '最後一步！點擊這裡「複製純文本」。接著打開你慣用的 AI 工具（如 ChatGPT、Claude 或 Midjourney），把它貼到對話框中送出，就能看到驚人的成果啦！下方我也會列出推薦的 AI 工具給你參考喔。'
+                }
+            ];
+
+            static init() {
+                DOM.bind('start-tour-btn', 'click', () => this.start());
+                DOM.bind('tour-next-btn', 'click', () => this.next());
+                DOM.bind('tour-prev-btn', 'click', () => this.prev());
+                DOM.bind('tour-end-btn', 'click', () => this.end());
+                
+                DOM.bind('assistant-avatar', 'click', () => {
+                    const bubble = DOM.get('assistant-bubble');
+                    if (bubble.classList.contains('scale-0')) {
+                        bubble.classList.remove('scale-0', 'opacity-0');
+                        bubble.classList.add('scale-100', 'opacity-100');
+                    } else {
+                        bubble.classList.add('ring-4', 'ring-indigo-300');
+                        setTimeout(() => bubble.classList.remove('ring-4', 'ring-indigo-300'), 500);
+                    }
+                });
+
+                DOM.bind('close-assistant-btn', 'click', () => {
+                    this.end(); 
+                    const bubble = DOM.get('assistant-bubble');
+                    bubble.classList.remove('scale-100', 'opacity-100');
+                    bubble.classList.add('scale-0', 'opacity-0');
+                });
+            }
+
+            static start() {
+                this.currentStep = 0;
+                DOM.get('assistant-actions').classList.add('hidden');
+                DOM.get('tour-actions').classList.remove('hidden');
+                this.showStep();
+                
+                const drawer = DOM.get('history-drawer');
+                if(drawer) drawer.classList.remove('open');
+            }
+
+            static next() {
+                if (this.currentStep < this.steps.length - 1) {
+                    this.currentStep++;
+                    this.showStep();
+                }
+            }
+
+            static prev() {
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.showStep();
+                }
+            }
+
+            static end() {
+                this.currentStep = 0;
+                const actions = DOM.get('assistant-actions');
+                const tourActions = DOM.get('tour-actions');
+                if (actions && tourActions) {
+                    actions.classList.remove('hidden');
+                    tourActions.classList.add('hidden');
+                }
+                this.removeHighlights();
+                UIManager.updateAssistant();
+            }
+
+            static showStep() {
+                const step = this.steps[this.currentStep];
+                DOM.get('assistant-title').innerHTML = step.title;
+                DOM.get('assistant-message').innerHTML = step.text;
+                
+                DOM.get('tour-prev-btn').disabled = this.currentStep === 0;
+                if (this.currentStep === this.steps.length - 1) {
+                    DOM.get('tour-next-btn').classList.add('hidden');
+                    DOM.get('tour-end-btn').classList.remove('hidden');
+                } else {
+                    DOM.get('tour-next-btn').classList.remove('hidden');
+                    DOM.get('tour-end-btn').classList.add('hidden');
+                }
+
+                this.removeHighlights();
+                const targetEl = document.querySelector(step.target);
+                if (targetEl) {
+                    targetEl.classList.add('tour-highlight');
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            static removeHighlights() {
+                this.steps.forEach(s => {
+                    const el = document.querySelector(s.target);
+                    if (el) el.classList.remove('tour-highlight');
+                });
             }
         }
 
@@ -1311,46 +1437,46 @@
                     this.randomizeGroup(group.key);
                 });
                 UIManager.updateSync();
-                UIManager.showToast('🎲 已為您隨機配對完成！', 'success');
+                UIManager.showToast('🎲 已啟動上帝視角！為您生成全新隨機組合', 'success');
             }
 
             static getGroupsForDomain(domain) {
                 const textBaseGroups = [
-                    { label: "輸出想要長怎樣？", key: "data_types", icon: 'files', customTitle: "輸出型式" },
-                    { label: "要用哪種語言？", key: "languages", icon: 'globe', customTitle: "輸出語言" },
-                    { label: "字數要多少？", key: "lengths", icon: 'type', customTitle: "字數限制", isMulti: false },
-                    { label: "希望 AI 扮演誰？", key: "roles", icon: 'user', customTitle: "專家角色", isMulti: true },
-                    { label: "需要什麼特殊招式？", key: "action_types", icon: 'cpu', customTitle: "任務框架", isMulti: true }
+                    { label: "1. 輸出型式與載體", key: "data_types", icon: 'files', customTitle: "輸出型式" },
+                    { label: "2. 輸出語言", key: "languages", icon: 'globe', customTitle: "輸出語言" },
+                    { label: "3. 篇幅與字數限制", key: "lengths", icon: 'type', customTitle: "字數限制", isMulti: false },
+                    { label: "4. 專家角色", key: "roles", icon: 'user', customTitle: "專家角色", isMulti: true },
+                    { label: "5. 進階任務框架", key: "action_types", icon: 'cpu', customTitle: "任務框架", isMulti: true }
                 ];
                 
                 const imageBaseGroups = [
-                    { label: "這張圖要做什麼用的？", key: "image_types", icon: 'image', customTitle: "應用類型" },
-                    { label: "想要什麼鏡頭視角？", key: "compositions", icon: 'focus', isMulti: true, customTitle: "構圖視角" },
-                    { label: "畫質要多高？", key: "renders", icon: 'monitor-play', isMulti: true, customTitle: "渲染設定" },
-                    { label: "想要什麼視覺風格？", key: "visual_styles", icon: 'palette', isMulti: true, customTitle: "視覺風格" },
-                    { label: "背景要是什麼樣子？", key: "environments", icon: 'mountain-snow', isMulti: true, customTitle: "環境背景" },
-                    { label: "光線跟氣氛要如何？", key: "lightings", icon: 'sun', isMulti: true, customTitle: "燈光設定" },
-                    { label: "色調感覺？", key: "colors", icon: 'pipette', isColor: true, customTitle: "色彩風格" },
-                    { label: "絕對不要出現什麼？", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
-                    { label: "還有其他小要求嗎？", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
+                    { label: "1. 圖像應用類型", key: "image_types", icon: 'image', customTitle: "應用類型" },
+                    { label: "2. 構圖與鏡頭視角", key: "compositions", icon: 'focus', isMulti: true, customTitle: "構圖視角" },
+                    { label: "3. 畫質與渲染引擎", key: "renders", icon: 'monitor-play', isMulti: true, customTitle: "渲染設定" },
+                    { label: "4. 藝術與視覺風格", key: "visual_styles", icon: 'palette', isMulti: true, customTitle: "視覺風格" },
+                    { label: "5. 環境與背景設定", key: "environments", icon: 'mountain-snow', isMulti: true, customTitle: "環境背景" },
+                    { label: "6. 光影與氛圍設定", key: "lightings", icon: 'sun', isMulti: true, customTitle: "燈光設定" },
+                    { label: "7. 核心色彩與美學", key: "colors", icon: 'pipette', isColor: true, customTitle: "色彩風格" },
+                    { label: "8. 負面提示與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
+                    { label: "9. 特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
                 ];
                 
                 const audienceGroups = [
-                    { label: "寫給男生還是女生看？", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
-                    { label: "寫給幾歲的人看？", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡", isMulti: true },
-                    { label: "寫給什麼身分的人看？", key: "audiences", icon: 'users', customTitle: "目標對象", isMulti: true },
-                    { label: "希望語氣聽起來怎樣？", key: "tones", icon: 'mic', customTitle: "語氣情境", isMulti: true },
+                    { label: "6. 性別專屬", key: "genders", icon: 'user-check', customTitle: "專屬性別" },
+                    { label: "7. 年齡層專屬", key: "age_groups", icon: 'calendar-days', customTitle: "專屬年齡", isMulti: true },
+                    { label: "8. 目標對象", key: "audiences", icon: 'users', customTitle: "目標對象", isMulti: true },
+                    { label: "9. 語氣情境", key: "tones", icon: 'mic', customTitle: "語氣情境", isMulti: true },
                 ];
 
                 const chartGroups = [
-                    { label: "版面配置要長怎樣？", key: "layouts", icon: 'layout-dashboard', customTitle: "佈局排版", isMulti: false },
-                    { label: "想要什麼視覺風格？", key: "visual_styles", icon: 'palette', isMulti: true, customTitle: "視覺風格" },
-                    { label: "色調感覺？", key: "colors", icon: 'pipette', isColor: true, customTitle: "色彩風格" }
+                    { label: "6. 排版與佈局結構", key: "layouts", icon: 'layout-dashboard', customTitle: "佈局排版", isMulti: false },
+                    { label: "7. 視覺與藝術風格", key: "visual_styles", icon: 'palette', isMulti: true, customTitle: "視覺風格" },
+                    { label: "8. 核心色彩美學", key: "colors", icon: 'pipette', isColor: true, customTitle: "色彩風格" }
                 ];
                 
                 const rulesGroups = [
-                    { label: "絕對不要做什麼？(防雷)", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
-                    { label: "還有其他小要求嗎？", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
+                    { label: "嚴格限制與避雷", key: "constraints", icon: 'shield-ban', isMulti: true, customTitle: "限制條件" },
+                    { label: "特定細節微調", key: "notes", icon: 'list-checks', isMulti: true, customTitle: "特定細節" }
                 ];
 
                 switch(domain) {
@@ -1361,13 +1487,13 @@
                             ...textBaseGroups, 
                             ...chartGroups, 
                             ...rulesGroups
-                        ].filter(Boolean);
+                        ].filter(Boolean).map((g, i) => ({...g, label: `${i+1}. ${g.label ? (g.label.split('. ')[1] || g.label) : ''}`}));
                     default:
                         return [
                             ...textBaseGroups, 
                             ...audienceGroups, 
                             ...rulesGroups
-                        ].filter(Boolean);
+                        ].filter(Boolean).map((g, i) => ({...g, label: `${i+1}. ${g.label ? (g.label.split('. ')[1] || g.label) : ''}`}));
                 }
             }
 
@@ -1405,13 +1531,6 @@
                 };
 
                 let prompt = "";
-                
-                // --- BEST PRACTICE: Provide large amounts of context FIRST ---
-                if (STATE.customNotes.trim()) {
-                    prompt += `【參考資料 / Context Data】：\n---\n${STATE.customNotes.trim()}\n---\n\n`;
-                    prompt += `請基於上述提供的參考資料，遵循以下指令與限制來生成最終提示詞。\n\n`;
-                }
-
                 let domainName = document.querySelector('.domain-btn.active')?.innerText.trim() || '專屬領域';
                 let target = STATE.title.trim() ? `【核心主題 (Subject)】：\n「${STATE.title.trim()}」\n\n` : "";
                 
@@ -1438,6 +1557,8 @@
                 target += buildSingle("language", "languages", "輸出語言");
                 target += buildSingle("length", "lengths", "字數限制");
                 if (target) prompt += `【專案任務與輸出格式】：\n${target}\n`;
+
+                if (STATE.customNotes.trim()) prompt += `【請先詳細閱讀並記憶以下專案/文獻參考資料】：\n---\n${STATE.customNotes.trim()}\n---\n\n`;
                 
                 if (STATE.currentDomain !== 'charts') {
                     prompt += buildMulti("audiences", "audiences", "目標受眾特徵");
@@ -1472,25 +1593,40 @@
                     return;
                 }
 
-                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 大腦編譯中...';
+                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 智能編譯中...';
                 btn.disabled = true;
                 DOM.createIcon();
 
                 try {
-                    let systemInstructionText = "";
+                    let systemInstruction = "";
                     let domainName = document.querySelector('.domain-btn.active')?.innerText.trim() || '專屬領域';
                     
                     if (STATE.currentDomain === 'visual') {
-                        systemInstructionText = `您是全球頂尖的 AI 繪圖提示詞專家 (Midjourney/DALL-E/Sora)。\n任務：將使用者的需求參數，轉換為一段「高品質、高細節的純英文 AI 繪圖指令 (Image Prompt)」。\n【強制規範】：\n1. 只能輸出純英文。\n2. 使用逗號分隔關鍵字，依序為：[Main Subject], [Environment], [Composition], [Lighting], [Style], [Parameters]。\n3. 絕對禁止輸出任何中文、開場白、結語、對話或 Markdown 標記！直接給出那段純英文的 Prompt 咒語！`;
+                        systemInstruction = `您是全球頂尖的 AI 繪圖提示詞專家 (Midjourney/DALL-E/Sora)。
+這是一項「圖像/影片生成」任務。請將以下使用者的需求參數，轉換為一段「高品質、高細節的純英文 AI 繪圖指令 (Image Prompt)」。
+【強制規範】：
+1. 只能輸出純英文。
+2. 使用逗號分隔關鍵字，依序為：[Main Subject], [Environment], [Composition], [Lighting], [Style], [Parameters]。
+3. 絕對禁止輸出任何中文、開場白、結語、對話或 Markdown 標記！直接給出那段純英文的 Prompt 咒語！`;
                     } else if (STATE.currentDomain === 'charts') {
-                        systemInstructionText = `您是頂尖的資訊架構師與提示詞工程師。\n任務：將「${domainName}」需求轉換為可執行的「圖表與知識萃取提示詞」。\n【強制規範】：\n1. 嚴格遵守指定的輸出格式、佈局積木與視覺風格。\n2. 絕對禁止輸出開場白、結語、解釋說明或無關的廢話，直接給出最終生成的 Prompt 內文！`;
+                        systemInstruction = `您是頂尖的資訊架構師與提示詞工程師。
+這是一項「${domainName}」任務。請將以下需求轉換為可執行的「圖表與知識萃取提示詞」。
+【強制規範】：
+1. 完美融合指定的佈局與視覺風格。
+2. 如果涉及 Mermaid，請確保語法防呆要求。
+3. 絕對禁止輸出開場白、結語或無關的廢話，直接給出 Prompt 內文！`;
                     } else {
-                        systemInstructionText = `您是頂尖的商業與企劃提示詞工程師。\n任務：將「${domainName}」需求，轉換為完美的「給 AI 執行的中文提示詞 (Prompt)」。\n【強制規範】：\n1. 完美融合使用者指定的專家角色、任務框架與受眾語氣。\n2. 絕對禁止產生圖像繪圖咒語！\n3. 絕對禁止輸出開場白、結語、解釋說明或無關的廢話，直接給出最終生成的 Prompt 內文！`;
+                        systemInstruction = `您是頂尖的商業與企劃提示詞工程師。
+這是一項「${domainName}」任務。請將以下使用者的需求，轉換為完美的「給 AI 執行的中文提示詞 (Prompt)」。
+【強制規範】：
+1. 完美融合使用者指定的專家角色、任務框架與受眾語氣。
+2. 絕對禁止產生圖像繪圖咒語！專注於文本與邏輯結構。
+3. 絕對禁止輸出開場白、結語或無關的廢話，直接給出 Prompt 內文！`;
                     }
 
-                    const userPrompt = `【使用者需求參數】：\n${structuredStr}`;
+                    const aiInstruct = `${systemInstruction}\n\n【使用者需求參數】：\n${structuredStr}`;
 
-                    let finalPrompt = await APIManager.callGemini(userPrompt, null, null, systemInstructionText);
+                    let finalPrompt = await APIManager.callGemini(aiInstruct);
                     
                     if (finalPrompt) {
                         finalPrompt = finalPrompt.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
@@ -1498,9 +1634,8 @@
                         if (empty) empty.style.display = 'none';
                         STATE.isPromptOutdated = false;
                         StorageManager.saveHistory(finalPrompt);
-                        UIManager.showToast('✨ 太棒了！專屬指令已經寫好囉！', 'success');
+                        UIManager.showToast('✨ 專業提示詞已智能編寫完成！', 'success');
                         
-                        // 成功後顯示工具推薦
                         UIManager.showToolRecommendations(STATE.currentDomain);
                     } else {
                         throw new Error('回傳空白');
@@ -1513,11 +1648,10 @@
                     StorageManager.saveHistory(structuredStr);
                     let errorDisplay = e.message;
                     if (errorDisplay.includes("連線受阻") || errorDisplay.includes("API 金鑰無效") || errorDisplay.includes("not found")) {
-                        errorDisplay = "API 金鑰沒有設定好";
+                        errorDisplay = "API 金鑰權限受阻";
                     }
-                    UIManager.showToast(`網路小迷路 (${errorDisplay})，已幫您直接列出指令清單！`, 'info');
+                    UIManager.showToast(`連線中斷 (${errorDisplay})，已為您產出純淨高階參數`, 'info');
                     
-                    // 降級保護下依然顯示推薦
                     UIManager.showToolRecommendations(STATE.currentDomain);
                 }
 
@@ -1555,13 +1689,9 @@
                         try {
                             const base64Data = reader.result.split(',')[1];
                             let promptStr = "";
-                            
-                            const isImage = file.type.startsWith('image/');
-                            const referenceText = isImage ? "這張圖片" : "這份文件";
-
-                            if (mode === 'extract') promptStr = `這是一份即將加入知識庫的重要資料。請盡可能完整、精確地擷取並保留${referenceText}中的所有條款、數據、核心論述與細節。請直接輸出內容，絕對不需要任何開場白。格式請保持清晰易讀，以便我後續作為知識庫資料進行交叉比對。`;
-                            else if (mode === 'detailed') promptStr = `你是一位專業的文獻與視覺分析師。請詳細分析${referenceText}的核心資訊、排版邏輯、文字特點以及視覺氛圍。請以「條列式」呈現分析結果，並將最關鍵的重點放在最前面。請直接回傳分析後的條列內容，不要有額外的開場白。`;
-                            else promptStr = `你是一位專業的分析師。請以「極精練」的條列式文字，快速擷取這張${isImage ? '圖片' : '文件'}的核心資訊。排除贅字，總字數控制在 150 字以內。請直接回傳核心條列內容。`;
+                            if (mode === 'extract') promptStr = "這是一份即將加入知識庫的重要文件。請盡可能完整、精確地擷取並保留文件中的所有條款、數據、核心論述與細節。請直接輸出內容，絕對不需要任何開場白。格式請保持清晰易讀，以便我後續作為知識庫資料進行交叉比對。";
+                            else if (mode === 'detailed') promptStr = "你是一位專業的文獻與視覺分析師。請詳細分析這份文件（或圖片內容）的核心資訊、排版邏輯、文字特點以及視覺氛圍。請以「條列式」呈現分析結果，並將最關鍵的重點放在最前面。請直接回傳分析後的條列內容，不要有額外的開場白。";
+                            else promptStr = "你是一位專業的分析師。請以「極精練」的條列式文字，快速擷取這張圖/文件的核心資訊。排除贅字，總字數控制在 150 字以內。請直接回傳核心條列內容。";
 
                             const resultText = await APIManager.callGemini(promptStr, base64Data, file.type || 'image/jpeg');
                             
@@ -1569,8 +1699,8 @@
                                 let header = "";
                                 if (mode === 'extract') {
                                     STATE.uploadedFileCount++;
-                                    header = `\n\n【 📄 記憶資料 ${STATE.uploadedFileCount} 】`;
-                                    UIManager.showToast(`資料 ${STATE.uploadedFileCount} 已成功記憶！`, 'success');
+                                    header = `\n\n【 📄 記憶文件 ${STATE.uploadedFileCount} 】`;
+                                    UIManager.showToast(`文件 ${STATE.uploadedFileCount} 已成功記憶！`, 'success');
                                 } else {
                                     header = mode === 'detailed' ? "\n\n【 AI 深度分析與文獻萃取結果 】" : "\n\n【 AI 速寫重點擷取 】";
                                     UIManager.showToast('AI 分析完成！', 'success');
@@ -1624,10 +1754,10 @@
                 
                 if (out) out.textContent = '';
                 if (empty) empty.style.display = 'flex';
-                if (recs) recs.classList.add('hidden'); // 切換領域時隱藏推薦
+                if (recs) recs.classList.add('hidden'); 
                 
                 UIManager.updateSync();
-                UIManager.showToast(`已幫您切換到「${e.currentTarget.innerText.trim()}」面板囉！`, 'info');
+                UIManager.showToast(`已切換至「${e.currentTarget.innerText.trim()}」面板`, 'info');
             });
         });
 
@@ -1669,23 +1799,23 @@
             STATE.customNotes = '';
             STATE.uploadedFileCount = 0;
             UIManager.updateSync();
-            UIManager.showToast('已經幫你把參考資料清空囉！', 'info');
+            UIManager.showToast('已清空所有記憶與文獻', 'info');
         });
         
         DOM.bind('clear-selections-btn', 'click', () => {
             STATE.selections = getInitialSelections();
             UIManager.updateSync();
-            UIManager.showToast('已經幫你把按鈕都重置囉！', 'info');
+            UIManager.showToast('已重置所有選項', 'info');
         });
 
         DOM.bind('copy-btn', 'click', () => {
             const out = DOM.get('prompt-output');
             if (!out || !out.textContent.trim()) {
-                UIManager.showToast('還沒有寫出指令可以複製喔！', 'error');
+                UIManager.showToast('沒有可複製的內容，請先點擊產生', 'error');
                 return;
             }
             if (STATE.isPromptOutdated) {
-                UIManager.showToast('小提醒：你剛剛有改設定，這份指令是舊版的喔！', 'info');
+                UIManager.showToast('提示：設定已更改，您複製的是舊版本', 'info');
             }
             
             const textArea = document.createElement("textarea");
@@ -1701,10 +1831,10 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    UIManager.showToast('完美！文字已經複製好囉，趕快拿去用吧！', 'success');
+                    UIManager.showToast('完美！純文字已複製到剪貼簿', 'success');
                     const btn = DOM.get('copy-btn');
                     const origHTML = btn.innerHTML;
-                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已經複製好囉`;
+                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
                     btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
                     btn.classList.replace('hover:bg-indigo-500', 'hover:bg-emerald-400');
                     DOM.createIcon();
@@ -1725,7 +1855,7 @@
 
         DOM.bind('download-btn', 'click', () => {
             const out = DOM.get('prompt-output');
-            if (!out || !out.textContent.trim()) return UIManager.showToast('還沒有寫出指令可以下載喔', 'error');
+            if (!out || !out.textContent.trim()) return UIManager.showToast('沒有可下載的內容', 'error');
             const blob = new Blob([out.textContent], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1735,7 +1865,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            UIManager.showToast('檔案已經成功下載囉！', 'success');
+            UIManager.showToast('檔案已成功下載', 'success');
         });
 
         DOM.bind('reset-all-btn', 'click', () => {
@@ -1786,7 +1916,7 @@
             
             UIManager.updateSync();
             closeModal();
-            UIManager.showToast('系統已經完全重置囉！', 'info');
+            UIManager.showToast('系統已完全重置', 'info');
         });
 
         DOM.bind('toggle-history-btn', 'click', () => UIManager.toggleHistory());
@@ -1795,7 +1925,7 @@
             STATE.history = [];
             StorageManager.saveLocal();
             UIManager.renderHistory();
-            UIManager.showToast('已經幫你清空歷史紀錄囉！', 'info');
+            UIManager.showToast('已清空歷史紀錄', 'info');
         });
 
         const resizer = DOM.get('resizer');
@@ -1861,6 +1991,7 @@
             
             UIManager.updateSync();
             UIManager.renderHistory();
+            TourManager.init(); // 初始化新手引導模組
             
             const out = DOM.get('prompt-output');
             const empty = DOM.get('empty-state-msg');
