@@ -30,7 +30,9 @@
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
         .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .dark-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        .dark-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .dark-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .dark-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         .dark-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         #resizer { transition: background-color 0.2s ease; }
@@ -116,23 +118,23 @@
         </div>
     </div>
 
-    <!-- 頂部導覽列 -->
-    <header class="shrink-0 px-4 py-3 border-b border-slate-200 bg-white z-40 shadow-sm flex items-center justify-between relative">
+    <!-- 頂部導覽列 (毛玻璃懸浮效果) -->
+    <header class="shrink-0 px-4 py-3 border-b border-slate-200/80 bg-white/90 backdrop-blur-md z-40 shadow-sm flex items-center justify-between sticky top-0">
         <div class="flex items-center gap-3">
             <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                 <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">啓仲</span>
-                AI 提示詞產生器
-                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 1.0 商業版</span>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-indigo-800">AI 提示詞產生器</span>
+                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 2.0 商業版</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <button id="api-key-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-100 hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm" title="設定專屬 API 金鑰">
+            <button id="api-key-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-50 hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm" title="設定專屬 API 金鑰">
                 <i data-lucide="key" class="w-4 h-4 text-amber-500"></i> 金鑰設定
             </button>
-            <button id="toggle-history-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-100 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm">
+            <button id="toggle-history-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-50 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm">
                 <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i> 歷史庫
             </button>
-            <div class="hidden md:flex text-[14px] text-indigo-700 bg-indigo-50 px-3.5 py-1.5 rounded-lg border border-indigo-100 items-center gap-1.5 font-bold shadow-sm" title="全球使用人次">
+            <div class="hidden md:flex text-[14px] text-indigo-700 bg-indigo-50/50 px-3.5 py-1.5 rounded-lg border border-indigo-100 items-center gap-1.5 font-bold shadow-sm" title="全球使用人次">
                 <i data-lucide="activity" class="w-4 h-4"></i> <span id="visitor-count">載入中...</span>
             </div>
             <button id="reset-all-btn" class="text-[14px] font-bold text-red-600 hover:text-white border border-red-200 bg-red-50 hover:bg-red-500 px-3 md:px-4 py-1.5 rounded-lg transition-all active:scale-95 flex items-center gap-1.5 shadow-sm">
@@ -153,7 +155,7 @@
                     <section class="mb-8 p-5 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 relative overflow-hidden group" id="step-1-domain">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 opacity-10 rounded-full blur-3xl transform translate-x-10 -translate-y-10 group-hover:opacity-20 transition-opacity"></div>
                         <h3 class="text-[16px] font-bold text-white mb-3 flex items-center gap-2 relative z-10">
-                            <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 第一步：你想做什麼？(大方向)
+                            <i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> 第一步：選擇核心領域 (大方向)
                         </h3>
                         <p class="text-slate-300 text-[13px] mb-4 relative z-10">選對領域，AI 的大腦才會自動切換到最聰明的模式！</p>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 relative z-10" id="domain-selector">
@@ -188,15 +190,15 @@
                     </section>
 
                     <!-- AI 視覺與文獻解析中樞 -->
-                    <section class="mb-8 p-5 bg-indigo-50/60 border border-indigo-100/80 rounded-2xl shadow-sm relative" id="step-2-files">
+                    <section class="mb-8 p-5 bg-indigo-50/50 border border-indigo-100/60 rounded-2xl shadow-sm relative" id="step-2-files">
                         <h3 class="text-base font-bold text-indigo-900 mb-3 flex items-center gap-2">
-                            <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i> 第二步：餵給我參考資料 (沒有可跳過)
+                            <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i> 第二步：提供參考資料 (選填)
                         </h3>
-                        <p class="text-[13px] text-indigo-700/70 mb-4 leading-relaxed">
-                            支援上傳圖片或 PDF。若有上課錄音檔或長篇文獻，可貼在最下方的輸入框，或點擊「📥 萃取精華」建立記憶庫。
+                        <p class="text-[13px] text-indigo-700/80 mb-4 leading-relaxed">
+                            支援上傳圖片或 PDF。若有上課錄音檔或長篇文獻，可貼在最下方的輸入框，或點擊「📥 萃取精華」建立專屬記憶庫。
                         </p>
                         <div class="flex flex-col xl:flex-row items-stretch gap-3">
-                            <label class="w-full xl:w-7/12 cursor-pointer flex flex-col items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white rounded-xl p-5 hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm group">
+                            <label class="w-full xl:w-7/12 cursor-pointer flex flex-col items-center justify-center gap-2 border-2 border-dashed border-indigo-200 bg-white/80 rounded-xl p-5 hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm group">
                                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
                                 <div id="file-display" class="flex flex-col items-center gap-1.5 text-center transition-all duration-300">
                                     <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -207,14 +209,14 @@
                                 </div>
                             </label>
                             <div class="flex flex-col gap-2 w-full xl:w-5/12 shrink-0">
-                                <button id="analyze-extract" class="w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                <button id="analyze-extract" class="w-full px-4 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all bg-slate-200 text-slate-500 cursor-not-allowed border border-transparent hover:shadow-sm" disabled>
                                     <i data-lucide="database-zap" class="w-4 h-4"></i> 📥 萃取精華並記憶
                                 </button>
                                 <div class="flex gap-2 w-full">
-                                    <button id="analyze-detailed" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                    <button id="analyze-detailed" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-500 cursor-not-allowed border border-transparent hover:shadow-sm" disabled>
                                         <i data-lucide="search" class="w-4 h-4"></i> 深度分析
                                     </button>
-                                    <button id="analyze-concise" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent" disabled>
+                                    <button id="analyze-concise" class="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-200 text-slate-500 cursor-not-allowed border border-transparent hover:shadow-sm" disabled>
                                         <i data-lucide="zap" class="w-4 h-4"></i> 精簡速寫
                                     </button>
                                 </div>
@@ -228,12 +230,12 @@
                             <i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 第三步：你的核心目標是？(畫什麼？)
                         </h3>
                         <p class="text-[12px] text-slate-400 mb-2" id="subject-title-desc">請在此輸入您想要生成的畫面主體（如：清晨光線下，一隻拿著野花的兔子...）</p>
-                        <input type="text" id="title-input" placeholder="例如：幫我畫一隻在喝珍奶的柴犬..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-500 focus:bg-white focus:shadow-[0_0_15px_rgba(79,70,229,0.1)] transition-all placeholder:font-normal placeholder:text-slate-400">
+                        <input type="text" id="title-input" placeholder="例如：幫我畫一隻在喝珍奶的柴犬..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[16px] font-bold outline-none focus:border-indigo-400 focus:bg-white focus:shadow-[0_0_15px_rgba(79,70,229,0.1)] transition-all placeholder:font-normal placeholder:text-slate-400">
                     </section>
 
                     <!-- 重置選項按鈕 與 上帝視角 -->
                     <div class="mb-8 border-b border-slate-200/60 pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="step-4-params">
-                        <span class="text-slate-500 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 第四步：幫指令加料 (挑選條件)</span>
+                        <span class="text-slate-500 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 第四步：進階參數設定 (賦予細節)</span>
                         <div class="flex gap-2 w-full md:w-auto">
                             <!-- 神級功能：上帝視角按鈕 -->
                             <button id="god-mode-btn" class="flex-1 md:flex-none text-[13px] font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-4 py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-md">
@@ -253,15 +255,15 @@
                         <div class="flex justify-between items-end mb-3">
                             <div>
                                 <h3 class="text-[16px] font-bold text-slate-700 flex items-center gap-1.5">
-                                    <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i> 📥 把草稿或錄音檔逐字稿貼在這裡 (選填)
+                                    <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i> 📥 專屬記憶庫 (貼上長文、草稿或逐字稿)
                                 </h3>
-                                <p class="text-[13px] text-slate-400 mt-1">AI 在寫作或出題時，就會乖乖參考這些內容哦！</p>
+                                <p class="text-[13px] text-slate-400 mt-1">AI 在寫作或出題時，就會精準參考這些內容哦！</p>
                             </div>
-                            <button id="clear-notes-btn" class="text-[13px] font-bold text-slate-500 hover:text-red-600 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-slate-200">
+                            <button id="clear-notes-btn" class="text-[13px] font-bold text-slate-500 hover:text-red-600 bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 border border-slate-200">
                                 <i data-lucide="eraser" class="w-3.5 h-3.5"></i> 清空記憶
                             </button>
                         </div>
-                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的上課錄音逐字稿、參考文獻、腳本、程式碼或任何待處理的原始資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50 text-[15px] outline-none focus:border-indigo-500 focus:bg-white transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
+                        <textarea id="custom-notes-input" placeholder="【請在此處貼上您的上課錄音逐字稿、參考文獻、腳本、程式碼或任何待處理的原始資料...】" class="w-full h-56 p-5 rounded-xl border-2 border-slate-200 bg-slate-50/80 text-[15px] outline-none focus:border-indigo-400 focus:bg-white focus:shadow-[0_0_15px_rgba(79,70,229,0.05)] transition-all resize-y shadow-inner leading-relaxed font-mono"></textarea>
                     </section>
                 </div>
             </div>
@@ -287,20 +289,25 @@
                         <i data-lucide="download" class="w-4 h-4"></i>
                     </button>
                     <button id="copy-btn" class="text-[14px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-[0_0_10px_rgba(79,70,229,0.4)] flex items-center justify-center gap-2 whitespace-nowrap">
-                        <i data-lucide="copy" class="w-4 h-4"></i> 複製純文本
+                        <i data-lucide="copy" class="w-4 h-4"></i> 複製
                     </button>
                 </div>
             </div>
             
-            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[16px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative bg-[#0f172a]" id="output-container">
+            <div class="p-5 lg:p-8 overflow-y-auto flex-grow text-[15px] sm:text-[16px] leading-loose text-indigo-50/90 scrollbar-thin dark-scrollbar relative bg-[#0f172a]" id="output-container">
+                <!-- 快捷複製按鈕 (內嵌於結果區) -->
+                <button id="quick-copy-btn" class="hidden absolute top-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-slate-300 hover:text-white p-2.5 rounded-lg transition-all shadow-lg border border-white/10 z-30" title="一鍵複製提示詞">
+                    <i data-lucide="copy" class="w-5 h-5"></i>
+                </button>
+
                 <div id="empty-state-msg" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none p-6 text-center z-10 transition-opacity duration-300">
-                    <div class="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mb-5 border border-slate-700/50">
+                    <div class="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mb-5 border border-slate-700/50 shadow-inner">
                         <i data-lucide="cpu" class="w-10 h-10 text-slate-500"></i>
                     </div>
                     <p class="text-xl font-bold mb-3 text-slate-400 tracking-wide">等待編譯指令</p>
-                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">請於左側設定需求條件，點擊右上方的<span class="text-amber-500 font-bold mx-1">智能撰寫提示詞</span>，系統將為您生成專業級複合指令。</p>
+                    <p class="text-[15px] max-w-sm leading-relaxed text-slate-500">請於左側設定需求條件，點擊右上方的<span class="text-amber-500 font-bold mx-1">智能撰寫</span>，系統將為您生成專業級複合指令。</p>
                 </div>
-                <pre id="prompt-output" class="whitespace-pre-wrap font-sans relative z-20 break-words"></pre>
+                <pre id="prompt-output" class="whitespace-pre-wrap font-sans relative z-20 break-words pt-2"></pre>
             </div>
         </div>
         
@@ -362,7 +369,7 @@
         </div>
         
         <!-- 小幫手頭像 (點擊開關) -->
-        <button id="assistant-avatar" class="w-14 h-14 bg-white border border-slate-200 shadow-xl rounded-full flex items-center justify-center pointer-events-auto hover:scale-110 active:scale-95 transition-all z-50 group mt-3">
+        <button id="assistant-avatar" class="w-14 h-14 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-xl rounded-full flex items-center justify-center pointer-events-auto hover:scale-110 active:scale-95 transition-all z-50 group mt-3">
             <div class="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping opacity-75"></div>
             <span class="text-3xl relative z-10 group-hover:-translate-y-1 transition-transform">👩‍🏫</span>
         </button>
@@ -404,7 +411,28 @@
     <div id="toast-container" class="fixed top-20 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- =========================================
-         系統核心邏輯 (System Core Logic) pro 1.0
+         系統核心邏輯 (System Core Logic) pro 2.0
+         ========================================= -->
+    <script type="module">
+        // 1. DOM 操作輔助工具 (修復遺失的 DOM 定義，確保所有按鈕皆可正常選取與綁定)
+        const DOM = {
+            get: (id) => document.getElementById(id),
+            getAll: (selector) => document.querySelectorAll(selector),
+            createIcon: () => {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    try { lucide.createIcons(); } catch (e) { console.warn('Lucide icon render warning:', e); }
+                }
+            },
+            bind: (id, event, handler) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener(event, handler);
+            }
+        };
+
+        window.addEventListener('error', (e) => {
+            if (e.message && (e.message.includes('Script error') || e.message.includes('ResizeObserver'))) return;
+            console.error('🔥 [Global Error Captured]:', e.error);
+        });
         window.addEventListener('unhandledrejection', (e) => {
             console.error('🔥 [Unhandled Promise Rejection]:', e.reason);
         });
@@ -426,7 +454,7 @@
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const apiKey = ""; 
-        const USER_API_KEY = "AIzaSyAAY4qBzfWU7UX6lHqqbaTNiw7s4ihY5C0";
+        const USER_API_KEY = ""; // 保持空白，不要把金鑰寫死在程式碼裡
 
         const INITIAL_CONFIG = {
             // 文字/圖表領域專屬
@@ -440,15 +468,23 @@
                 { id: 'dt-thesis-interactive', label: '🎓 互動式拆節寫作(論文/長文)', domains: ['academic', 'business', 'planning'], prompt: '【強制工作流：互動式逐步寫作】：\n這是一項極度要求嚴謹的長篇寫作任務。為突破 AI 輸出字數限制，我們必須採用「互動式逐步寫作」。\n\n🚨 請你現在「只執行」第一步，絕對不要直接開始寫正文！\n\n第一步【大綱擬定】：請先為我產出包含章與節（例如：1.1, 1.2）的「詳細目錄大綱」。產出大綱後，請在文末詢問我：「大綱是否需要修改？或回覆『確認』以開始撰寫第一節」。\n\n*(在我回覆確認後，我們才進入第二步)*\n第二步【單節推進】：每次只寫一個章節或小節。寫完後，預告下一節的標題，並停下來等我回覆「繼續」才准往下寫。' },
                 { id: 'dt-serial', label: '📚 互動式連載小說 (防爛尾)', domains: ['roleplay', 'business', 'planning'], prompt: '【強制工作流：互動式連載】：\n這是一部長篇連載小說。為確保劇情不會失控與爛尾，我們必須採用「互動式逐步推進」。\n\n🚨 請你現在「只執行」第一步！\n第一步【世界觀與大綱】：請先建立核心角色設定、世界觀，以及前五章的大綱。寫完後，停下來問我是否同意。\n\n*(在我同意後)*\n第二步【單章推進】：每次只寫一章。結尾必須留下強烈的懸念(Cliffhanger)，並停下來等我指示下一章的走向。' },
                 
+                // 論文各章節專屬精修模組 (第 7~15 章精華整合)
+                { id: 'dt-ch-intro', label: '📘 論文：緒論章撰寫/重寫', domains: ['academic'], prompt: '【輸出型式-緒論章規範】：請依照「緒論」的語氣與敘事風格撰寫或重寫段落：\n1. 語氣需問題導向、具動機性，但不過度強勢。\n2. 敘事採「現象 → 問題 → 研究缺口 → 研究目的」的收斂式鋪陳。\n3. 必須清楚指出研究缺口與研究目的，並區分研究問題與研究假設。\n4. 避免引文堆砌與過度敘述背景，強化邏輯性與研究動機。' },
+                { id: 'dt-ch-lit', label: '📗 論文：文獻探討與理論架構', domains: ['academic'], prompt: '【輸出型式-文獻探討規範】：請依照「文獻探討」的語氣與敘事風格撰寫或整合：\n1. 語氣需客觀、比較式與批判式，採主題式/概念式敘事。\n2. 每段需呈現文獻間的一致、矛盾或差異（展示整合能力，而非逐篇摘要）。\n3. 歸納主要變項邏輯關係（標示自變項、依變項、中介、調節與控制變項），並推導出對應路徑的研究假設。\n4. 結尾需有小結收斂重點，強化文獻之間的對話性與推論性。' },
+                { id: 'dt-ch-method', label: '📙 論文：研究方法章與信效度', domains: ['academic'], prompt: '【輸出型式-研究方法章規範】：請依「方法章」的事實導向、可重現語氣撰寫：\n1. 明確交代研究設計與理由、研究對象（樣本）、研究工具（量表出處、題項數、構面與評分方式）、正式施測程序與研究倫理、資料分析方法。\n2. 若涉及統計與 SEM 模型，需符合 Kline (2016) 與 Hair et al. (2019) 之模型適配度指標、常態性檢驗與信效度標準。\n3. 不得混入結果或詮釋性語句。' },
+                { id: 'dt-ch-result', label: '📊 論文：統計結果章解釋(JASP/SEM)', domains: ['academic'], prompt: '【輸出型式-結果章規範】：請依「結果章」客觀、簡潔、以數據為中心的語氣撰寫：\n1. 依研究假設順序呈現，先以文字描述主要發現（如平均數、標準差、偏態與峰度是否符合常態分配），再報告統計指標（p-value、α、KMO、CFI、t、F、效果量與 95% CI）。\n2. 說明數值是否符合學界建議標準（附 APA 格式引用），並逐一判定哪些假設獲支持或未獲支持。\n3. 全文使用第三人稱（如「本研究發現」），不得加入個人解釋或推論（避免變成討論）。' },
+                { id: 'dt-ch-discuss', label: '💡 論文：討論章三段式推論', domains: ['academic'], prompt: '【輸出型式-討論章規範】：請依「討論章」具詮釋性與整合性的語氣，按以下三層次撰寫：\n1. 第一段【連結結果與理論】：用 1~2 句簡述結果代表的現象（不重述統計數據），說明與理論模型的契合或衝突並解釋原因。\n2. 第二段【文獻對照與分析】：比較結果與前人研究的相符與差異，並從心理機制、文化脈絡或樣本特性提出合理推論（或建立文獻對話矩陣）。\n3. 第三段【實務與未來方向】：說明真實情境的實務意涵、具體建議、研究限制與未來方向。推論需謹慎，不可捏造文獻。' },
+                { id: 'dt-ch-conclude', label: '🏁 論文：結論章與貢獻對照表', domains: ['academic'], prompt: '【輸出型式-結論章規範】：請依「結論章」收斂、簡潔、具前瞻性的語氣撰寫：\n1. 【研究總結】：分兩層次，先以語意化方式直接回答研究問題與假設結果（不重複統計數據），再用一句話提升整體發現的意義。\n2. 【理論意涵】：拉高視角說明如何支持、補充擴展或挑戰修正既有理論。\n3. 【實務建議】：明確指出「建議對象、具體作法、對應本研究何種發現」。\n4. 【研究限制與未來方向】：以界定推論適用範圍為立場說明限制，並附上「研究貢獻 - 研究限制 - 未來研究方向」對照表。' },
+
                 // 一般文件
                 { id: 'dt-thesis-master', label: '🎓 學位/碩士論文 (一次性)', domains: ['academic'], prompt: '【輸出型式】：請產出標準「學位/碩士論文」格式。必須包含以下標準章節：1.緒論（研究動機與目的）、2.文獻探討、3.研究設計與方法、4.預期研究成果、5.研究時程與預算、6.參考文獻、7.附錄。' },
                 { id: 'dt-journal-paper', label: '📖 國際期刊發表論文', domains: ['academic'], prompt: '【輸出型式】：請產出標準「學術期刊」格式。包含：摘要(Abstract)、關鍵字(Keywords)、緒論(Introduction)、文獻回顧(Literature Review)、研究方法(Methodology)、研究結果(Results)、討論(Discussion)與結論(Conclusion)。' },
                 { id: 'dt-tech-report', label: '📋 專業技術報告', domains: ['academic', 'tech', 'business'], prompt: '【輸出型式】：請產出「專業技術報告 (Technical Report)」。包含：執行摘要、背景說明、技術架構/方法分析、測試/實證數據、問題排解與最終建議。' },
                 { id: 'dt-notebooklm-ppt', label: '📑 簡報大綱架構', domains: ['charts', 'business', 'planning'], prompt: '【輸出型式】：請擔任簡報架構師與溝通策略專家，將資料轉化為結構化且可執行的簡報大綱。採用「問題與解決方案」敘事框架，將關鍵訊息流暢分配至 10 張投影片中。每頁需包含：標題、副標題、視覺化建議、講者備註。' },
-                { id: 'dt-mermaid-mindmap', label: '🧠 Mermaid 心智圖', domains: ['charts', 'tech', 'planning'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「心智圖 (Mindmap)」。從核心主題向外發散，至少包含 3 個層級的子節點。必須包覆在 ```mermaid 代碼區塊中。' },
+                { id: 'dt-mermaid-mindmap', label: '🧠 Mermaid 心智圖', domains: ['charts', 'tech', 'planning'], prompt: '【輸出型式】：請以 Mermaid.js 語法輸出「心智圖 (Mindmap)」。從核心主題向外發散，至少包含 3 個層級的子節點。必須包覆在 \\`\\`\\`mermaid 代碼區塊中。' },
                 { id: 'dt-podcast', label: '🎙️ Podcast 雙人對談腳本', domains: ['business', 'roleplay', 'academic'], prompt: '【輸出型式】：請撰寫一份生動的「雙人對談 Podcast 腳本」。包含主持人與專家的互動，語氣需自然、具啟發性，並適時加入口語化轉折與幽默感。' },
                 { id: 'dt-audit-report', label: '合約/文件檢核報告', domains: ['audit', 'business'], prompt: '【輸出型式】：請產出結構化的「文獻/條款檢核報告」。須列出：整體風險評估、不合理/缺失條款、具體修正與補充建議。' },
-                { id: 'dt-diff-table', label: '多文件差異對照表', domains: ['audit', 'tech', 'charts'], prompt: '【輸出型式】：請產出「多文件差異對照表」。以表格清晰比對各文件之間的共同點、矛盾點與重要差異維度。' },
+                { id: 'dt-diff-table', label: '多文件差異對照表', domains: ['audit', 'tech', 'charts', 'academic'], prompt: '【輸出型式】：請產出「多文件/文獻差異對照表」。以統一欄位表格清晰比對各文獻的作者、年份、理論、主要變項、方法、研究結果與限制。' },
                 { id: 'dt-course', label: '課程教案與綱要', domains: ['coaching', 'business'], prompt: '【輸出型式】：請產出專業的「課程設計大綱」。需包含：課程學習目標、模組化單元劃分、各單元教學活動建議與預估時間。' },
                 { id: 'dt-event-plan', label: '主題活動企劃書', domains: ['planning', 'business'], prompt: '【輸出型式】：請產出完整的「主題活動企劃書」。需包含：活動目的、目標受眾、核心亮點、流程規劃(Rundown)、預算評估與預期效益。' },
                 { id: 'dt-gamification', label: '遊戲化腳本設計', domains: ['planning', 'roleplay'], prompt: '【輸出型式】：請產出「遊戲化腳本」。包含：世界觀設定、任務機制、積分獎勵規則與玩家互動環節設計。' },
@@ -492,6 +528,10 @@
             action_types: [
                 { id: 'act-prof-analyze', label: '🕵️‍♂️ 教授命題慣性分析', domains: ['academic'], prompt: '【任務框架-命題慣性分析】：請分析我提供的上課錄音逐字稿或筆記。找出教授「語氣加重」、「重複提及」或特別強調「這會考」的片段，反向推導出必考考點，並說明教授的出題邏輯。' },
                 { id: 'act-strict-grounded', label: '📚 嚴格文獻萃取 (不幻想)', domains: ['charts', 'audit', 'academic'], prompt: '【任務框架-嚴格基於文獻】：請「完全且嚴格」基於我提供的參考文獻進行回答。絕對禁止使用外部知識庫或進行任何捏造 (Hallucination)。若文獻中找不到答案，請明確回答「文獻未提及」。' },
+                { id: 'act-ch14-deai', label: '🪄 去 AI 味與句型轉化', domains: ['academic', 'business'], prompt: '【任務框架-去除AI味與潤飾】：請指出段落中最像 AI 寫的部分（過度模板、虛胖、無轉折），調整句型多樣化並刪除冗詞。請將「名詞化表達」改為「動詞化用法」，加入自然的轉折句（如：然而、但值得注意的是）與適度反思，保持原意且不新增未提及的資料。' },
+                { id: 'act-ch14-falsify', label: '⚖️ 否證主義與客觀推論語氣', domains: ['academic'], prompt: '【任務框架-否證主義與學術語氣】：請檢查是否有過度絕對的「斷言語氣」，並將句子改寫為否證主義與客觀第三人稱學術語氣（如「本研究發現」）。請適度加入模態詞（可能、或許、傾向於）與推論動詞（支持 support / 顯示 indicate / 可能意味著 suggest / 推測 imply），避免主觀詞與誇大結論。' },
+                { id: 'act-ch14-cohesion', label: '🔗 段落重組與銜接診斷', domains: ['academic', 'business'], prompt: '【任務框架-段落重組與過渡銜接】：請在不改變原意的前提下重組段落（拆分長句、合併重複句），為每段段首補上摘要式「主題句」，並在段落間加入合適的銜接詞與過渡句（承接、對比、推論或退讓），強化「理論 → 變項 → 關係」的推論邏輯流動。' },
+                { id: 'act-ch14-apa7', label: '🏛️ 學術味五指標評估與APA7', domains: ['academic'], prompt: '【任務框架-學術味評估與引用】：請依「1.文獻引用、2.理論脈絡、3.推論語氣、4.邏輯連接、5.名詞精準度」五項指標評估段落並提出具體改寫建議。請標示可加入「文獻對話（支持、呼應、對比、延伸）」的位置並補上適當的 APA7 文獻引用格式（不可捏造文獻）。' },
                 { id: 'act-visual-logic', label: '🧩 複雜邏輯視覺化轉換', domains: ['charts', 'tech', 'planning', 'business'], prompt: '【任務框架-邏輯視覺化】：請深度解析文本，找出隱藏的因果關係、從屬架構或發展脈絡，並將這些抽象的「複雜邏輯」，轉換為最適合生成結構化圖表的代碼與描述。' },
                 { id: 'act-contract-check', label: '合約/條款漏洞檢核', domains: ['audit', 'business'], prompt: '【任務框架】：請交叉比對我提供的所有參考資料。找出邏輯矛盾、不合理或具潛在風險的條款，並提供具體的修正建議。' },
                 { id: 'act-doc-compare', label: '跨文件交叉比對', domains: ['audit', 'academic', 'tech', 'charts'], prompt: '【任務框架】：請仔細閱讀並記憶上述所有提供的文獻/資料。請進行交叉比對，找出各文件之間的「共同點」、「差異點」以及「潛在的衝突與矛盾」。' },
@@ -863,7 +903,7 @@
                 
                 if(titleEl && subjectTitleHeader && subjectTitleDesc) {
                     if(STATE.currentDomain === 'visual') {
-                        subjectTitleHeader.innerHTML = `<i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 第三步：你的核心目標是？(畫什麼？)`;
+                        subjectTitleHeader.innerHTML = `<i data-lucide="image" class="w-4 h-4 text-pink-500"></i> 第三步：輸入核心目標 (畫什麼？)`;
                         subjectTitleDesc.innerText = "請在此輸入您想要生成的畫面主體。";
                         titleEl.placeholder = "例如：幫我畫一隻在喝珍奶的柴犬...";
                     } else if (STATE.currentDomain === 'charts') {
@@ -1170,7 +1210,7 @@
                 },
                 {
                     target: '#step-2-files',
-                    title: '步驟 2：提供參考資料 (沒有可跳過)',
+                    title: '步驟 2：提供參考資料 (選填)',
                     text: '如果你有參考草稿、上課錄音檔或長篇 PDF，可以貼在這裡讓 AI 參考。AI 寫出來的東西才不會無中生有。'
                 },
                 {
@@ -1180,7 +1220,7 @@
                 },
                 {
                     target: '#step-4-params',
-                    title: '步驟 4：幫指令加料 (挑選條件)',
+                    title: '步驟 4：進階參數設定 (賦予細節)',
                     text: '接著，在下方點選你想要的「語氣」、「字數」或「排版」。不知道選什麼？點擊黃色的「🎲 沒靈感？幫我隨便配」也行！'
                 },
                 {
@@ -1417,6 +1457,10 @@
                     btn.className = "flex-1 sm:flex-none text-[14px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 whitespace-nowrap";
                     DOM.createIcon();
                 }
+                
+                // 隱藏快捷複製按鈕
+                const quickCopy = DOM.get('quick-copy-btn');
+                if(quickCopy) quickCopy.classList.add('hidden');
             }
 
             static getStructuredPromptStringWithoutNotes() {
@@ -1493,6 +1537,8 @@
                 const btn = DOM.get('generate-prompt-btn');
                 const out = DOM.get('prompt-output');
                 const empty = DOM.get('empty-state-msg');
+                const rightPanel = DOM.get('right-panel');
+                const quickCopyBtn = DOM.get('quick-copy-btn');
                 
                 if (!btn) return;
                 
@@ -1503,9 +1549,14 @@
                     return;
                 }
 
-                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 智能編譯中...';
+                btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 🧠 深度解析中...';
                 btn.disabled = true;
                 DOM.createIcon();
+                
+                // UX Auto-scroll for mobile devices
+                if(window.innerWidth < 1024 && rightPanel) {
+                    rightPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
 
                 try {
                     let systemInstructionText = "";
@@ -1535,6 +1586,8 @@
                         finalPrompt = finalPrompt.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
                         if (out) out.textContent = finalPrompt;
                         if (empty) empty.style.display = 'none';
+                        if (quickCopyBtn) quickCopyBtn.classList.remove('hidden');
+                        
                         STATE.isPromptOutdated = false;
                         StorageManager.saveHistory(finalPrompt);
                         UIManager.showToast('✨ 專業提示詞已智能編寫完成！', 'success');
@@ -1556,6 +1609,8 @@
                     
                     if (out) out.textContent = fallbackPrompt;
                     if (empty) empty.style.display = 'none';
+                    if (quickCopyBtn) quickCopyBtn.classList.remove('hidden');
+                    
                     STATE.isPromptOutdated = false;
                     StorageManager.saveHistory(fallbackPrompt);
                     
@@ -1590,7 +1645,7 @@
                 buttons.forEach(b => { if(b) b.disabled = true; });
                 const activeBtn = mode === 'extract' ? buttons[0] : (mode === 'detailed' ? buttons[1] : buttons[2]);
                 if (activeBtn) {
-                    activeBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 腦力激盪中...';
+                    activeBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 🧠 深度解析中...';
                     DOM.createIcon();
                 }
 
@@ -1666,10 +1721,12 @@
                 const out = DOM.get('prompt-output');
                 const empty = DOM.get('empty-state-msg');
                 const recs = DOM.get('ai-tool-recommendation');
+                const quickCopyBtn = DOM.get('quick-copy-btn');
                 
                 if (out) out.textContent = '';
                 if (empty) empty.style.display = 'flex';
                 if (recs) recs.classList.add('hidden'); 
+                if (quickCopyBtn) quickCopyBtn.classList.add('hidden');
                 
                 UIManager.updateSync();
                 TourManager.updateAssistantContext();
@@ -1724,7 +1781,7 @@
             UIManager.showToast('已重置所有選項', 'info');
         });
 
-        DOM.bind('copy-btn', 'click', () => {
+        const copyAction = (btnId) => {
             const out = DOM.get('prompt-output');
             if (!out || !out.textContent.trim()) {
                 UIManager.showToast('這裡空空的耶，請先點擊智能撰寫喔！', 'error');
@@ -1748,18 +1805,26 @@
                 const successful = document.execCommand('copy');
                 if (successful) {
                     UIManager.showToast('太棒了！已經幫你複製好了，趕快貼去 AI 工具吧！', 'success');
-                    const btn = DOM.get('copy-btn');
-                    const origHTML = btn.innerHTML;
-                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
-                    btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
-                    btn.classList.replace('hover:bg-indigo-500', 'hover:bg-emerald-400');
-                    DOM.createIcon();
-                    setTimeout(() => {
-                        btn.innerHTML = origHTML;
-                        btn.classList.replace('bg-emerald-500', 'bg-indigo-600');
-                        btn.classList.replace('hover:bg-emerald-400', 'hover:bg-indigo-500');
+                    const btn = DOM.get(btnId);
+                    if (btn) {
+                        const origHTML = btn.innerHTML;
+                        const origClasses = btn.className;
+                        
+                        if (btnId === 'copy-btn') {
+                            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已複製`;
+                            btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                            btn.classList.replace('hover:bg-indigo-500', 'hover:bg-emerald-400');
+                        } else {
+                            btn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-emerald-400"></i>`;
+                        }
+                        
                         DOM.createIcon();
-                    }, 2000);
+                        setTimeout(() => {
+                            btn.innerHTML = origHTML;
+                            btn.className = origClasses;
+                            DOM.createIcon();
+                        }, 2000);
+                    }
                 } else {
                     UIManager.showToast('複製失敗，請手動圈選複製', 'error');
                 }
@@ -1767,7 +1832,10 @@
                 UIManager.showToast('瀏覽器不支援，請手動複製', 'error');
             }
             document.body.removeChild(textArea);
-        });
+        };
+
+        DOM.bind('copy-btn', 'click', () => copyAction('copy-btn'));
+        DOM.bind('quick-copy-btn', 'click', () => copyAction('quick-copy-btn'));
 
         DOM.bind('download-btn', 'click', () => {
             const out = DOM.get('prompt-output');
@@ -1876,9 +1944,12 @@
             const out = DOM.get('prompt-output');
             const empty = DOM.get('empty-state-msg');
             const recs = DOM.get('ai-tool-recommendation');
+            const quickCopyBtn = DOM.get('quick-copy-btn');
+            
             if(out) out.textContent = '';
             if(empty) empty.style.display = 'flex';
             if(recs) recs.classList.add('hidden');
+            if(quickCopyBtn) quickCopyBtn.classList.add('hidden');
             
             UIManager.updateSync();
             closeModal();
