@@ -122,10 +122,13 @@
             <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                 <span class="bg-indigo-600 text-white px-2.5 py-0.5 rounded shadow-sm text-sm tracking-widest font-sans">啓仲</span>
                 AI 提示詞產生器
-                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 2.0 商業版</span>
+                <span class="hidden lg:inline-block text-[10px] bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ml-2">pro 1.0 商業版</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
+            <button id="api-key-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-100 hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm" title="設定專屬 API 金鑰">
+                <i data-lucide="key" class="w-4 h-4 text-amber-500"></i> 金鑰設定
+            </button>
             <button id="toggle-history-btn" class="hidden sm:flex text-[14px] text-slate-600 bg-slate-100 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200 items-center gap-1.5 font-bold transition-colors shadow-sm">
                 <i data-lucide="history" class="w-4 h-4 text-indigo-500"></i> 歷史庫
             </button>
@@ -381,27 +384,27 @@
         </div>
     </div>
 
+    <!-- API 金鑰設定 Modal -->
+    <div id="api-key-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+        <div class="bg-white rounded-2xl p-8 w-11/12 max-w-md shadow-2xl border border-slate-200 transform scale-95 transition-all duration-200 opacity-0 pointer-events-auto" id="api-key-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i data-lucide="key" class="w-5 h-5 text-amber-500"></i> 設定專屬 API 金鑰</h3>
+                <button id="close-api-modal-btn" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">
+                系統內建的免費金鑰可能因使用人數過多或官方限制而受阻。強烈建議您前往 <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-500 underline font-bold">Google AI Studio</a> 免費申請一把專屬金鑰，以獲得最穩定的連線品質。
+            </p>
+            <input type="password" id="custom-api-key-input" placeholder="請貼上您的 Gemini API Key (AIzaSy...)" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white transition-all text-[14px] mb-6 font-mono">
+            <div class="flex justify-end gap-3">
+                <button id="save-api-key-btn" class="w-full py-3 text-[15px] font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors shadow-md">儲存金鑰</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed top-20 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- =========================================
-         系統核心邏輯 (System Core Logic) pro 2.0
-         ========================================= -->
-    <script type="module">
-        // 1. 全域變數與防禦性函式優先宣告，防止 DOM is not defined
-        const DOM = {
-            get: (id) => document.getElementById(id),
-            getAll: (selector) => document.querySelectorAll(selector),
-            createIcon: () => { if (typeof lucide !== 'undefined') lucide.createIcons(); },
-            bind: (id, event, handler) => {
-                const el = DOM.get(id);
-                if (el) el.addEventListener(event, handler);
-            }
-        };
-
-        window.addEventListener('error', (e) => {
-            if (e.message && (e.message.includes('Script error') || e.message.includes('ResizeObserver'))) return;
-            console.error('🔥 [Global Error Captured]:', e.error);
-        });
+         系統核心邏輯 (System Core Logic) pro 1.0
         window.addEventListener('unhandledrejection', (e) => {
             console.error('🔥 [Unhandled Promise Rejection]:', e.reason);
         });
@@ -425,8 +428,8 @@
         const apiKey = ""; 
         const USER_API_KEY = "AIzaSyAAY4qBzfWU7UX6lHqqbaTNiw7s4ihY5C0";
 
-        // 2. 初始化資料庫
         const INITIAL_CONFIG = {
+            // 文字/圖表領域專屬
             data_types: [
                 // NotebookLM / 學術衝刺核心專區
                 { id: 'dt-nl-review', label: '📝 跨媒材核心複習筆記', domains: ['charts', 'academic', 'coaching'], prompt: '【輸出型式】：請根據我上傳的「上課筆記」、「錄音逐字稿」與「簡報（PPT）」進行交叉比對與整合。請整理出一份結構清晰的【單元核心複習筆記】。要求：1.【核心概念與定義】：列出最重要的專有名詞、公式或理論，白話解釋。2.【簡報與錄音對齊】：將簡報大綱與教授特別補充的細節結合（標註「教授補充」）。3.【觀念澄清】：如有容易搞混的觀念，請用對比表格說明。' },
@@ -658,21 +661,22 @@
         }
 
         // ==========================================
-        //  API 通訊層 (APIManager) 
+        //  API 通訊層 (API Manager) - 雙軌保證不崩潰
         // ==========================================
         class APIManager {
             static async callGemini(promptStr, base64Data = null, mimeType = 'image/jpeg', systemInstruction = null) {
+                // 優先使用使用者自行設定的金鑰，若無則使用內建金鑰
+                const savedKey = localStorage.getItem('roly_custom_api_key');
                 const isPreviewEnv = typeof __app_id !== 'undefined' || window.location.hostname.includes("usercontent.goog") || window.location.hostname.includes("csb.app");
-                const keyToUse = isPreviewEnv ? "" : USER_API_KEY.trim();
+                let keyToUse = isPreviewEnv && !savedKey ? "" : (savedKey || USER_API_KEY.trim());
                 
-                const modelsToTry = isPreviewEnv 
-                    ? ["gemini-2.5-flash-preview-09-2025"] 
-                    : [
-                        "gemini-2.5-flash", 
-                        "gemini-1.5-flash-latest", 
-                        "gemini-1.5-flash", 
-                        "gemini-1.5-pro-latest"
-                      ];
+                // 更穩定的廣泛模型 fallback 陣列
+                const modelsToTry = [
+                    "gemini-1.5-flash",
+                    "gemini-2.5-flash", 
+                    "gemini-1.5-pro",
+                    "gemini-1.5-flash-latest"
+                ];
                 
                 const parts = [{ text: promptStr }];
                 if (base64Data) {
@@ -720,13 +724,19 @@
                             return result.candidates[0].content.parts[0].text;
                         } catch (error) {
                             const errMsg = error.message.toLowerCase();
-                            if (errMsg.includes("api key not valid") || errMsg.includes("quota") || errMsg.includes("api_key_invalid")) {
-                                throw new Error(`API 金鑰無效或配額已滿，請確認金鑰設定。`);
+                            
+                            if (errMsg.includes("api key not valid") || errMsg.includes("quota") || errMsg.includes("api_key_invalid") || errMsg.includes("403") || errMsg.includes("400")) {
+                                lastErrorMsg = "API 金鑰無效、受限或配額已滿";
+                                // 觸發開啟 API 設定視窗
+                                if (window.openApiKeyModal) window.openApiKeyModal();
+                                throw new Error(`API 金鑰無效或配額已滿，請設定您的專屬金鑰。`);
                             }
+                            
                             if (errMsg.includes("not found") || errMsg.includes("not supported")) {
                                 lastErrorMsg = `模型 ${currentModel} 無法使用或沒有權限`;
                                 break; 
                             }
+                            
                             lastErrorMsg = error.message;
                             if (i < delays.length) {
                                 await new Promise(resolve => setTimeout(resolve, delays[i]));
@@ -1793,6 +1803,56 @@
                 DOM.get('modal-backdrop')?.classList.add('hidden');
             }, 200);
         };
+
+        // API 金鑰 Modal 邏輯
+        window.openApiKeyModal = () => {
+            const modal = DOM.get('api-key-modal');
+            const backdrop = DOM.get('modal-backdrop');
+            const content = DOM.get('api-key-content');
+            const input = DOM.get('custom-api-key-input');
+            if(modal && backdrop && content && input) {
+                input.value = localStorage.getItem('roly_custom_api_key') || '';
+                modal.classList.remove('hidden');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.replace('scale-95', 'scale-100');
+                    content.classList.replace('opacity-0', 'opacity-100');
+                    backdrop.classList.replace('opacity-0', 'opacity-100');
+                }, 10);
+            }
+        };
+
+        const closeApiKeyModal = () => {
+            const modal = DOM.get('api-key-modal');
+            const backdrop = DOM.get('modal-backdrop');
+            const content = DOM.get('api-key-content');
+            if(content && backdrop) {
+                content.classList.replace('scale-100', 'scale-95');
+                content.classList.replace('opacity-100', 'opacity-0');
+                backdrop.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => {
+                    if(modal) modal.classList.add('hidden');
+                    backdrop.classList.add('hidden');
+                }, 200);
+            }
+        };
+
+        DOM.bind('api-key-btn', 'click', window.openApiKeyModal);
+        DOM.bind('close-api-modal-btn', 'click', closeApiKeyModal);
+        DOM.bind('save-api-key-btn', 'click', () => {
+            const input = DOM.get('custom-api-key-input');
+            if (input) {
+                const newKey = input.value.trim();
+                if (newKey) {
+                    localStorage.setItem('roly_custom_api_key', newKey);
+                    UIManager.showToast('金鑰已儲存！請重新點擊生成。', 'success');
+                } else {
+                    localStorage.removeItem('roly_custom_api_key');
+                    UIManager.showToast('已恢復使用系統內建金鑰。', 'info');
+                }
+                closeApiKeyModal();
+            }
+        });
         
         DOM.bind('cancel-reset-btn', 'click', closeModal);
         DOM.bind('confirm-reset-btn', 'click', () => {
